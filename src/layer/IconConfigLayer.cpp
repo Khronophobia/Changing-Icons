@@ -38,7 +38,7 @@ bool IconConfigLayer::setup() {
     m_gamemodeBar->ignoreAnchorPointForPosition(false);
     m_gamemodeBar->setContentWidth(m_size.width - 40.f);
     m_gamemodeBar->setLayout(RowLayout::create()->setAxisAlignment(AxisAlignment::Even));
-    m_mainLayer->addChildAtPosition(m_gamemodeBar, Anchor::Center, ccp(0.f, 60.f));
+    m_mainLayer->addChildAtPosition(m_gamemodeBar, Anchor::Bottom, ccp(0.f, 52.f));
 
     auto cubeBtn = CCMenuItemToggler::create(
         CCSprite::createWithSpriteFrameName("gj_iconBtn_off_001.png"),
@@ -120,12 +120,12 @@ bool IconConfigLayer::setup() {
         menu_selector(IconConfigLayer::onVarToggle),
         0.7f
     );
-    m_buttonMenu->addChildAtPosition(m_randomBtn, Anchor::Left, ccp(40.f, 26.f));
+    m_buttonMenu->addChildAtPosition(m_randomBtn, Anchor::TopLeft, ccp(40.f, -44.f));
 
     auto randomText = CCLabelBMFont::create("Random", "bigFont.fnt");
     randomText->setAnchorPoint(ccp(0.f, 0.5f));
     randomText->setScale(0.5f);
-    m_mainLayer->addChildAtPosition(randomText, Anchor::Left, ccp(54.f, 26.f));
+    m_mainLayer->addChildAtPosition(randomText, Anchor::TopLeft, ccp(54.f, -44.f));
 
     auto randomInfoSpr = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
     randomInfoSpr->setScale(0.4f);
@@ -135,16 +135,49 @@ bool IconConfigLayer::setup() {
         menu_selector(IconConfigLayer::onVarInfo)
     );
     randomInfoBtn->setUserObject(CCString::create("Randomly select from entire icon kit instead of from the list below."));
-    m_buttonMenu->addChildAtPosition(randomInfoBtn, Anchor::Left, ccp(26.f, 40.f));
+    m_buttonMenu->addChildAtPosition(randomInfoBtn, Anchor::TopLeft, ccp(26.f, -30.f));
 
     auto iconListBG = CCLayerColor::create({0, 0, 0, 95});
     iconListBG->setAnchorPoint(ccp(1.f, 0.5f));
     iconListBG->ignoreAnchorPointForPosition(false);
     iconListBG->setContentSize(ccp(170.f, 170.f));
-    m_mainLayer->addChildAtPosition(iconListBG, Anchor::Right, ccp(-20.f, -45.f));
+    m_mainLayer->addChildAtPosition(iconListBG, Anchor::Right, ccp(-20.f, 20.f));
 
     m_iconList = ScrollLayer::create(iconListBG->getContentSize());
     iconListBG->addChild(m_iconList);
+
+    m_iconOrderLabel = CCLabelBMFont::create(
+        m_iconOrderList.at(static_cast<int>(m_globalConfig.order)).c_str(),
+        "bigFont.fnt"
+    );
+    m_iconOrderLabel->setScale(0.6f);
+    m_mainLayer->addChildAtPosition(m_iconOrderLabel, Anchor::Bottom, ccp(0.f, 16.f));
+
+    auto iconOrderRArrowSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png");
+    iconOrderRArrowSpr->setScale(0.5f);
+    iconOrderRArrowSpr->setFlipX(true);
+    auto iconOrderRArrowBtn = CCMenuItemSpriteExtra::create(
+        iconOrderRArrowSpr,
+        this,
+        menu_selector(IconConfigLayer::onOrderArrow)
+    );
+    iconOrderRArrowBtn->setTag(1);
+
+    auto iconOrderLArrowSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png");
+    iconOrderLArrowSpr->setScale(0.5f);
+    auto iconOrderLArrowBtn = CCMenuItemSpriteExtra::create(
+        iconOrderLArrowSpr,
+        this,
+        menu_selector(IconConfigLayer::onOrderArrow)
+    );
+    iconOrderLArrowBtn->setTag(-1);
+
+    m_buttonMenu->addChildAtPosition(iconOrderRArrowBtn, Anchor::Bottom, ccp(60.f, 16.f));
+    m_buttonMenu->addChildAtPosition(iconOrderLArrowBtn, Anchor::Bottom, ccp(-60.f, 16.f));
+
+    auto iconOrderText = CCLabelBMFont::create("Icon Order", "goldFont.fnt");
+    iconOrderText->setScale(0.5f);
+    m_mainLayer->addChildAtPosition(iconOrderText, Anchor::Bottom, ccp(0.f, 30.f));
 
     IconConfigLayer::refreshTab();
 
@@ -212,7 +245,20 @@ void IconConfigLayer::onVarToggle(CCObject* sender) {
     }
 }
 
+void IconConfigLayer::onOrderArrow(CCObject* sender) {
+    int choiceTemp = static_cast<int>(m_globalConfig.order) + sender->getTag();
+    log::debug("Choice was going to be: {}", choiceTemp);
+    if (choiceTemp < 0)
+        choiceTemp = m_iconOrderList.size() - 1;
+    else if (choiceTemp >= m_iconOrderList.size())
+        choiceTemp = 0;
+    m_iconOrderLabel->setString(m_iconOrderList.at(choiceTemp).c_str());
+    log::debug("Choice set to: {}", choiceTemp);
+    m_globalConfig.order = static_cast<IconOrder>(choiceTemp);
+}
+
 IconConfigLayer::~IconConfigLayer() {
+    log::debug("Saving config.");
     Mod::get()->setSavedValue("global", m_globalConfig);
     Mod::get()->setSavedValue("cube", m_cubeConfig);
     Mod::get()->setSavedValue("ship", m_shipConfig);

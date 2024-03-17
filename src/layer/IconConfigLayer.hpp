@@ -19,6 +19,8 @@ namespace changing_icons {
         IconConfigData m_spiderConfig;
         IconConfigData m_swingConfig;
         IconConfigData m_jetpackConfig;
+        std::vector<std::string> const m_iconOrderList{"Random", "Down", "Up"};
+        cocos2d::CCLabelBMFont* m_iconOrderLabel;
         bool setup();
         void refreshTab();
         ~IconConfigLayer();
@@ -28,5 +30,6 @@ namespace changing_icons {
         void onSwitchTab(CCObject*);
         void onVarInfo(CCObject*);
         void onVarToggle(CCObject*);
+        void onOrderArrow(CCObject*);
     };
 }
