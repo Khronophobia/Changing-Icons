@@ -2,6 +2,7 @@
 #include <Geode/Enums.hpp>
 #include "IconConfigLayer.hpp"
 #include "../class/CIVariableRef.hpp"
+#include "../class/IconCell.hpp"
 
 using namespace geode::prelude;
 using namespace changing_icons;
@@ -17,16 +18,6 @@ IconConfigLayer* IconConfigLayer::create() {
 }
 
 bool IconConfigLayer::setup() {
-    m_noElasticity = true;
-    m_activeTab = IconType::Cube;
-    this->setTitle("Changing Icons Config");
-
-    m_gamemodeBar = CCMenu::create();
-    m_gamemodeBar->ignoreAnchorPointForPosition(false);
-    m_gamemodeBar->setContentWidth(m_size.width - 40.f);
-    m_gamemodeBar->setLayout(RowLayout::create()->setAxisAlignment(AxisAlignment::Even));
-    m_mainLayer->addChildAtPosition(m_gamemodeBar, Anchor::Center, ccp(0.f, 90.f));
-
     // Config
     m_globalConfig = Mod::get()->getSavedValue<GlobalConfigData>("global");
     m_cubeConfig = Mod::get()->getSavedValue<IconConfigData>("cube");
@@ -39,6 +30,16 @@ bool IconConfigLayer::setup() {
     m_swingConfig = Mod::get()->getSavedValue<IconConfigData>("swing");
     m_jetpackConfig = Mod::get()->getSavedValue<IconConfigData>("jetpack");
 
+    m_noElasticity = true;
+    m_currentTab = m_globalConfig.currentTab;
+    this->setTitle("Changing Icons Config");
+
+    m_gamemodeBar = CCMenu::create();
+    m_gamemodeBar->ignoreAnchorPointForPosition(false);
+    m_gamemodeBar->setContentWidth(m_size.width - 40.f);
+    m_gamemodeBar->setLayout(RowLayout::create()->setAxisAlignment(AxisAlignment::Even));
+    m_mainLayer->addChildAtPosition(m_gamemodeBar, Anchor::Center, ccp(0.f, 60.f));
+
     auto cubeBtn = CCMenuItemToggler::create(
         CCSprite::createWithSpriteFrameName("gj_iconBtn_off_001.png"),
         CCSprite::createWithSpriteFrameName("gj_iconBtn_on_001.png"),
@@ -46,8 +47,6 @@ bool IconConfigLayer::setup() {
         menu_selector(IconConfigLayer::onSwitchTab)
     );
     cubeBtn->setTag(0);
-    cubeBtn->toggle(true);
-    cubeBtn->setEnabled(false);
     auto shipBtn = CCMenuItemToggler::create(
         CCSprite::createWithSpriteFrameName("gj_shipBtn_off_001.png"),
         CCSprite::createWithSpriteFrameName("gj_shipBtn_on_001.png"),
@@ -121,20 +120,39 @@ bool IconConfigLayer::setup() {
         menu_selector(IconConfigLayer::onVarToggle),
         0.7f
     );
-    m_randomBtn->toggle(m_cubeConfig.random);
-    m_randomBtn->setUserObject(CIVariableRef<bool>::create(m_cubeConfig.random));
-    m_buttonMenu->addChildAtPosition(m_randomBtn, Anchor::Left, ccp(40.f, 56.f));
+    m_buttonMenu->addChildAtPosition(m_randomBtn, Anchor::Left, ccp(40.f, 26.f));
 
     auto randomText = CCLabelBMFont::create("Random", "bigFont.fnt");
     randomText->setAnchorPoint(ccp(0.f, 0.5f));
     randomText->setScale(0.5f);
-    m_mainLayer->addChildAtPosition(randomText, Anchor::Left, ccp(54.f, 56.f));
+    m_mainLayer->addChildAtPosition(randomText, Anchor::Left, ccp(54.f, 26.f));
+
+    auto randomInfoSpr = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
+    randomInfoSpr->setScale(0.4f);
+    auto randomInfoBtn = CCMenuItemSpriteExtra::create(
+        randomInfoSpr,
+        this,
+        menu_selector(IconConfigLayer::onVarInfo)
+    );
+    randomInfoBtn->setUserObject(CCString::create("Randomly select from entire icon kit instead of from the list below."));
+    m_buttonMenu->addChildAtPosition(randomInfoBtn, Anchor::Left, ccp(26.f, 40.f));
+
+    auto iconListBG = CCLayerColor::create({0, 0, 0, 95});
+    iconListBG->setAnchorPoint(ccp(1.f, 0.5f));
+    iconListBG->ignoreAnchorPointForPosition(false);
+    iconListBG->setContentSize(ccp(170.f, 170.f));
+    m_mainLayer->addChildAtPosition(iconListBG, Anchor::Right, ccp(-20.f, -45.f));
+
+    m_iconList = ScrollLayer::create(iconListBG->getContentSize());
+    iconListBG->addChild(m_iconList);
+
+    IconConfigLayer::refreshTab();
 
     return true;
 }
 
-IconConfigData& IconConfigLayer::getCurrentConfig(IconType activeTab) {
-    switch (activeTab) {
+IconConfigData& IconConfigLayer::getCurrentConfig(IconType currentTab) {
+    switch (currentTab) {
         default:
         case IconType::Cube: return m_cubeConfig;
         case IconType::Ship: return m_shipConfig;
@@ -149,8 +167,14 @@ IconConfigData& IconConfigLayer::getCurrentConfig(IconType activeTab) {
 }
 
 void IconConfigLayer::onSwitchTab(CCObject* sender) {
+    m_currentTab = static_cast<IconType>(sender->getTag());
+    m_globalConfig.currentTab = m_currentTab;
+    IconConfigLayer::refreshTab();
+}
+
+void IconConfigLayer::refreshTab() {
     for (auto btn : CCArrayExt<CCMenuItemToggler*>(m_gamemodeBar->getChildren())) {
-        if (btn == sender) {
+        if (btn->getTag() == static_cast<int>(m_currentTab)) {
             btn->setEnabled(false);
             btn->toggle(true);
             continue;
@@ -158,11 +182,20 @@ void IconConfigLayer::onSwitchTab(CCObject* sender) {
         btn->setEnabled(true);
         btn->toggle(false);
     }
-    m_activeTab = static_cast<IconType>(sender->getTag());
 
-    auto& currentConfig = IconConfigLayer::getCurrentConfig(m_activeTab);
+    auto& currentConfig = IconConfigLayer::getCurrentConfig(m_currentTab);
     m_randomBtn->toggle(currentConfig.random);
     m_randomBtn->setUserObject(CIVariableRef<bool>::create(currentConfig.random));
+}
+
+void IconConfigLayer::onVarInfo(CCObject* sender) {
+    auto obj = static_cast<CCNode*>(sender)->getUserObject();
+    auto infoStr = static_cast<CCString*>(obj)->getCString();
+    FLAlertLayer::create(
+        "Info",
+        infoStr,
+        "OK"
+    )->show();
 }
 
 /* void IconConfigLayer::onRandomToggle(CCObject* sender) {
@@ -179,7 +212,7 @@ void IconConfigLayer::onVarToggle(CCObject* sender) {
     }
 }
 
-void IconConfigLayer::onClose(CCObject* sender) {
+IconConfigLayer::~IconConfigLayer() {
     Mod::get()->setSavedValue("global", m_globalConfig);
     Mod::get()->setSavedValue("cube", m_cubeConfig);
     Mod::get()->setSavedValue("ship", m_shipConfig);
@@ -190,5 +223,4 @@ void IconConfigLayer::onClose(CCObject* sender) {
     Mod::get()->setSavedValue("spider", m_spiderConfig);
     Mod::get()->setSavedValue("swing", m_swingConfig);
     Mod::get()->setSavedValue("jetpack", m_jetpackConfig);
-    Popup::onClose(sender);
 }

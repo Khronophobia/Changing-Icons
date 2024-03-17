@@ -1,6 +1,9 @@
 {
 	"geode": "2.0.0-beta.21",
-	"gd": "2.204",
+	"gd": {
+		"win": "2.204",
+		"android": "2.205"
+	},
 	"version": "v1.0.0",
 	"id": "khronophobia.changing_icons",
 	"name": "Changing Icons",
@@ -10,5 +13,12 @@
 		"sprites": [
 			"resources/*.png"
 		]
-	}
+	},
+	"dependencies": [
+		{
+			"id": "geode.node-ids",
+			"importance": "required",
+			"version": ">=v1.8.0"
+		}
+	]
 }

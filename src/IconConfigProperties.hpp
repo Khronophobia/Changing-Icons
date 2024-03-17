@@ -15,6 +15,7 @@ namespace changing_icons {
     };
 
     struct GlobalConfigData {
+        IconType currentTab = IconType::Cube;
         IconOrder order = IconOrder::Random;
     };
 
@@ -22,15 +23,38 @@ namespace changing_icons {
         std::vector<IconProperties> iconSet;
         bool random;
     };
+
+    namespace utils {
+        template<typename T>
+        T tryGetJsonValue(matjson::Value const& value, std::string_view key, T defaultVar) {
+            return value.contains(key) ? value[key].as<T>() : defaultVar;
+        }
+        template<typename T, typename A>
+        T tryGetJsonValue(matjson::Value const& value, std::string_view key, T defaultVar) {
+            return value.contains(key) ? static_cast<T>(value[key].as<A>()) : defaultVar;
+        }
+    }
 }
 
 template<>
 struct matjson::Serialize<changing_icons::IconProperties> {
     static changing_icons::IconProperties from_json(matjson::Value const& value) {
         return changing_icons::IconProperties {
-            .iconID = value["ID"].as_int(),
-            .color1 = value["color1"].as<std::optional<cocos2d::ccColor3B>>(),
-            .color2 = value["color2"].as<std::optional<cocos2d::ccColor3B>>()
+            .iconID = changing_icons::utils::tryGetJsonValue<int>(
+                value,
+                "ID",
+                changing_icons::IconProperties().iconID
+            ),
+            .color1 = changing_icons::utils::tryGetJsonValue<std::optional<cocos2d::ccColor3B>>(
+                value,
+                "color1",
+                changing_icons::IconProperties().color1
+            ),
+            .color2 = changing_icons::utils::tryGetJsonValue<std::optional<cocos2d::ccColor3B>>(
+                value,
+                "color2",
+                changing_icons::IconProperties().color2
+            )
         };
     }
     static matjson::Value to_json(changing_icons::IconProperties const& value) {
@@ -49,11 +73,21 @@ template<>
 struct matjson::Serialize<changing_icons::GlobalConfigData> {
     static changing_icons::GlobalConfigData from_json(matjson::Value const& value) {
         return changing_icons::GlobalConfigData {
-            .order = static_cast<changing_icons::IconOrder>(value["icon-order"].as_int())
+            .currentTab = changing_icons::utils::tryGetJsonValue<IconType, int>(
+                value,
+                "current-tab",
+                changing_icons::GlobalConfigData().currentTab
+            ),
+            .order = changing_icons::utils::tryGetJsonValue<changing_icons::IconOrder, int>(
+                value,
+                "icon-order",
+                changing_icons::GlobalConfigData().order
+            )
         };
     }
     static matjson::Value to_json(changing_icons::GlobalConfigData const& value) {
         auto obj = matjson::Object();
+        obj["current-tab"] = static_cast<int>(value.currentTab);
         obj["icon-order"] = static_cast<int>(value.order);
         return obj;
     }
@@ -66,8 +100,16 @@ template<>
 struct matjson::Serialize<changing_icons::IconConfigData> {
     static changing_icons::IconConfigData from_json(matjson::Value const& value) {
         return changing_icons::IconConfigData {
-            .iconSet = value["icon-set"].as<std::vector<changing_icons::IconProperties>>(),
-            .random = value["random"].as_bool()
+            .iconSet = changing_icons::utils::tryGetJsonValue<std::vector<changing_icons::IconProperties>>(
+                value,
+                "icon-set",
+                changing_icons::IconConfigData().iconSet
+            ),
+            .random = changing_icons::utils::tryGetJsonValue<bool>(
+                value,
+                "random",
+                changing_icons::IconConfigData().random
+            )
         };
     }
     static matjson::Value to_json(changing_icons::IconConfigData const& value) {

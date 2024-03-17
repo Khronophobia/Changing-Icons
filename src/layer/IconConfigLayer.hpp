@@ -5,9 +5,9 @@
 namespace changing_icons {
     class IconConfigLayer : public geode::Popup<> {
     protected:
-        IconType m_activeTab;
+        IconType m_currentTab;
         cocos2d::CCMenu* m_gamemodeBar;
-        cocos2d::CCLayerColor* m_iconList;
+        geode::ScrollLayer* m_iconList;
         CCMenuItemToggler* m_randomBtn;
         GlobalConfigData m_globalConfig;
         IconConfigData m_cubeConfig;
@@ -20,11 +20,13 @@ namespace changing_icons {
         IconConfigData m_swingConfig;
         IconConfigData m_jetpackConfig;
         bool setup();
+        void refreshTab();
+        ~IconConfigLayer();
     public:
         static IconConfigLayer* create();
-        IconConfigData& getCurrentConfig(IconType activeTab);
+        IconConfigData& getCurrentConfig(IconType currentTab);
         void onSwitchTab(CCObject*);
+        void onVarInfo(CCObject*);
         void onVarToggle(CCObject*);
-        void onClose(CCObject*);
     };
 }
