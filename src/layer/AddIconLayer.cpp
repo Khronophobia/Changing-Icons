@@ -74,6 +74,7 @@ bool AddIconLayer::setup(
             ->setCrossAxisOverflow(true)
     );
 
+    // Setup icons
     for (size_t i = 1; i <= AddIconLayer::getIconCount(); i++) {
         auto iconSpr = GJItemIcon::createBrowserItem(convertIconType(m_iconType), i);
         auto iconBtn = CCMenuItemSpriteExtra::create(
@@ -88,7 +89,7 @@ bool AddIconLayer::setup(
 
     auto contentHeight = std::max<int>(
         m_iconList->getContentHeight() + 10.f,
-        iconScrollLayer->m_contentLayer->getContentHeight()
+        iconScrollLayer->getContentHeight()
     );
     iconScrollLayer->m_contentLayer->setContentHeight(contentHeight);
     iconScrollLayer->m_contentLayer->addChildAtPosition(
@@ -152,27 +153,93 @@ bool AddIconLayer::setup(
     color1ListBg->setContentSize(ccp(90.f, 160.f));
     m_mainLayer->addChildAtPosition(color1ListBg, Anchor::Center, ccp(50.f, -10.f));
 
+    auto color1ScrollLayer = ScrollLayer::create(color1ListBg->getContentSize());
+    color1ListBg->addChild(color1ScrollLayer);
+
+    auto color1Menu = CCMenu::create();
+    color1Menu->ignoreAnchorPointForPosition(false);
+    color1Menu->setContentWidth(80.f);
+    color1Menu->setLayout(
+        RowLayout::create()
+            ->setAxisAlignment(AxisAlignment::Start)
+            ->setGap(4.f)
+            ->setGrowCrossAxis(true)
+            ->setCrossAxisOverflow(true)
+    );
+
     auto color2ListBg = CCLayerColor::create({0, 0, 0, 95});
     color2ListBg->ignoreAnchorPointForPosition(false);
     color2ListBg->setContentSize(ccp(90.f, 160.f));
     m_mainLayer->addChildAtPosition(color2ListBg, Anchor::Center, ccp(155.f, -10.f));
 
+    auto color2ScrollLayer = ScrollLayer::create(color2ListBg->getContentSize());
+    color2ListBg->addChild(color2ScrollLayer);
+
+    auto color2Menu = CCMenu::create();
+    color2Menu->ignoreAnchorPointForPosition(false);
+    color2Menu->setContentWidth(80.f);
+    color2Menu->setLayout(
+        RowLayout::create()
+            ->setAxisAlignment(AxisAlignment::Start)
+            ->setGap(4.f)
+            ->setGrowCrossAxis(true)
+            ->setCrossAxisOverflow(true)
+    );
+
+    // Setup colors
+    for (size_t i = 0; i <= constants::COLOR_COUNT; i++) {
+        auto color1Spr = ColorChannelSprite::create();
+        color1Spr->setColor(GameManager::get()->colorForIdx(i));
+        color1Spr->setScale(0.7f);
+        auto color1Btn = CCMenuItemSpriteExtra::create(
+            color1Spr,
+            this,
+            menu_selector(AddIconLayer::onColor)
+        );
+        color1Btn->setTag(i);
+        color1Menu->addChild(color1Btn);
+
+        auto color2Spr = ColorChannelSprite::create();
+        color2Spr->setColor(GameManager::get()->colorForIdx(i));
+        color2Spr->setScale(0.7f);
+        auto color2Btn = CCMenuItemSpriteExtra::create(
+            color2Spr,
+            this,
+            menu_selector(AddIconLayer::onSecondColor)
+        );
+        color2Btn->setTag(i);
+        color2Menu->addChild(color2Btn);
+    }
+    color1Menu->updateLayout();
+    color2Menu->updateLayout();
+
+    auto colorContentHeight = std::max<float>(
+        color1Menu->getContentHeight() + 10.f,
+        color1ScrollLayer->getContentHeight()
+    );
+    color1ScrollLayer->m_contentLayer->setContentHeight(colorContentHeight);
+    color2ScrollLayer->m_contentLayer->setContentHeight(colorContentHeight);
+
+    color1ScrollLayer->m_contentLayer->addChildAtPosition(
+        color1Menu,
+        Anchor::Top,
+        ccp(0.f, -color1Menu->getContentHeight() / 2 - 5.f),
+        false
+    );
+    color2ScrollLayer->m_contentLayer->addChildAtPosition(
+        color2Menu,
+        Anchor::Top,
+        ccp(0.f, -color2Menu->getContentHeight() / 2 - 5.f),
+        false
+    );
+    color1ScrollLayer->moveToTop();
+    color2ScrollLayer->moveToTop();
+
     return true;
 }
 
 size_t AddIconLayer::getIconCount() const {
-    switch (m_iconType) {
-        default:
-        case IconType::Cube: return constants::CUBE_COUNT;
-        case IconType::Ship: return constants::SHIP_COUNT;
-        case IconType::Ball: return constants::BALL_COUNT;
-        case IconType::Ufo: return constants::BIRD_COUNT;
-        case IconType::Wave: return constants::DART_COUNT;
-        case IconType::Robot: return constants::ROBOT_COUNT;
-        case IconType::Spider: return constants::SPIDER_COUNT;
-        case IconType::Swing: return constants::SWING_COUNT;
-        case IconType::Jetpack: return constants::JETPACK_COUNT;
-    }
+    return GameManager::get()->countForType(m_iconType);
 }
 
 UnlockType AddIconLayer::convertIconType(IconType type) {
@@ -202,16 +269,20 @@ void AddIconLayer::updateIconColors() {
     if (m_selectedIcon.color1) {
         m_color1Label->setString("1");
         m_color1Display->setColor(m_selectedIcon.color1.value());
+        m_iconDisplay->setColor(m_selectedIcon.color1.value());
     } else {
         m_color1Label->setString("1U");
         m_color1Display->setColor(GameManager::get()->colorForIdx(17));
+        m_iconDisplay->setColor(GameManager::get()->colorForIdx(17));
     }
     if (m_selectedIcon.color2) {
         m_color2Label->setString("2");
         m_color2Display->setColor(m_selectedIcon.color2.value());
+        m_iconDisplay->setSecondColor(m_selectedIcon.color2.value());
     } else {
         m_color2Label->setString("2U");
         m_color2Display->setColor(GameManager::get()->colorForIdx(12));
+        m_iconDisplay->setSecondColor(GameManager::get()->colorForIdx(12));
     }
  }
 
