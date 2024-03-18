@@ -27,7 +27,9 @@ namespace changing_icons {
         void setOrderChoice(IconOrder choice);
         void setOrderChoice(int choice);
         ~IconConfigLayer();
+        static inline IconConfigLayer* m_instance = nullptr;
     public:
+        static IconConfigLayer* getInstance();
         static IconConfigLayer* create();
         IconConfigData& getCurrentConfig(IconType currentTab);
         void onSwitchTab(CCObject*);

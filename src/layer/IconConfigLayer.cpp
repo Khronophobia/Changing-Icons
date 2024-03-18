@@ -7,6 +7,10 @@
 using namespace geode::prelude;
 using namespace changing_icons;
 
+IconConfigLayer* IconConfigLayer::getInstance() {
+    return m_instance;
+}
+
 IconConfigLayer* IconConfigLayer::create() {
     auto ret = new IconConfigLayer();
     if (ret && ret->initAnchored(400.f, 280.f)) {
@@ -18,6 +22,7 @@ IconConfigLayer* IconConfigLayer::create() {
 }
 
 bool IconConfigLayer::setup() {
+    m_instance = this;
     // Config
     m_globalConfig = Mod::get()->getSavedValue<GlobalConfigData>("global");
     m_cubeConfig = Mod::get()->getSavedValue<IconConfigData>("cube");
@@ -313,6 +318,7 @@ void IconConfigLayer::setOrderChoice(int choice) {
 }
 
 IconConfigLayer::~IconConfigLayer() {
+    m_instance = nullptr;
     log::debug("Saving config.");
     Mod::get()->setSavedValue("global", m_globalConfig);
     Mod::get()->setSavedValue("cube", m_cubeConfig);
