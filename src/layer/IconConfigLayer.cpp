@@ -38,7 +38,7 @@ bool IconConfigLayer::setup() {
     m_gamemodeBar->ignoreAnchorPointForPosition(false);
     m_gamemodeBar->setContentWidth(m_size.width - 40.f);
     m_gamemodeBar->setLayout(RowLayout::create()->setAxisAlignment(AxisAlignment::Even));
-    m_mainLayer->addChildAtPosition(m_gamemodeBar, Anchor::Bottom, ccp(0.f, 52.f));
+    m_mainLayer->addChildAtPosition(m_gamemodeBar, Anchor::Bottom, ccp(0.f, 25.f));
 
     auto cubeBtn = CCMenuItemToggler::create(
         CCSprite::createWithSpriteFrameName("gj_iconBtn_off_001.png"),
@@ -159,11 +159,11 @@ bool IconConfigLayer::setup() {
     iconListBG->addChild(m_iconList);
 
     m_iconOrderLabel = CCLabelBMFont::create(
-        m_iconOrderList.at(static_cast<int>(m_globalConfig.order)).c_str(),
+        "",
         "bigFont.fnt"
     );
     m_iconOrderLabel->setScale(0.6f);
-    m_mainLayer->addChildAtPosition(m_iconOrderLabel, Anchor::Bottom, ccp(0.f, 16.f));
+    m_mainLayer->addChildAtPosition(m_iconOrderLabel, Anchor::TopLeft, ccp(110.f, -80.f));
 
     auto iconOrderRArrowSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png");
     iconOrderRArrowSpr->setScale(0.5f);
@@ -184,15 +184,46 @@ bool IconConfigLayer::setup() {
     );
     iconOrderLArrowBtn->setTag(-1);
 
-    m_buttonMenu->addChildAtPosition(iconOrderRArrowBtn, Anchor::Bottom, ccp(60.f, 16.f));
-    m_buttonMenu->addChildAtPosition(iconOrderLArrowBtn, Anchor::Bottom, ccp(-60.f, 16.f));
+    m_buttonMenu->addChildAtPosition(iconOrderRArrowBtn, Anchor::TopLeft, ccp(170.f, -80.f));
+    m_buttonMenu->addChildAtPosition(iconOrderLArrowBtn, Anchor::TopLeft, ccp(50.f, -80.f));
 
-    auto iconOrderText = CCLabelBMFont::create("Icon Order", "goldFont.fnt");
-    iconOrderText->setScale(0.5f);
-    m_mainLayer->addChildAtPosition(iconOrderText, Anchor::Bottom, ccp(0.f, 30.f));
+    auto iconOrderTitle = CCLabelBMFont::create("Icon Order", "goldFont.fnt");
+    iconOrderTitle->setScale(0.5f);
+    m_mainLayer->addChildAtPosition(iconOrderTitle, Anchor::TopLeft, ccp(110.f, -65.f));
+
+    auto iconListMenu = CCMenu::create();
+    iconListMenu->ignoreAnchorPointForPosition(false);
+    iconListMenu->setAnchorPoint(ccp(1.f, 0.5f));
+    iconListMenu->setContentSize(ccp(160.f, 32.f));
+    iconListMenu->setLayout(
+        RowLayout::create()
+            ->setAxisAlignment(AxisAlignment::Even)
+            ->setCrossAxisOverflow(false)
+    );
+    m_mainLayer->addChildAtPosition(iconListMenu, Anchor::Right, ccp(-20.f, -83.f));
+
+    auto iconListAddBtn = CCMenuItemSpriteExtra::create(
+        CCSprite::createWithSpriteFrameName("GJ_plusBtn_001.png"),
+        this,
+        nullptr
+    );
+    auto iconListClearBtn = CCMenuItemSpriteExtra::create(
+        CCSprite::createWithSpriteFrameName("GJ_closeBtn_001.png"),
+        this,
+        nullptr
+    );
+    auto iconListSaveBtn = CCMenuItemSpriteExtra::create(
+        CCSprite::createWithSpriteFrameName("GJ_duplicateBtn_001.png"),
+        this,
+        nullptr
+    );
+
+    iconListMenu->addChild(iconListAddBtn);
+    iconListMenu->addChild(iconListSaveBtn);
+    iconListMenu->addChild(iconListClearBtn);
+    iconListMenu->updateLayout();
 
     IconConfigLayer::refreshTab();
-
     return true;
 }
 
@@ -233,6 +264,8 @@ void IconConfigLayer::refreshTab() {
     m_randomBtn->setUserObject(CIVariableRef<bool>::create(currentConfig.random));
     m_disableBtn->toggle(currentConfig.disabled);
     m_disableBtn->setUserObject(CIVariableRef<bool>::create(currentConfig.disabled));
+
+    IconConfigLayer::setOrderChoice(currentConfig.order);
 }
 
 void IconConfigLayer::onVarInfo(CCObject* sender) {
@@ -260,15 +293,23 @@ void IconConfigLayer::onVarToggle(CCObject* sender) {
 }
 
 void IconConfigLayer::onOrderArrow(CCObject* sender) {
-    int choiceTemp = static_cast<int>(m_globalConfig.order) + sender->getTag();
-    log::debug("Choice was going to be: {}", choiceTemp);
+    auto& currentConfig = IconConfigLayer::getCurrentConfig(m_currentTab);
+    int choiceTemp = static_cast<int>(currentConfig.order) + sender->getTag();
     if (choiceTemp < 0)
         choiceTemp = m_iconOrderList.size() - 1;
     else if (choiceTemp >= m_iconOrderList.size())
         choiceTemp = 0;
-    m_iconOrderLabel->setString(m_iconOrderList.at(choiceTemp).c_str());
-    log::debug("Choice set to: {}", choiceTemp);
-    m_globalConfig.order = static_cast<IconOrder>(choiceTemp);
+
+    IconConfigLayer::setOrderChoice(choiceTemp);
+    currentConfig.order = static_cast<IconOrder>(choiceTemp);
+}
+
+void IconConfigLayer::setOrderChoice(IconOrder choice) {
+    m_iconOrderLabel->setString(m_iconOrderList.at(static_cast<int>(choice)).c_str());
+}
+
+void IconConfigLayer::setOrderChoice(int choice) {
+    m_iconOrderLabel->setString(m_iconOrderList.at(choice).c_str());
 }
 
 IconConfigLayer::~IconConfigLayer() {

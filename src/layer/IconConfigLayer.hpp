@@ -24,6 +24,8 @@ namespace changing_icons {
         cocos2d::CCLabelBMFont* m_iconOrderLabel;
         bool setup();
         void refreshTab();
+        void setOrderChoice(IconOrder choice);
+        void setOrderChoice(int choice);
         ~IconConfigLayer();
     public:
         static IconConfigLayer* create();

@@ -16,11 +16,11 @@ namespace changing_icons {
 
     struct GlobalConfigData {
         IconType currentTab = IconType::Cube;
-        IconOrder order = IconOrder::Random;
     };
 
     struct IconConfigData {
         std::vector<IconProperties> iconSet;
+        IconOrder order = IconOrder::Random;
         bool random;
         bool disabled;
     };
@@ -78,18 +78,12 @@ struct matjson::Serialize<changing_icons::GlobalConfigData> {
                 value,
                 "current-tab",
                 changing_icons::GlobalConfigData().currentTab
-            ),
-            .order = changing_icons::utils::tryGetJsonValue<changing_icons::IconOrder, int>(
-                value,
-                "icon-order",
-                changing_icons::GlobalConfigData().order
             )
         };
     }
     static matjson::Value to_json(changing_icons::GlobalConfigData const& value) {
         auto obj = matjson::Object();
         obj["current-tab"] = static_cast<int>(value.currentTab);
-        obj["icon-order"] = static_cast<int>(value.order);
         return obj;
     }
     static bool is_json(matjson::Value const& value) {
@@ -106,6 +100,11 @@ struct matjson::Serialize<changing_icons::IconConfigData> {
                 "icon-set",
                 changing_icons::IconConfigData().iconSet
             ),
+            .order = changing_icons::utils::tryGetJsonValue<changing_icons::IconOrder, int>(
+                value,
+                "order",
+                changing_icons::IconConfigData().order
+            ),
             .random = changing_icons::utils::tryGetJsonValue<bool>(
                 value,
                 "random",
@@ -121,6 +120,7 @@ struct matjson::Serialize<changing_icons::IconConfigData> {
     static matjson::Value to_json(changing_icons::IconConfigData const& value) {
         auto obj = matjson::Object();
         obj["icon-set"] = value.iconSet;
+        obj["order"] = static_cast<int>(value.order);
         obj["random"] = value.random;
         obj["disabled"] = value.disabled;
         return obj;
