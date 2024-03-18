@@ -22,6 +22,7 @@ namespace changing_icons {
     struct IconConfigData {
         std::vector<IconProperties> iconSet;
         bool random;
+        bool disabled;
     };
 
     namespace utils {
@@ -109,6 +110,11 @@ struct matjson::Serialize<changing_icons::IconConfigData> {
                 value,
                 "random",
                 changing_icons::IconConfigData().random
+            ),
+            .disabled = changing_icons::utils::tryGetJsonValue<bool>(
+                value,
+                "disabled",
+                changing_icons::IconConfigData().disabled
             )
         };
     }
@@ -116,6 +122,7 @@ struct matjson::Serialize<changing_icons::IconConfigData> {
         auto obj = matjson::Object();
         obj["icon-set"] = value.iconSet;
         obj["random"] = value.random;
+        obj["disabled"] = value.disabled;
         return obj;
     }
     static bool is_json(matjson::Value const& value) {

@@ -27,7 +27,7 @@ bool IconCell::init(
     std::optional<cocos2d::ccColor3B> color2
 ) {
     if (!CCLayerColor::init()) return false;
-    this->setContentSize(ccp(170.f, 40.f));
+    this->setContentSize(ccp(160.f, 40.f));
     this->setAnchorPoint(ccp(0.f, 0.f));
     if (index % 2 == 0)
         this->setOpacity(100);

@@ -118,14 +118,14 @@ bool IconConfigLayer::setup() {
     m_randomBtn = CCMenuItemToggler::createWithStandardSprites(
         this,
         menu_selector(IconConfigLayer::onVarToggle),
-        0.7f
+        0.6f
     );
-    m_buttonMenu->addChildAtPosition(m_randomBtn, Anchor::TopLeft, ccp(40.f, -44.f));
+    m_buttonMenu->addChildAtPosition(m_randomBtn, Anchor::TopLeft, ccp(30.f, -45.f));
 
     auto randomText = CCLabelBMFont::create("Random", "bigFont.fnt");
     randomText->setAnchorPoint(ccp(0.f, 0.5f));
     randomText->setScale(0.5f);
-    m_mainLayer->addChildAtPosition(randomText, Anchor::TopLeft, ccp(54.f, -44.f));
+    m_mainLayer->addChildAtPosition(randomText, Anchor::TopLeft, ccp(45.f, -45.f));
 
     auto randomInfoSpr = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
     randomInfoSpr->setScale(0.4f);
@@ -135,12 +135,24 @@ bool IconConfigLayer::setup() {
         menu_selector(IconConfigLayer::onVarInfo)
     );
     randomInfoBtn->setUserObject(CCString::create("Randomly select from entire icon kit instead of from the list below."));
-    m_buttonMenu->addChildAtPosition(randomInfoBtn, Anchor::TopLeft, ccp(26.f, -30.f));
+    m_buttonMenu->addChildAtPosition(randomInfoBtn, Anchor::TopLeft, ccp(17.f, -32.f));
+
+    m_disableBtn = CCMenuItemToggler::createWithStandardSprites(
+        this,
+        menu_selector(IconConfigLayer::onVarToggle),
+        0.6f
+    );
+    m_buttonMenu->addChildAtPosition(m_disableBtn, Anchor::TopLeft, ccp(130.f, -45.f));
+
+    auto disableText = CCLabelBMFont::create("Disable", "bigFont.fnt");
+    disableText->setAnchorPoint(ccp(0.f, 0.5f));
+    disableText->setScale(0.5f);
+    m_mainLayer->addChildAtPosition(disableText, Anchor::TopLeft, ccp(145.f, -45.f));
 
     auto iconListBG = CCLayerColor::create({0, 0, 0, 95});
     iconListBG->setAnchorPoint(ccp(1.f, 0.5f));
     iconListBG->ignoreAnchorPointForPosition(false);
-    iconListBG->setContentSize(ccp(170.f, 170.f));
+    iconListBG->setContentSize(ccp(160.f, 170.f));
     m_mainLayer->addChildAtPosition(iconListBG, Anchor::Right, ccp(-20.f, 20.f));
 
     m_iconList = ScrollLayer::create(iconListBG->getContentSize());
@@ -219,6 +231,8 @@ void IconConfigLayer::refreshTab() {
     auto& currentConfig = IconConfigLayer::getCurrentConfig(m_currentTab);
     m_randomBtn->toggle(currentConfig.random);
     m_randomBtn->setUserObject(CIVariableRef<bool>::create(currentConfig.random));
+    m_disableBtn->toggle(currentConfig.disabled);
+    m_disableBtn->setUserObject(CIVariableRef<bool>::create(currentConfig.disabled));
 }
 
 void IconConfigLayer::onVarInfo(CCObject* sender) {
