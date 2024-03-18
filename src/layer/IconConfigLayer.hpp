@@ -13,6 +13,7 @@ namespace changing_icons {
         geode::Scrollbar* m_iconListScrollbar;
         CCMenuItemToggler* m_randomBtn;
         CCMenuItemToggler* m_disableBtn;
+        CCMenuItemToggler* m_mirrorEndBtn;
         GlobalConfigData m_globalConfig;
         IconConfigData m_cubeConfig;
         IconConfigData m_shipConfig;

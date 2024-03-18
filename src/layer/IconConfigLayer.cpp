@@ -120,17 +120,23 @@ bool IconConfigLayer::setup() {
     m_gamemodeBar->addChild(jetpackBtn);
     m_gamemodeBar->updateLayout();
 
+    auto const toggleTextOffset = ccp(15.f, 0.f);
+    auto const toggleInfoOffset = ccp(-12.f, 12.f);
+
+    auto const randomBtnOffset = ccp(30.f, -75.f);
     m_randomBtn = CCMenuItemToggler::createWithStandardSprites(
         this,
         menu_selector(IconConfigLayer::onVarToggle),
         0.6f
     );
-    m_buttonMenu->addChildAtPosition(m_randomBtn, Anchor::TopLeft, ccp(30.f, -75.f));
+    m_buttonMenu->addChildAtPosition(m_randomBtn, Anchor::TopLeft, randomBtnOffset);
 
     auto randomText = CCLabelBMFont::create("Use all icons", "bigFont.fnt");
     randomText->setAnchorPoint(ccp(0.f, 0.5f));
     randomText->setScale(0.5f);
-    m_mainLayer->addChildAtPosition(randomText, Anchor::TopLeft, ccp(45.f, -75.f));
+    m_mainLayer->addChildAtPosition(
+        randomText, Anchor::TopLeft, randomBtnOffset + toggleTextOffset
+    );
 
     auto randomInfoSpr = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
     randomInfoSpr->setScale(0.4f);
@@ -139,20 +145,25 @@ bool IconConfigLayer::setup() {
         this,
         menu_selector(IconConfigLayer::onVarInfo)
     );
-    randomInfoBtn->setUserObject(CCString::create("Select from all icons instead of the list."));
-    m_buttonMenu->addChildAtPosition(randomInfoBtn, Anchor::TopLeft, ccp(18.f, -63.f));
+    randomInfoBtn->setUserObject(CCString::create("Select from <cj>all icons</c> instead of the <cj>list</c>."));
+    m_buttonMenu->addChildAtPosition(
+        randomInfoBtn, Anchor::TopLeft, randomBtnOffset + toggleInfoOffset
+    );
 
+    auto const disableBtnOffset = ccp(30.f, -45.f);
     m_disableBtn = CCMenuItemToggler::createWithStandardSprites(
         this,
         menu_selector(IconConfigLayer::onVarToggle),
         0.6f
     );
-    m_buttonMenu->addChildAtPosition(m_disableBtn, Anchor::TopLeft, ccp(30.f, -45.f));
+    m_buttonMenu->addChildAtPosition(m_disableBtn, Anchor::TopLeft, disableBtnOffset);
 
     auto disableText = CCLabelBMFont::create("Disable", "bigFont.fnt");
     disableText->setAnchorPoint(ccp(0.f, 0.5f));
     disableText->setScale(0.5f);
-    m_mainLayer->addChildAtPosition(disableText, Anchor::TopLeft, ccp(45.f, -45.f));
+    m_mainLayer->addChildAtPosition(
+        disableText, Anchor::TopLeft, disableBtnOffset + toggleTextOffset
+    );
 
     auto iconListBG = CCLayerColor::create({0, 0, 0, 95});
     iconListBG->setAnchorPoint(ccp(1.f, 0.5f));
@@ -168,12 +179,16 @@ bool IconConfigLayer::setup() {
         m_iconListScrollbar, Anchor::Right, ccp(5.f, 0.f), false
     );
 
+    auto constexpr iconOrderYOffset = 10.f;
+
     m_iconOrderLabel = CCLabelBMFont::create(
         "",
         "bigFont.fnt"
     );
     m_iconOrderLabel->setScale(0.8f);
-    m_mainLayer->addChildAtPosition(m_iconOrderLabel, Anchor::Left, ccp(110.f, 0.f));
+    m_mainLayer->addChildAtPosition(
+        m_iconOrderLabel, Anchor::Left, ccp(110.f, iconOrderYOffset)
+    );
 
     auto iconOrderRArrowSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png");
     iconOrderRArrowSpr->setScale(0.7f);
@@ -194,12 +209,47 @@ bool IconConfigLayer::setup() {
     );
     iconOrderLArrowBtn->setTag(-1);
 
-    m_buttonMenu->addChildAtPosition(iconOrderRArrowBtn, Anchor::Left, ccp(180.f, 0.f));
-    m_buttonMenu->addChildAtPosition(iconOrderLArrowBtn, Anchor::Left, ccp(40.f, 0.f));
+    m_buttonMenu->addChildAtPosition(
+        iconOrderRArrowBtn, Anchor::Left, ccp(180.f, iconOrderYOffset)
+    );
+    m_buttonMenu->addChildAtPosition(
+        iconOrderLArrowBtn, Anchor::Left, ccp(40.f, iconOrderYOffset)
+    );
 
     auto iconOrderTitle = CCLabelBMFont::create("Icon Order", "goldFont.fnt");
     iconOrderTitle->setScale(0.7f);
-    m_mainLayer->addChildAtPosition(iconOrderTitle, Anchor::Left, ccp(110.f, 20.f));
+    m_mainLayer->addChildAtPosition(
+        iconOrderTitle, Anchor::Left, ccp(110.f, iconOrderYOffset + 20.f)
+    );
+
+    auto const mirrorEndOffset = ccp(30.f, -20.f);
+    m_mirrorEndBtn = CCMenuItemToggler::createWithStandardSprites(
+        this,
+        menu_selector(IconConfigLayer::onVarToggle),
+        0.6f
+    );
+    m_buttonMenu->addChildAtPosition(m_mirrorEndBtn, Anchor::Left, mirrorEndOffset);
+    
+    auto mirrorEndText = CCLabelBMFont::create("Mirror after End", "bigFont.fnt");
+    mirrorEndText->setAnchorPoint(ccp(0.f, 0.5f));
+    mirrorEndText->setScale(0.5f);
+    m_mainLayer->addChildAtPosition(
+        mirrorEndText, Anchor::Left, mirrorEndOffset + toggleTextOffset
+    );
+
+    auto mirrorEndInfoSpr = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
+    mirrorEndInfoSpr->setScale(0.4f);
+    auto mirrorEndInfoBtn = CCMenuItemSpriteExtra::create(
+        mirrorEndInfoSpr,
+        this,
+        menu_selector(IconConfigLayer::onVarInfo)
+    );
+    mirrorEndInfoBtn->setUserObject(CCString::create(
+        "Only applicable when <cy>Icon Order</c> is set to <cj>Up</c> or <cj>Down</c>. Mirror the list when reaching the end instead of wrapping around."
+    ));
+    m_buttonMenu->addChildAtPosition(
+        mirrorEndInfoBtn, Anchor::Left, mirrorEndOffset + toggleInfoOffset
+    );
 
     auto iconListMenu = CCMenu::create();
     iconListMenu->ignoreAnchorPointForPosition(false);
@@ -207,15 +257,19 @@ bool IconConfigLayer::setup() {
     iconListMenu->setLayout(
         RowLayout::create()
     );
-    m_mainLayer->addChildAtPosition(iconListMenu, Anchor::Left, ccp(110.f, -60.f));
+    m_mainLayer->addChildAtPosition(iconListMenu, Anchor::Left, ccp(110.f, -65.f));
 
+    auto iconListAddSpr = CCSprite::createWithSpriteFrameName("GJ_plusBtn_001.png");
+    iconListAddSpr->setScale(0.83f);
     auto iconListAddBtn = CCMenuItemSpriteExtra::create(
-        CCSprite::createWithSpriteFrameName("GJ_plusBtn_001.png"),
+        iconListAddSpr,
         this,
         menu_selector(IconConfigLayer::onAddIcon)
     );
+    auto iconListClearSpr = CCSprite::createWithSpriteFrameName("GJ_deleteBtn_001.png");
+    iconListClearSpr->setScale(0.83f);
     auto iconListClearBtn = CCMenuItemSpriteExtra::create(
-        CCSprite::createWithSpriteFrameName("GJ_deleteBtn_001.png"),
+        iconListClearSpr,
         this,
         menu_selector(IconConfigLayer::onClearList)
     );
@@ -224,8 +278,10 @@ bool IconConfigLayer::setup() {
         this,
         nullptr
     );
+    auto iconListLoadSpr = CCSprite::createWithSpriteFrameName("GJ_duplicateBtn_001.png");
+    iconListLoadSpr->setScale(0.83f);
     auto iconListLoadBtn = CCMenuItemSpriteExtra::create(
-        CCSprite::createWithSpriteFrameName("GJ_duplicateBtn_001.png"),
+        iconListLoadSpr,
         this,
         nullptr
     );
@@ -277,6 +333,8 @@ void IconConfigLayer::refreshTab() {
     m_randomBtn->setUserObject(CIVariableRef<bool>::create(currentConfig.random));
     m_disableBtn->toggle(currentConfig.disabled);
     m_disableBtn->setUserObject(CIVariableRef<bool>::create(currentConfig.disabled));
+    m_mirrorEndBtn->toggle(currentConfig.mirrorEnd);
+    m_mirrorEndBtn->setUserObject(CIVariableRef<bool>::create(currentConfig.mirrorEnd));
 
     IconConfigLayer::setOrderChoice(currentConfig.order);
     IconConfigLayer::refreshIconList(m_currentTab, true);
