@@ -4,10 +4,13 @@
 
 namespace changing_icons {
     class IconConfigLayer : public geode::Popup<> {
+    private:
+        static inline IconConfigLayer* m_instance = nullptr;
     protected:
         IconType m_currentTab;
         cocos2d::CCMenu* m_gamemodeBar;
         geode::ScrollLayer* m_iconList;
+        geode::Scrollbar* m_iconListScrollbar;
         CCMenuItemToggler* m_randomBtn;
         CCMenuItemToggler* m_disableBtn;
         GlobalConfigData m_globalConfig;
@@ -26,15 +29,18 @@ namespace changing_icons {
         void refreshTab();
         void setOrderChoice(IconOrder choice);
         void setOrderChoice(int choice);
+        void refreshIconList(IconType currentTab);
         ~IconConfigLayer();
-        static inline IconConfigLayer* m_instance = nullptr;
     public:
         static IconConfigLayer* getInstance();
         static IconConfigLayer* create();
-        IconConfigData& getCurrentConfig(IconType currentTab);
+        IconConfigData& getCurrentConfig();
         void onSwitchTab(CCObject*);
         void onVarInfo(CCObject*);
         void onVarToggle(CCObject*);
         void onOrderArrow(CCObject*);
+        void onAddIcon(CCObject*);
+        void addIcon(IconProperties properties);
+        void deleteIcon(int index);
     };
 }

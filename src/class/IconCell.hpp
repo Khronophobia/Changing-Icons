@@ -3,6 +3,7 @@
 namespace changing_icons {
     class IconCell : public cocos2d::CCLayerColor {
     protected:
+        int m_index;
         bool init(
             int index,
             IconType iconType,
@@ -18,5 +19,6 @@ namespace changing_icons {
             std::optional<cocos2d::ccColor3B> color1 = std::nullopt,
             std::optional<cocos2d::ccColor3B> color2 = std::nullopt
         );
+        void onDelete(CCObject*);
     };
 }

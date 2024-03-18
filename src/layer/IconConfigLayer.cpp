@@ -1,6 +1,6 @@
 #include <Geode/Geode.hpp>
-#include <Geode/Enums.hpp>
 #include "IconConfigLayer.hpp"
+#include "AddIconLayer.hpp"
 #include "../class/CIVariableRef.hpp"
 #include "../class/IconCell.hpp"
 
@@ -139,7 +139,7 @@ bool IconConfigLayer::setup() {
         this,
         menu_selector(IconConfigLayer::onVarInfo)
     );
-    randomInfoBtn->setUserObject(CCString::create("Randomly select from entire icon kit instead of from the list below."));
+    randomInfoBtn->setUserObject(CCString::create("Randomly select from entire icon kit instead of from the list."));
     m_buttonMenu->addChildAtPosition(randomInfoBtn, Anchor::TopLeft, ccp(17.f, -32.f));
 
     m_disableBtn = CCMenuItemToggler::createWithStandardSprites(
@@ -157,11 +157,16 @@ bool IconConfigLayer::setup() {
     auto iconListBG = CCLayerColor::create({0, 0, 0, 95});
     iconListBG->setAnchorPoint(ccp(1.f, 0.5f));
     iconListBG->ignoreAnchorPointForPosition(false);
-    iconListBG->setContentSize(ccp(160.f, 170.f));
-    m_mainLayer->addChildAtPosition(iconListBG, Anchor::Right, ccp(-20.f, 20.f));
+    iconListBG->setContentSize(ccp(160.f, 190.f));
+    m_mainLayer->addChildAtPosition(iconListBG, Anchor::Right, ccp(-20.f, 10.f));
 
     m_iconList = ScrollLayer::create(iconListBG->getContentSize());
     iconListBG->addChild(m_iconList);
+
+    m_iconListScrollbar = Scrollbar::create(m_iconList);
+    iconListBG->addChildAtPosition(
+        m_iconListScrollbar, Anchor::Right, ccp(5.f, 0.f), false
+    );
 
     m_iconOrderLabel = CCLabelBMFont::create(
         "",
@@ -198,22 +203,16 @@ bool IconConfigLayer::setup() {
 
     auto iconListMenu = CCMenu::create();
     iconListMenu->ignoreAnchorPointForPosition(false);
-    iconListMenu->setAnchorPoint(ccp(1.f, 0.5f));
-    iconListMenu->setContentSize(ccp(160.f, 32.f));
-    iconListMenu->setLayout(
-        RowLayout::create()
-            ->setAxisAlignment(AxisAlignment::Even)
-            ->setCrossAxisOverflow(false)
-    );
-    m_mainLayer->addChildAtPosition(iconListMenu, Anchor::Right, ccp(-20.f, -83.f));
+    iconListMenu->setContentSize(ccp(56.f, 56.f));
+    m_mainLayer->addChildAtPosition(iconListMenu, Anchor::Left, ccp(110.f, -20.f));
 
     auto iconListAddBtn = CCMenuItemSpriteExtra::create(
         CCSprite::createWithSpriteFrameName("GJ_plusBtn_001.png"),
         this,
-        nullptr
+        menu_selector(IconConfigLayer::onAddIcon)
     );
     auto iconListClearBtn = CCMenuItemSpriteExtra::create(
-        CCSprite::createWithSpriteFrameName("GJ_closeBtn_001.png"),
+        CCSprite::createWithSpriteFrameName("GJ_deleteBtn_001.png"),
         this,
         nullptr
     );
@@ -223,17 +222,17 @@ bool IconConfigLayer::setup() {
         nullptr
     );
 
-    iconListMenu->addChild(iconListAddBtn);
-    iconListMenu->addChild(iconListSaveBtn);
-    iconListMenu->addChild(iconListClearBtn);
-    iconListMenu->updateLayout();
+    iconListMenu->addChildAtPosition(iconListAddBtn, Anchor::TopLeft);
+    iconListMenu->addChildAtPosition(iconListSaveBtn, Anchor::TopRight);
+    iconListMenu->addChildAtPosition(iconListClearBtn, Anchor::BottomLeft);
 
     IconConfigLayer::refreshTab();
+    m_iconList->moveToTop();
     return true;
 }
 
-IconConfigData& IconConfigLayer::getCurrentConfig(IconType currentTab) {
-    switch (currentTab) {
+IconConfigData& IconConfigLayer::getCurrentConfig() {
+    switch (m_currentTab) {
         default:
         case IconType::Cube: return m_cubeConfig;
         case IconType::Ship: return m_shipConfig;
@@ -264,13 +263,14 @@ void IconConfigLayer::refreshTab() {
         btn->toggle(false);
     }
 
-    auto& currentConfig = IconConfigLayer::getCurrentConfig(m_currentTab);
+    auto& currentConfig = IconConfigLayer::getCurrentConfig();
     m_randomBtn->toggle(currentConfig.random);
     m_randomBtn->setUserObject(CIVariableRef<bool>::create(currentConfig.random));
     m_disableBtn->toggle(currentConfig.disabled);
     m_disableBtn->setUserObject(CIVariableRef<bool>::create(currentConfig.disabled));
 
     IconConfigLayer::setOrderChoice(currentConfig.order);
+    IconConfigLayer::refreshIconList(m_currentTab);
 }
 
 void IconConfigLayer::onVarInfo(CCObject* sender) {
@@ -298,7 +298,7 @@ void IconConfigLayer::onVarToggle(CCObject* sender) {
 }
 
 void IconConfigLayer::onOrderArrow(CCObject* sender) {
-    auto& currentConfig = IconConfigLayer::getCurrentConfig(m_currentTab);
+    auto& currentConfig = IconConfigLayer::getCurrentConfig();
     int choiceTemp = static_cast<int>(currentConfig.order) + sender->getTag();
     if (choiceTemp < 0)
         choiceTemp = m_iconOrderList.size() - 1;
@@ -315,6 +315,49 @@ void IconConfigLayer::setOrderChoice(IconOrder choice) {
 
 void IconConfigLayer::setOrderChoice(int choice) {
     m_iconOrderLabel->setString(m_iconOrderList.at(choice).c_str());
+}
+
+void IconConfigLayer::onAddIcon(CCObject*) {
+    AddIconLayer::create(m_currentTab)->show();
+}
+
+void IconConfigLayer::refreshIconList(IconType currentTab) {
+    auto& currentConfig = IconConfigLayer::getCurrentConfig();
+    auto iconList = currentConfig.iconSet;
+    auto content = m_iconList->m_contentLayer;
+
+    auto height = std::max<int>(m_iconList->getContentHeight(), iconList.size() * 30.f);
+    content->setContentHeight(height);
+
+    m_iconList->m_contentLayer->removeAllChildren();
+    size_t i = 0;
+    for (auto const& icon : iconList) {
+        auto cell = IconCell::create(
+            i,
+            currentTab,
+            icon.iconID,
+            icon.color1,
+            icon.color2
+        );
+        cell->setPositionY(height - (i + 1) * 30.f);
+        cell->setTag(i);
+        content->addChild(cell);
+        i++;
+    }
+    m_iconListScrollbar->setTarget(m_iconList);
+}
+
+void IconConfigLayer::addIcon(IconProperties icon) {
+    log::debug("Added icon ID {}", icon.iconID);
+    IconConfigLayer::getCurrentConfig().iconSet.push_back(icon);
+    IconConfigLayer::refreshIconList(m_currentTab);
+}
+
+void IconConfigLayer::deleteIcon(int index) {
+    log::debug("Removed icon at index {}", index);
+    auto& iconSet = IconConfigLayer::getCurrentConfig().iconSet;
+    iconSet.erase(iconSet.begin() + index);
+    IconConfigLayer::refreshIconList(m_currentTab);
 }
 
 IconConfigLayer::~IconConfigLayer() {
