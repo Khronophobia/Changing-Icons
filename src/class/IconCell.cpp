@@ -9,10 +9,11 @@ IconCell* IconCell::create(
         IconType iconType,
         int iconID,
         std::optional<cocos2d::ccColor3B> color1,
-        std::optional<cocos2d::ccColor3B> color2
+        std::optional<cocos2d::ccColor3B> color2,
+        bool isLast
     ) {
     auto ret = new IconCell();
-    if (ret && ret->init(index, iconType, iconID, color1, color2)) {
+    if (ret && ret->init(index, iconType, iconID, color1, color2, isLast)) {
         ret->autorelease();
         return ret;
     }
@@ -25,7 +26,8 @@ bool IconCell::init(
         IconType iconType,
         int iconID,
         std::optional<cocos2d::ccColor3B> color1,
-        std::optional<cocos2d::ccColor3B> color2
+        std::optional<cocos2d::ccColor3B> color2,
+        bool isLast
     ) {
     if (!CCLayerColor::init()) return false;
     this->setContentSize(ccp(160.f, 30.f));
@@ -63,19 +65,46 @@ bool IconCell::init(
     menu->setAnchorPoint(ccp(1.f, 0.5f));
     this->addChildAtPosition(menu, Anchor::Right);
 
-    auto trashBtnSpr = CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png");
-    trashBtnSpr->setScale(0.7f);
+    auto trashBtnSpr = CCSprite::createWithSpriteFrameName("edit_delBtnSmall_001.png");
     auto trashBtn = CCMenuItemSpriteExtra::create(
         trashBtnSpr,
         this,
         menu_selector(IconCell::onDelete)
     );
-    trashBtn->setPosition(menu->getContentSize() / 2);
-    menu->addChild(trashBtn);
+    menu->addChildAtPosition(trashBtn, Anchor::Center, CCPointZero, false);
+
+    auto moveDownSpr = CCSprite::createWithSpriteFrameName("edit_downBtn_001.png");
+    moveDownSpr->setScale(0.7f);
+    auto moveDownBtn = CCMenuItemSpriteExtra::create(
+        moveDownSpr,
+        this,
+        menu_selector(IconCell::onMoveDown)
+    );
+    menu->addChildAtPosition(moveDownBtn, Anchor::Center, ccp(-20.f, -6.f), false);
+
+    auto moveUpSpr = CCSprite::createWithSpriteFrameName("edit_upBtn_001.png");
+    moveUpSpr->setScale(0.7f);
+    auto moveUpBtn = CCMenuItemSpriteExtra::create(
+        moveUpSpr,
+        this,
+        menu_selector(IconCell::onMoveUp)
+    );
+    menu->addChildAtPosition(moveUpBtn, Anchor::Center, ccp(-20.f, 6.f), false);
+
+    if (index == 0) moveUpBtn->setVisible(false);
+    if (isLast) moveDownBtn->setVisible(false);
 
     return true;
 }
 
 void IconCell::onDelete(CCObject*) {
     IconConfigLayer::getInstance()->deleteIcon(m_index);
+}
+
+void IconCell::onMoveDown(CCObject*) {
+    IconConfigLayer::getInstance()->swapIcons(m_index, m_index + 1);
+}
+
+void IconCell::onMoveUp(CCObject*) {
+    IconConfigLayer::getInstance()->swapIcons(m_index, m_index - 1);
 }

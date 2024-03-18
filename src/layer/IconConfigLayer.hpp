@@ -29,7 +29,7 @@ namespace changing_icons {
         void refreshTab();
         void setOrderChoice(IconOrder choice);
         void setOrderChoice(int choice);
-        void refreshIconList(IconType currentTab);
+        void refreshIconList(IconType currentTab, bool toTop = false);
         ~IconConfigLayer();
     public:
         static IconConfigLayer* getInstance();
@@ -40,7 +40,9 @@ namespace changing_icons {
         void onVarToggle(CCObject*);
         void onOrderArrow(CCObject*);
         void onAddIcon(CCObject*);
+        void onClearList(CCObject*);
         void addIcon(IconProperties properties);
+        void swapIcons(int icon1, int icon2);
         void deleteIcon(int index);
     };
 }

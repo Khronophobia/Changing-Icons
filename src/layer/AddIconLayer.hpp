@@ -13,6 +13,8 @@ namespace changing_icons {
         IconType m_iconType;
         cocos2d::CCMenu* m_iconList;
         SimplePlayer* m_iconDisplay;
+        ColorChannelSprite* m_color1Display;
+        ColorChannelSprite* m_color2Display;
         IconProperties m_selectedIcon;
         bool setup(
             IconType iconType,

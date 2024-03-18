@@ -112,7 +112,28 @@ bool AddIconLayer::setup(
     m_iconDisplay->setColor(GameManager::get()->colorForIdx(17));
     m_iconDisplay->setSecondColor(GameManager::get()->colorForIdx(12));
 
-    m_mainLayer->addChildAtPosition(m_iconDisplay, Anchor::TopRight, ccp(-80.f, -30.f));
+    m_mainLayer->addChildAtPosition(m_iconDisplay, Anchor::Top, ccp(100.f, -30.f));
+
+    m_color1Display = ColorChannelSprite::create();
+    m_color1Display->setScale(0.7f);
+    auto color1Label = CCLabelBMFont::create("1", "bigFont.fnt");
+    color1Label->setPosition(m_color1Display->getContentSize() / 2);
+    color1Label->setColor(cc3x(0x0));
+    color1Label->setOpacity(127);
+    color1Label->setScale(0.8f);
+    m_color1Display->addChild(color1Label);
+
+    m_color2Display = ColorChannelSprite::create();
+    m_color2Display->setScale(0.7f);
+    auto color2Label = CCLabelBMFont::create("2", "bigFont.fnt");
+    color2Label->setPosition(m_color2Display->getContentSize() / 2);
+    color2Label->setColor(cc3x(0x0));
+    color2Label->setOpacity(127);
+    color2Label->setScale(0.8f);
+    m_color2Display->addChild(color2Label);
+
+    m_mainLayer->addChildAtPosition(m_color1Display, Anchor::Top, ccp(75.f, -65.f));
+    m_mainLayer->addChildAtPosition(m_color2Display, Anchor::Top, ccp(125.f, -65.f));
 
     return true;
 }

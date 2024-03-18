@@ -11,4 +11,5 @@ namespace changing_icons::constants {
     inline size_t constexpr SPIDER_COUNT = 69;
     inline size_t constexpr SWING_COUNT = 43;
     inline size_t constexpr JETPACK_COUNT = 5;
+    inline size_t constexpr COLOR_COUNT = 106;
 }
