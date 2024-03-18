@@ -15,6 +15,8 @@ namespace changing_icons {
         SimplePlayer* m_iconDisplay;
         ColorChannelSprite* m_color1Display;
         ColorChannelSprite* m_color2Display;
+        cocos2d::CCLabelBMFont* m_color1Label;
+        cocos2d::CCLabelBMFont* m_color2Label;
         IconProperties m_selectedIcon;
         bool setup(
             IconType iconType,
@@ -24,6 +26,8 @@ namespace changing_icons {
         );
         size_t getIconCount() const;
         UnlockType convertIconType(IconType type);
+        void setIconColor(std::optional<cocos2d::ccColor3B> color, int colorType);
+        void updateIconColors();
     public:
         static AddIconLayer* create(
             IconType iconType,
@@ -33,5 +37,7 @@ namespace changing_icons {
         );
         void onSelectIcon(CCObject* sender);
         void onAddIcon(CCObject* sender);
+        void onColor(CCObject* sender);
+        void onSecondColor(CCObject* sender);
     };
 }

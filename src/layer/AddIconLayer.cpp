@@ -13,7 +13,7 @@ AddIconLayer* AddIconLayer::create(
             std::optional<cocos2d::ccColor3B> color2
         ) {
     auto ret = new AddIconLayer();
-    if (ret && ret->initAnchored(350.f, 300.f, iconType, ID, color1, color2)) {
+    if (ret && ret->initAnchored(420.f, 300.f, iconType, ID, color1, color2)) {
         ret->autorelease();
         return ret;
     }
@@ -116,24 +116,46 @@ bool AddIconLayer::setup(
 
     m_color1Display = ColorChannelSprite::create();
     m_color1Display->setScale(0.7f);
-    auto color1Label = CCLabelBMFont::create("1", "bigFont.fnt");
-    color1Label->setPosition(m_color1Display->getContentSize() / 2);
-    color1Label->setColor(cc3x(0x0));
-    color1Label->setOpacity(127);
-    color1Label->setScale(0.8f);
-    m_color1Display->addChild(color1Label);
+
+    m_color1Label = CCLabelBMFont::create("1U", "bigFont.fnt");
+    m_color1Label->setPosition(m_color1Display->getContentSize() / 2);
+    m_color1Label->setColor(cc3x(0x0));
+    m_color1Label->setOpacity(127);
+    m_color1Label->setScale(0.65f);
+    if (color1) {
+        m_color1Label->setString("1");
+        m_color1Display->setColor(m_selectedIcon.color1.value());
+    } else m_color1Display->setColor(GameManager::get()->colorForIdx(17));
+
+    m_color1Display->addChild(m_color1Label);
 
     m_color2Display = ColorChannelSprite::create();
     m_color2Display->setScale(0.7f);
-    auto color2Label = CCLabelBMFont::create("2", "bigFont.fnt");
-    color2Label->setPosition(m_color2Display->getContentSize() / 2);
-    color2Label->setColor(cc3x(0x0));
-    color2Label->setOpacity(127);
-    color2Label->setScale(0.8f);
-    m_color2Display->addChild(color2Label);
 
-    m_mainLayer->addChildAtPosition(m_color1Display, Anchor::Top, ccp(75.f, -65.f));
-    m_mainLayer->addChildAtPosition(m_color2Display, Anchor::Top, ccp(125.f, -65.f));
+    m_color2Label = CCLabelBMFont::create("2U", "bigFont.fnt");
+    m_color2Label->setPosition(m_color2Display->getContentSize() / 2);
+    m_color2Label->setColor(cc3x(0x0));
+    m_color2Label->setOpacity(127);
+    m_color2Label->setScale(0.65f);
+    if (color2) {
+        m_color2Label->setString("2");
+        m_color2Display->setColor(m_selectedIcon.color2.value());
+    } else m_color2Display->setColor(GameManager::get()->colorForIdx(12));
+
+    m_color2Display->addChild(m_color2Label);
+
+    m_mainLayer->addChildAtPosition(m_color1Display, Anchor::Top, ccp(50.f, -65.f));
+    m_mainLayer->addChildAtPosition(m_color2Display, Anchor::Top, ccp(155.f, -65.f));
+
+    auto color1ListBg = CCLayerColor::create({0, 0, 0, 95});
+    color1ListBg->ignoreAnchorPointForPosition(false);
+    color1ListBg->setContentSize(ccp(90.f, 160.f));
+    m_mainLayer->addChildAtPosition(color1ListBg, Anchor::Center, ccp(50.f, -10.f));
+
+    auto color2ListBg = CCLayerColor::create({0, 0, 0, 95});
+    color2ListBg->ignoreAnchorPointForPosition(false);
+    color2ListBg->setContentSize(ccp(90.f, 160.f));
+    m_mainLayer->addChildAtPosition(color2ListBg, Anchor::Center, ccp(155.f, -10.f));
 
     return true;
 }
@@ -168,6 +190,31 @@ UnlockType AddIconLayer::convertIconType(IconType type) {
     }
 }
 
+void AddIconLayer::setIconColor(std::optional<cocos2d::ccColor3B> color, int colorType) {
+    switch(colorType) {
+        case 0: m_selectedIcon.color1 = color; break;
+        case 1: m_selectedIcon.color2 = color; break;
+    }
+    AddIconLayer::updateIconColors();
+}
+
+void AddIconLayer::updateIconColors() {
+    if (m_selectedIcon.color1) {
+        m_color1Label->setString("1");
+        m_color1Display->setColor(m_selectedIcon.color1.value());
+    } else {
+        m_color1Label->setString("1U");
+        m_color1Display->setColor(GameManager::get()->colorForIdx(17));
+    }
+    if (m_selectedIcon.color2) {
+        m_color2Label->setString("2");
+        m_color2Display->setColor(m_selectedIcon.color2.value());
+    } else {
+        m_color2Label->setString("2U");
+        m_color2Display->setColor(GameManager::get()->colorForIdx(12));
+    }
+ }
+
 void AddIconLayer::onSelectIcon(CCObject* sender) {
     auto iconID = sender->getTag();
     m_iconDisplay->updatePlayerFrame(iconID, m_iconType);
@@ -177,4 +224,18 @@ void AddIconLayer::onSelectIcon(CCObject* sender) {
 void AddIconLayer::onAddIcon(CCObject* sender) {
     IconConfigLayer::getInstance()->addIcon(m_selectedIcon);
     AddIconLayer::onClose(nullptr);
+}
+
+void AddIconLayer::onColor(CCObject* sender) {
+    AddIconLayer::setIconColor(
+        GameManager::get()->colorForIdx(sender->getTag()),
+        0
+    );
+}
+
+void AddIconLayer::onSecondColor(CCObject* sender) {
+    AddIconLayer::setIconColor(
+        GameManager::get()->colorForIdx(sender->getTag()),
+        1
+    );
 }
