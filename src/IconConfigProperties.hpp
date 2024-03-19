@@ -4,8 +4,8 @@
 namespace changing_icons {
     enum class IconOrder {
         Random,
-        Down,
-        Up,
+        Forward,
+        Backward,
     };
 
     struct IconProperties {
@@ -29,6 +29,7 @@ namespace changing_icons {
     struct IconConfigData {
         std::vector<IconProperties> iconSet;
         IconOrder order = IconOrder::Random;
+        IconOrder tempOrder = IconOrder::Random;
         bool useAll;
         bool mirrorEnd;
         bool disabled;

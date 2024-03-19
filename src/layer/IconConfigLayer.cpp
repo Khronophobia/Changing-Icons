@@ -176,7 +176,7 @@ bool IconConfigLayer::setup() {
         "",
         "bigFont.fnt"
     );
-    m_iconOrderLabel->setScale(0.8f);
+    m_iconOrderLabel->setScale(0.75f);
     m_mainLayer->addChildAtPosition(
         m_iconOrderLabel, Anchor::Left, ccp(110.f, iconOrderYOffset)
     );
@@ -201,10 +201,10 @@ bool IconConfigLayer::setup() {
     iconOrderLArrowBtn->setTag(-1);
 
     m_buttonMenu->addChildAtPosition(
-        iconOrderRArrowBtn, Anchor::Left, ccp(180.f, iconOrderYOffset)
+        iconOrderRArrowBtn, Anchor::Left, ccp(185.f, iconOrderYOffset)
     );
     m_buttonMenu->addChildAtPosition(
-        iconOrderLArrowBtn, Anchor::Left, ccp(40.f, iconOrderYOffset)
+        iconOrderLArrowBtn, Anchor::Left, ccp(35.f, iconOrderYOffset)
     );
 
     auto iconOrderTitle = CCLabelBMFont::create("Icon Order", "goldFont.fnt");

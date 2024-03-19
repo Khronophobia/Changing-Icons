@@ -16,7 +16,7 @@ namespace changing_icons {
         CCMenuItemToggler* m_disableBtn;
         CCMenuItemToggler* m_mirrorEndBtn;
         CIConfigManager* m_configManager;
-        std::vector<std::string> const m_iconOrderList{"Random", "Down", "Up"};
+        std::vector<std::string> const m_iconOrderList{"Random", "Forward", "Backward"};
         cocos2d::CCLabelBMFont* m_iconOrderLabel;
         bool setup();
         void refreshTab();
