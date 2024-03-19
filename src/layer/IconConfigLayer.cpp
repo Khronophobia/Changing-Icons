@@ -288,7 +288,7 @@ bool IconConfigLayer::setup() {
 }
 
 IconConfigData& IconConfigLayer::getCurrentConfig() {
-    return m_configManager->getConfigOfType(m_currentTab);
+    return m_configManager->getConfig(m_currentTab);
 }
 
 void IconConfigLayer::onSwitchTab(CCObject* sender) {
@@ -309,8 +309,8 @@ void IconConfigLayer::refreshTab() {
     }
 
     auto& currentConfig = IconConfigLayer::getCurrentConfig();
-    m_randomBtn->toggle(currentConfig.random);
-    m_randomBtn->setUserObject(CIVariableRef<bool>::create(currentConfig.random));
+    m_randomBtn->toggle(currentConfig.useAll);
+    m_randomBtn->setUserObject(CIVariableRef<bool>::create(currentConfig.useAll));
     m_disableBtn->toggle(currentConfig.disabled);
     m_disableBtn->setUserObject(CIVariableRef<bool>::create(currentConfig.disabled));
     m_mirrorEndBtn->toggle(currentConfig.mirrorEnd);
@@ -444,13 +444,13 @@ IconConfigLayer::~IconConfigLayer() {
     m_instance = nullptr;
     log::debug("Saving config.");
     Mod::get()->setSavedValue("global", m_configManager->getGlobalConfig());
-    Mod::get()->setSavedValue("cube", m_configManager->getConfigOfType(IconType::Cube));
-    Mod::get()->setSavedValue("ship", m_configManager->getConfigOfType(IconType::Ship));
-    Mod::get()->setSavedValue("ball", m_configManager->getConfigOfType(IconType::Ball));
-    Mod::get()->setSavedValue("bird", m_configManager->getConfigOfType(IconType::Ufo));
-    Mod::get()->setSavedValue("dart", m_configManager->getConfigOfType(IconType::Wave));
-    Mod::get()->setSavedValue("robot", m_configManager->getConfigOfType(IconType::Robot));
-    Mod::get()->setSavedValue("spider", m_configManager->getConfigOfType(IconType::Spider));
-    Mod::get()->setSavedValue("swing", m_configManager->getConfigOfType(IconType::Swing));
-    Mod::get()->setSavedValue("jetpack", m_configManager->getConfigOfType(IconType::Jetpack));
+    Mod::get()->setSavedValue("cube", m_configManager->getConfig(IconType::Cube));
+    Mod::get()->setSavedValue("ship", m_configManager->getConfig(IconType::Ship));
+    Mod::get()->setSavedValue("ball", m_configManager->getConfig(IconType::Ball));
+    Mod::get()->setSavedValue("bird", m_configManager->getConfig(IconType::Ufo));
+    Mod::get()->setSavedValue("dart", m_configManager->getConfig(IconType::Wave));
+    Mod::get()->setSavedValue("robot", m_configManager->getConfig(IconType::Robot));
+    Mod::get()->setSavedValue("spider", m_configManager->getConfig(IconType::Spider));
+    Mod::get()->setSavedValue("swing", m_configManager->getConfig(IconType::Swing));
+    Mod::get()->setSavedValue("jetpack", m_configManager->getConfig(IconType::Jetpack));
 }

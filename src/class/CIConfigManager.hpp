@@ -20,6 +20,6 @@ namespace changing_icons {
         // Get the shared instance of CIConfigManager
         static CIConfigManager* get();
         GlobalConfigData& getGlobalConfig();
-        IconConfigData& getConfigOfType(IconType type);
+        IconConfigData& getConfig(IconType type);
     };
 }

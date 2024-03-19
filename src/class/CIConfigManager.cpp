@@ -31,7 +31,7 @@ GlobalConfigData& CIConfigManager::getGlobalConfig() {
     return m_globalConfig;
 }
 
-IconConfigData& CIConfigManager::getConfigOfType(IconType type) {
+IconConfigData& CIConfigManager::getConfig(IconType type) {
     switch (type) {
         default:
         case IconType::Cube: return m_cubeConfig;

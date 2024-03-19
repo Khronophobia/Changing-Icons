@@ -15,7 +15,7 @@ namespace changing_icons {
     };
 
     struct GlobalOverrideData {
-        std::optional<bool> random = std::nullopt;
+        std::optional<bool> useAll = std::nullopt;
         std::optional<IconOrder> order = std::nullopt;
         std::optional<bool> disable = std::nullopt;
     };
@@ -29,7 +29,7 @@ namespace changing_icons {
     struct IconConfigData {
         std::vector<IconProperties> iconSet;
         IconOrder order = IconOrder::Random;
-        bool random;
+        bool useAll;
         bool mirrorEnd;
         bool disabled;
     };
@@ -109,10 +109,10 @@ template<>
 struct matjson::Serialize<changing_icons::GlobalOverrideData> {
     static changing_icons::GlobalOverrideData from_json(matjson::Value const& value) {
         return changing_icons::GlobalOverrideData {
-            .random = changing_icons::utils::tryGetJsonValue<std::optional<bool>>(
+            .useAll = changing_icons::utils::tryGetJsonValue<std::optional<bool>>(
                 value,
-                "random",
-                changing_icons::GlobalOverrideData().random
+                "use-all",
+                changing_icons::GlobalOverrideData().useAll
             ),
             .order = changing_icons::utils::tryGetJsonValue<std::optional<changing_icons::IconOrder>>(
                 value,
@@ -128,7 +128,7 @@ struct matjson::Serialize<changing_icons::GlobalOverrideData> {
     }
     static matjson::Value to_json(changing_icons::GlobalOverrideData const& value) {
         auto obj = matjson::Object();
-        obj["random"] = value.random;
+        obj["use-all"] = value.useAll;
         obj["order"] = value.order;
         obj["disable"] = value.disable;
         return obj;
@@ -185,10 +185,10 @@ struct matjson::Serialize<changing_icons::IconConfigData> {
                 "order",
                 changing_icons::IconConfigData().order
             ),
-            .random = changing_icons::utils::tryGetJsonValue<bool>(
+            .useAll = changing_icons::utils::tryGetJsonValue<bool>(
                 value,
-                "random",
-                changing_icons::IconConfigData().random
+                "use-all",
+                changing_icons::IconConfigData().useAll
             ),
             .mirrorEnd = changing_icons::utils::tryGetJsonValue(
                 value,
@@ -206,7 +206,7 @@ struct matjson::Serialize<changing_icons::IconConfigData> {
         auto obj = matjson::Object();
         obj["icon-set"] = value.iconSet;
         obj["order"] = static_cast<int>(value.order);
-        obj["random"] = value.random;
+        obj["use-all"] = value.useAll;
         obj["mirror-end"] = value.mirrorEnd;
         obj["disabled"] = value.disabled;
         return obj;
