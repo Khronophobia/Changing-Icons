@@ -23,20 +23,11 @@ IconConfigLayer* IconConfigLayer::create() {
 
 bool IconConfigLayer::setup() {
     m_instance = this;
-    // Config
-    m_globalConfig = Mod::get()->getSavedValue<GlobalConfigData>("global");
-    m_cubeConfig = Mod::get()->getSavedValue<IconConfigData>("cube");
-    m_shipConfig = Mod::get()->getSavedValue<IconConfigData>("ship");
-    m_ballConfig = Mod::get()->getSavedValue<IconConfigData>("ball");
-    m_birdConfig = Mod::get()->getSavedValue<IconConfigData>("bird");
-    m_dartConfig = Mod::get()->getSavedValue<IconConfigData>("dart");
-    m_robotConfig = Mod::get()->getSavedValue<IconConfigData>("robot");
-    m_spiderConfig = Mod::get()->getSavedValue<IconConfigData>("spider");
-    m_swingConfig = Mod::get()->getSavedValue<IconConfigData>("swing");
-    m_jetpackConfig = Mod::get()->getSavedValue<IconConfigData>("jetpack");
+
+    m_configManager = CIConfigManager::get();
 
     m_noElasticity = true;
-    m_currentTab = m_globalConfig.currentTab;
+    m_currentTab = m_configManager->getGlobalConfig().currentTab;
     this->setTitle("Changing Icons Config");
 
     m_gamemodeBar = CCMenu::create();
@@ -297,23 +288,12 @@ bool IconConfigLayer::setup() {
 }
 
 IconConfigData& IconConfigLayer::getCurrentConfig() {
-    switch (m_currentTab) {
-        default:
-        case IconType::Cube: return m_cubeConfig;
-        case IconType::Ship: return m_shipConfig;
-        case IconType::Ball: return m_ballConfig;
-        case IconType::Ufo: return m_birdConfig;
-        case IconType::Wave: return m_dartConfig;
-        case IconType::Robot: return m_robotConfig;
-        case IconType::Spider: return m_spiderConfig;
-        case IconType::Swing: return m_swingConfig;
-        case IconType::Jetpack: return m_jetpackConfig;
-    }
+    return m_configManager->getConfigOfType(m_currentTab);
 }
 
 void IconConfigLayer::onSwitchTab(CCObject* sender) {
     m_currentTab = static_cast<IconType>(sender->getTag());
-    m_globalConfig.currentTab = m_currentTab;
+    m_configManager->getGlobalConfig().currentTab = m_currentTab;
     IconConfigLayer::refreshTab();
 }
 
@@ -463,14 +443,14 @@ void IconConfigLayer::deleteIcon(int index) {
 IconConfigLayer::~IconConfigLayer() {
     m_instance = nullptr;
     log::debug("Saving config.");
-    Mod::get()->setSavedValue("global", m_globalConfig);
-    Mod::get()->setSavedValue("cube", m_cubeConfig);
-    Mod::get()->setSavedValue("ship", m_shipConfig);
-    Mod::get()->setSavedValue("ball", m_ballConfig);
-    Mod::get()->setSavedValue("bird", m_birdConfig);
-    Mod::get()->setSavedValue("dart", m_dartConfig);
-    Mod::get()->setSavedValue("robot", m_robotConfig);
-    Mod::get()->setSavedValue("spider", m_spiderConfig);
-    Mod::get()->setSavedValue("swing", m_swingConfig);
-    Mod::get()->setSavedValue("jetpack", m_jetpackConfig);
+    Mod::get()->setSavedValue("global", m_configManager->getGlobalConfig());
+    Mod::get()->setSavedValue("cube", m_configManager->getConfigOfType(IconType::Cube));
+    Mod::get()->setSavedValue("ship", m_configManager->getConfigOfType(IconType::Ship));
+    Mod::get()->setSavedValue("ball", m_configManager->getConfigOfType(IconType::Ball));
+    Mod::get()->setSavedValue("bird", m_configManager->getConfigOfType(IconType::Ufo));
+    Mod::get()->setSavedValue("dart", m_configManager->getConfigOfType(IconType::Wave));
+    Mod::get()->setSavedValue("robot", m_configManager->getConfigOfType(IconType::Robot));
+    Mod::get()->setSavedValue("spider", m_configManager->getConfigOfType(IconType::Spider));
+    Mod::get()->setSavedValue("swing", m_configManager->getConfigOfType(IconType::Swing));
+    Mod::get()->setSavedValue("jetpack", m_configManager->getConfigOfType(IconType::Jetpack));
 }

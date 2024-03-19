@@ -1,6 +1,7 @@
 #pragma once
 #include <Geode/ui/Popup.hpp>
 #include "../IconConfigProperties.hpp"
+#include "../class/CIConfigManager.hpp"
 
 namespace changing_icons {
     class IconConfigLayer : public geode::Popup<> {
@@ -14,16 +15,7 @@ namespace changing_icons {
         CCMenuItemToggler* m_randomBtn;
         CCMenuItemToggler* m_disableBtn;
         CCMenuItemToggler* m_mirrorEndBtn;
-        GlobalConfigData m_globalConfig;
-        IconConfigData m_cubeConfig;
-        IconConfigData m_shipConfig;
-        IconConfigData m_ballConfig;
-        IconConfigData m_birdConfig;
-        IconConfigData m_dartConfig;
-        IconConfigData m_robotConfig;
-        IconConfigData m_spiderConfig;
-        IconConfigData m_swingConfig;
-        IconConfigData m_jetpackConfig;
+        CIConfigManager* m_configManager;
         std::vector<std::string> const m_iconOrderList{"Random", "Down", "Up"};
         cocos2d::CCLabelBMFont* m_iconOrderLabel;
         bool setup();
