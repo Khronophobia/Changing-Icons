@@ -8,10 +8,6 @@
 using namespace geode::prelude;
 using namespace changing_icons;
 
-IconConfigLayer* IconConfigLayer::getInstance() {
-    return m_instance;
-}
-
 IconConfigLayer* IconConfigLayer::create() {
     auto ret = new IconConfigLayer();
     if (ret && ret->initAnchored(400.f, 280.f)) {
@@ -23,8 +19,6 @@ IconConfigLayer* IconConfigLayer::create() {
 }
 
 bool IconConfigLayer::setup() {
-    m_instance = this;
-
     m_configManager = CIConfigManager::get();
 
     m_noElasticity = true;
@@ -32,6 +26,7 @@ bool IconConfigLayer::setup() {
     this->setTitle("Changing Icons Config");
 
     m_gamemodeBar = CCMenu::create();
+    m_gamemodeBar->setTouchPriority(CCTouchDispatcher::get()->getForcePrio() - 1);
     m_gamemodeBar->ignoreAnchorPointForPosition(false);
     m_gamemodeBar->setContentWidth(m_size.width - 40.f);
     m_gamemodeBar->setLayout(RowLayout::create()->setAxisAlignment(AxisAlignment::Even));
@@ -366,7 +361,7 @@ void IconConfigLayer::setOrderChoice(int choice) {
 }
 
 void IconConfigLayer::onAddIcon(CCObject*) {
-    AddIconLayer::create(m_currentTab)->show();
+    AddIconLayer::create(m_currentTab, this)->show();
 }
 
 void IconConfigLayer::onClearList(CCObject*) {
@@ -397,6 +392,7 @@ void IconConfigLayer::refreshIconList(IconType currentTab, bool toTop) {
         bool isLast = false;
         if (i == iconList.size() - 1) isLast = true;
         auto cell = IconCell::create(
+            this,
             i,
             currentTab,
             icon.iconID,
@@ -442,7 +438,6 @@ void IconConfigLayer::deleteIcon(int index) {
 }
 
 IconConfigLayer::~IconConfigLayer() {
-    m_instance = nullptr;
     log::debug("Saving config.");
     Mod::get()->setSavedValue("global", m_configManager->getGlobalConfig());
     Mod::get()->setSavedValue("cube", m_configManager->getConfig(IconType::Cube));

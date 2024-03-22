@@ -6,8 +6,6 @@ namespace changing_icons {
     class CIConfigManager;
 
     class IconConfigLayer : public geode::Popup<> {
-    private:
-        static inline IconConfigLayer* m_instance = nullptr;
     protected:
         IconType m_currentTab;
         cocos2d::CCMenu* m_gamemodeBar;
@@ -19,6 +17,7 @@ namespace changing_icons {
         CIConfigManager* m_configManager;
         std::vector<std::string> const m_iconOrderList{"Random", "Forward", "Backward"};
         cocos2d::CCLabelBMFont* m_iconOrderLabel;
+        
         bool setup();
         void refreshTab();
         void setOrderChoice(IconOrder choice);
@@ -26,7 +25,6 @@ namespace changing_icons {
         void refreshIconList(IconType currentTab, bool toTop = false);
         ~IconConfigLayer();
     public:
-        static IconConfigLayer* getInstance();
         static IconConfigLayer* create();
         CITabProperties& getCurrentConfig();
         void onSwitchTab(CCObject*);
