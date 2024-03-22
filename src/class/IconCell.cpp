@@ -1,5 +1,5 @@
 #include "IconCell.hpp"
-#include "../layer/IconConfigLayer.hpp"
+#include "layer/IconConfigLayer.hpp"
 
 using namespace geode::prelude;
 using namespace changing_icons;

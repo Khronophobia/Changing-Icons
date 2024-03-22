@@ -1,8 +1,9 @@
 #include <Geode/Geode.hpp>
 #include "IconConfigLayer.hpp"
 #include "AddIconLayer.hpp"
-#include "../class/CIVariableRef.hpp"
-#include "../class/IconCell.hpp"
+#include "../CIVariableRef.hpp"
+#include "../IconCell.hpp"
+#include "../CIConfigManager.hpp"
 
 using namespace geode::prelude;
 using namespace changing_icons;
@@ -287,7 +288,7 @@ bool IconConfigLayer::setup() {
     return true;
 }
 
-IconConfigData& IconConfigLayer::getCurrentConfig() {
+CITabProperties& IconConfigLayer::getCurrentConfig() {
     return m_configManager->getConfig(m_currentTab);
 }
 

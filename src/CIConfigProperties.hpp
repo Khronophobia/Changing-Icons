@@ -1,5 +1,6 @@
 #pragma once
 #include <matjson/stl_serialize.hpp>
+#include "CIUtilities.hpp"
 
 namespace changing_icons {
     enum class IconOrder {
@@ -14,19 +15,19 @@ namespace changing_icons {
         std::optional<cocos2d::ccColor3B> color2 = std::nullopt;
     };
 
-    struct GlobalOverrideData {
+    struct CIGlobalOverride {
         std::optional<bool> useAll = std::nullopt;
         std::optional<IconOrder> order = std::nullopt;
         std::optional<bool> disable = std::nullopt;
     };
 
-    struct GlobalConfigData {
+    struct CIGlobalProperties {
         IconType currentTab = IconType::Cube;
         std::unordered_set<IconType> globalOverrides;
-        GlobalOverrideData override;
+        CIGlobalOverride override;
     };
 
-    struct IconConfigData {
+    struct CITabProperties {
         std::vector<IconProperties> iconSet;
         IconOrder order = IconOrder::Random;
         IconOrder tempOrder = IconOrder::Random;
@@ -34,13 +35,6 @@ namespace changing_icons {
         bool mirrorEnd;
         bool disabled;
     };
-
-    namespace utils {
-        template<typename T>
-        T tryGetJsonValue(matjson::Value const& value, std::string_view key, T defaultVar) {
-            return value.contains(key) ? value[key].as<T>() : defaultVar;
-        }
-    }
 }
 
 template<>
@@ -107,27 +101,27 @@ struct matjson::Serialize<changing_icons::IconProperties> {
 };
 
 template<>
-struct matjson::Serialize<changing_icons::GlobalOverrideData> {
-    static changing_icons::GlobalOverrideData from_json(matjson::Value const& value) {
-        return changing_icons::GlobalOverrideData {
+struct matjson::Serialize<changing_icons::CIGlobalOverride> {
+    static changing_icons::CIGlobalOverride from_json(matjson::Value const& value) {
+        return changing_icons::CIGlobalOverride {
             .useAll = changing_icons::utils::tryGetJsonValue<std::optional<bool>>(
                 value,
                 "use-all",
-                changing_icons::GlobalOverrideData().useAll
+                changing_icons::CIGlobalOverride().useAll
             ),
             .order = changing_icons::utils::tryGetJsonValue<std::optional<changing_icons::IconOrder>>(
                 value,
                 "order",
-                changing_icons::GlobalOverrideData().order
+                changing_icons::CIGlobalOverride().order
             ),
             .disable = changing_icons::utils::tryGetJsonValue<std::optional<bool>>(
                 value,
                 "disable",
-                changing_icons::GlobalOverrideData().disable
+                changing_icons::CIGlobalOverride().disable
             )
         };
     }
-    static matjson::Value to_json(changing_icons::GlobalOverrideData const& value) {
+    static matjson::Value to_json(changing_icons::CIGlobalOverride const& value) {
         auto obj = matjson::Object();
         obj["use-all"] = value.useAll;
         obj["order"] = value.order;
@@ -140,27 +134,27 @@ struct matjson::Serialize<changing_icons::GlobalOverrideData> {
 };
 
 template<>
-struct matjson::Serialize<changing_icons::GlobalConfigData> {
-    static changing_icons::GlobalConfigData from_json(matjson::Value const& value) {
-        return changing_icons::GlobalConfigData {
+struct matjson::Serialize<changing_icons::CIGlobalProperties> {
+    static changing_icons::CIGlobalProperties from_json(matjson::Value const& value) {
+        return changing_icons::CIGlobalProperties {
             .currentTab = changing_icons::utils::tryGetJsonValue<IconType>(
                 value,
                 "current-tab",
-                changing_icons::GlobalConfigData().currentTab
+                changing_icons::CIGlobalProperties().currentTab
             ),
             .globalOverrides = changing_icons::utils::tryGetJsonValue<std::unordered_set<IconType>>(
                 value,
                 "global-overrides",
-                changing_icons::GlobalConfigData().globalOverrides
+                changing_icons::CIGlobalProperties().globalOverrides
             ),
-            .override = changing_icons::utils::tryGetJsonValue<changing_icons::GlobalOverrideData>(
+            .override = changing_icons::utils::tryGetJsonValue<changing_icons::CIGlobalOverride>(
                 value,
                 "override",
-                changing_icons::GlobalConfigData().override
+                changing_icons::CIGlobalProperties().override
             )
         };
     }
-    static matjson::Value to_json(changing_icons::GlobalConfigData const& value) {
+    static matjson::Value to_json(changing_icons::CIGlobalProperties const& value) {
         auto obj = matjson::Object();
         obj["current-tab"] = static_cast<int>(value.currentTab);
         obj["global-overrides"] = value.globalOverrides;
@@ -173,37 +167,37 @@ struct matjson::Serialize<changing_icons::GlobalConfigData> {
 };
 
 template<>
-struct matjson::Serialize<changing_icons::IconConfigData> {
-    static changing_icons::IconConfigData from_json(matjson::Value const& value) {
-        return changing_icons::IconConfigData {
+struct matjson::Serialize<changing_icons::CITabProperties> {
+    static changing_icons::CITabProperties from_json(matjson::Value const& value) {
+        return changing_icons::CITabProperties {
             .iconSet = changing_icons::utils::tryGetJsonValue<std::vector<changing_icons::IconProperties>>(
                 value,
                 "icon-set",
-                changing_icons::IconConfigData().iconSet
+                changing_icons::CITabProperties().iconSet
             ),
             .order = changing_icons::utils::tryGetJsonValue<changing_icons::IconOrder>(
                 value,
                 "order",
-                changing_icons::IconConfigData().order
+                changing_icons::CITabProperties().order
             ),
             .useAll = changing_icons::utils::tryGetJsonValue<bool>(
                 value,
                 "use-all",
-                changing_icons::IconConfigData().useAll
+                changing_icons::CITabProperties().useAll
             ),
             .mirrorEnd = changing_icons::utils::tryGetJsonValue(
                 value,
                 "mirror-end",
-                changing_icons::IconConfigData().mirrorEnd
+                changing_icons::CITabProperties().mirrorEnd
             ),
             .disabled = changing_icons::utils::tryGetJsonValue<bool>(
                 value,
                 "disabled",
-                changing_icons::IconConfigData().disabled
+                changing_icons::CITabProperties().disabled
             )
         };
     }
-    static matjson::Value to_json(changing_icons::IconConfigData const& value) {
+    static matjson::Value to_json(changing_icons::CITabProperties const& value) {
         auto obj = matjson::Object();
         obj["icon-set"] = value.iconSet;
         obj["order"] = static_cast<int>(value.order);

@@ -1,25 +1,25 @@
 #pragma once
-#include "../IconConfigProperties.hpp"
+#include "../CIConfigProperties.hpp"
 
 namespace changing_icons {
     class CIConfigManager : public cocos2d::CCObject {
     protected:
         inline static CIConfigManager* m_sharedInstance = nullptr;
-        GlobalConfigData m_globalConfig;
-        IconConfigData m_cubeConfig;
-        IconConfigData m_shipConfig;
-        IconConfigData m_ballConfig;
-        IconConfigData m_birdConfig;
-        IconConfigData m_dartConfig;
-        IconConfigData m_robotConfig;
-        IconConfigData m_spiderConfig;
-        IconConfigData m_swingConfig;
-        IconConfigData m_jetpackConfig;
+        CIGlobalProperties m_globalConfig;
+        CITabProperties m_cubeConfig;
+        CITabProperties m_shipConfig;
+        CITabProperties m_ballConfig;
+        CITabProperties m_birdConfig;
+        CITabProperties m_dartConfig;
+        CITabProperties m_robotConfig;
+        CITabProperties m_spiderConfig;
+        CITabProperties m_swingConfig;
+        CITabProperties m_jetpackConfig;
         bool init();
     public:
         // Get the shared instance of CIConfigManager
         static CIConfigManager* get();
-        GlobalConfigData& getGlobalConfig();
-        IconConfigData& getConfig(IconType type);
+        CIGlobalProperties& getGlobalConfig();
+        CITabProperties& getConfig(IconType type);
     };
 }

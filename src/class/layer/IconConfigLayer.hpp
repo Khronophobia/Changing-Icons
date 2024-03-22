@@ -1,9 +1,10 @@
 #pragma once
 #include <Geode/ui/Popup.hpp>
-#include "../IconConfigProperties.hpp"
-#include "../class/CIConfigManager.hpp"
+#include "../../CIConfigProperties.hpp"
 
 namespace changing_icons {
+    class CIConfigManager;
+
     class IconConfigLayer : public geode::Popup<> {
     private:
         static inline IconConfigLayer* m_instance = nullptr;
@@ -27,7 +28,7 @@ namespace changing_icons {
     public:
         static IconConfigLayer* getInstance();
         static IconConfigLayer* create();
-        IconConfigData& getCurrentConfig();
+        CITabProperties& getCurrentConfig();
         void onSwitchTab(CCObject*);
         void onVarInfo(CCObject*);
         void onVarToggle(CCObject*);

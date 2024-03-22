@@ -1,6 +1,6 @@
 #pragma once
 #include <Geode/ui/Popup.hpp>
-#include "../IconConfigProperties.hpp"
+#include "../../CIConfigProperties.hpp"
 
 namespace changing_icons {
     class AddIconLayer : public geode::Popup<

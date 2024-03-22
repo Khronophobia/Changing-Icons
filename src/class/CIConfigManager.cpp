@@ -13,25 +13,25 @@ CIConfigManager* CIConfigManager::get() {
 }
 
 bool CIConfigManager::init() {
-    m_globalConfig = Mod::get()->getSavedValue<GlobalConfigData>("global");
-    m_cubeConfig = Mod::get()->getSavedValue<IconConfigData>("cube");
-    m_shipConfig = Mod::get()->getSavedValue<IconConfigData>("ship");
-    m_ballConfig = Mod::get()->getSavedValue<IconConfigData>("ball");
-    m_birdConfig = Mod::get()->getSavedValue<IconConfigData>("bird");
-    m_dartConfig = Mod::get()->getSavedValue<IconConfigData>("dart");
-    m_robotConfig = Mod::get()->getSavedValue<IconConfigData>("robot");
-    m_spiderConfig = Mod::get()->getSavedValue<IconConfigData>("spider");
-    m_swingConfig = Mod::get()->getSavedValue<IconConfigData>("swing");
-    m_jetpackConfig = Mod::get()->getSavedValue<IconConfigData>("jetpack");
+    m_globalConfig = Mod::get()->getSavedValue<CIGlobalProperties>("global");
+    m_cubeConfig = Mod::get()->getSavedValue<CITabProperties>("cube");
+    m_shipConfig = Mod::get()->getSavedValue<CITabProperties>("ship");
+    m_ballConfig = Mod::get()->getSavedValue<CITabProperties>("ball");
+    m_birdConfig = Mod::get()->getSavedValue<CITabProperties>("bird");
+    m_dartConfig = Mod::get()->getSavedValue<CITabProperties>("dart");
+    m_robotConfig = Mod::get()->getSavedValue<CITabProperties>("robot");
+    m_spiderConfig = Mod::get()->getSavedValue<CITabProperties>("spider");
+    m_swingConfig = Mod::get()->getSavedValue<CITabProperties>("swing");
+    m_jetpackConfig = Mod::get()->getSavedValue<CITabProperties>("jetpack");
 
     return true;
 }
 
-GlobalConfigData& CIConfigManager::getGlobalConfig() {
+CIGlobalProperties& CIConfigManager::getGlobalConfig() {
     return m_globalConfig;
 }
 
-IconConfigData& CIConfigManager::getConfig(IconType type) {
+CITabProperties& CIConfigManager::getConfig(IconType type) {
     switch (type) {
         default:
         case IconType::Cube: return m_cubeConfig;
