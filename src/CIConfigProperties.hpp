@@ -11,8 +11,8 @@ namespace changing_icons {
 
     struct IconProperties {
         int iconID;
-        std::optional<cocos2d::ccColor3B> color1 = std::nullopt;
-        std::optional<cocos2d::ccColor3B> color2 = std::nullopt;
+        std::optional<int> color1 = std::nullopt;
+        std::optional<int> color2 = std::nullopt;
     };
 
     struct CIGlobalOverride {
@@ -76,12 +76,12 @@ struct matjson::Serialize<changing_icons::IconProperties> {
                 "ID",
                 changing_icons::IconProperties().iconID
             ),
-            .color1 = changing_icons::utils::tryGetJsonValue<std::optional<cocos2d::ccColor3B>>(
+            .color1 = changing_icons::utils::tryGetJsonValue<std::optional<int>>(
                 value,
                 "color1",
                 changing_icons::IconProperties().color1
             ),
-            .color2 = changing_icons::utils::tryGetJsonValue<std::optional<cocos2d::ccColor3B>>(
+            .color2 = changing_icons::utils::tryGetJsonValue<std::optional<int>>(
                 value,
                 "color2",
                 changing_icons::IconProperties().color2

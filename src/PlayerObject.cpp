@@ -88,12 +88,12 @@ class $modify(CIPlayerObject, PlayerObject) {
         auto gm = GameManager::get();
 
         int newIcon = 1;
-        ccColor3B newColor1 = gm->colorForIdx(gm->getPlayerColor());
-        ccColor3B newColor2 = gm->colorForIdx(gm->getPlayerColor2());
+        int newColor1 = gm->getPlayerColor();
+        int newColor2 = gm->getPlayerColor2();
 
         if (config.disabled || (config.iconSet.empty() && !config.useAll)) {
-            PlayerObject::setColor(newColor1);
-            PlayerObject::setSecondColor(newColor2);
+            PlayerObject::setColor(gm->colorForIdx(newColor1));
+            PlayerObject::setSecondColor(gm->colorForIdx(newColor2));
             return;
         };
 
@@ -144,48 +144,48 @@ class $modify(CIPlayerObject, PlayerObject) {
         default: break;
         case IconType::Cube:
             PlayerObject::updatePlayerFrame(newIcon);
-            PlayerObject::setColor(newColor1);
-            PlayerObject::setSecondColor(newColor2);
+            PlayerObject::setColor(gm->colorForIdx(newColor1));
+            PlayerObject::setSecondColor(gm->colorForIdx(newColor2));
             break;
         case IconType::Ship:
             PlayerObject::updatePlayerShipFrame(newIcon);
-            CIPlayerObject::setVehicleColor(newColor1);
-            CIPlayerObject::setVehicleSecondColor(newColor2);
+            CIPlayerObject::setVehicleColor(gm->colorForIdx(newColor1));
+            CIPlayerObject::setVehicleSecondColor(gm->colorForIdx(newColor2));
             break;
         case IconType::Ball:
             PlayerObject::updatePlayerRollFrame(newIcon);
-            PlayerObject::setColor(newColor1);
-            PlayerObject::setSecondColor(newColor2);
+            PlayerObject::setColor(gm->colorForIdx(newColor1));
+            PlayerObject::setSecondColor(gm->colorForIdx(newColor2));
             break;
         case IconType::Ufo:
             PlayerObject::updatePlayerBirdFrame(newIcon);
-            CIPlayerObject::setVehicleColor(newColor1);
-            CIPlayerObject::setVehicleSecondColor(newColor2);
+            CIPlayerObject::setVehicleColor(gm->colorForIdx(newColor1));
+            CIPlayerObject::setVehicleSecondColor(gm->colorForIdx(newColor2));
             break;
         case IconType::Wave:
             PlayerObject::updatePlayerDartFrame(newIcon);
-            PlayerObject::setColor(newColor1);
-            PlayerObject::setSecondColor(newColor2);
+            PlayerObject::setColor(gm->colorForIdx(newColor1));
+            PlayerObject::setSecondColor(gm->colorForIdx(newColor2));
             break;
         case IconType::Robot:
             PlayerObject::updatePlayerRobotFrame(newIcon);
-            PlayerObject::setColor(newColor1);
-            PlayerObject::setSecondColor(newColor2);
+            PlayerObject::setColor(gm->colorForIdx(newColor1));
+            PlayerObject::setSecondColor(gm->colorForIdx(newColor2));
             break;
         case IconType::Spider:
             PlayerObject::updatePlayerSpiderFrame(newIcon);
-            PlayerObject::setColor(newColor1);
-            PlayerObject::setSecondColor(newColor2);
+            PlayerObject::setColor(gm->colorForIdx(newColor1));
+            PlayerObject::setSecondColor(gm->colorForIdx(newColor2));
             break;
         case IconType::Swing:
             PlayerObject::updatePlayerSwingFrame(newIcon);
-            PlayerObject::setColor(newColor1);
-            PlayerObject::setSecondColor(newColor2);
+            PlayerObject::setColor(gm->colorForIdx(newColor1));
+            PlayerObject::setSecondColor(gm->colorForIdx(newColor2));
             break;
         case IconType::Jetpack:
             PlayerObject::updatePlayerJetpackFrame(newIcon);
-            CIPlayerObject::setVehicleColor(newColor1);
-            CIPlayerObject::setVehicleSecondColor(newColor2);
+            CIPlayerObject::setVehicleColor(gm->colorForIdx(newColor1));
+            CIPlayerObject::setVehicleSecondColor(gm->colorForIdx(newColor2));
             break;
         }
     }

@@ -6,8 +6,8 @@ namespace changing_icons {
     class AddIconLayer : public geode::Popup<
             IconType,
             int,
-            std::optional<cocos2d::ccColor3B>,
-            std::optional<cocos2d::ccColor3B>
+            std::optional<int>,
+            std::optional<int>
         > {
     protected:
         IconType m_iconType;
@@ -21,19 +21,19 @@ namespace changing_icons {
         bool setup(
             IconType iconType,
             int ID,
-            std::optional<cocos2d::ccColor3B> color1,
-            std::optional<cocos2d::ccColor3B> color2
+            std::optional<int> color1,
+            std::optional<int> color2
         );
         size_t getIconCount() const;
         UnlockType convertIconType(IconType type);
-        void setIconColor(std::optional<cocos2d::ccColor3B> color, int colorType);
+        void setIconColor(std::optional<int> color, int colorType);
         void updateIconColors();
     public:
         static AddIconLayer* create(
             IconType iconType,
             int ID = 1,
-            std::optional<cocos2d::ccColor3B> color1 = std::nullopt,
-            std::optional<cocos2d::ccColor3B> color2 = std::nullopt
+            std::optional<int> color1 = std::nullopt,
+            std::optional<int> color2 = std::nullopt
         );
         void onSelectIcon(CCObject* sender);
         void onAddIcon(CCObject* sender);

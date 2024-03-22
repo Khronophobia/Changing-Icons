@@ -1,5 +1,6 @@
 #include <Geode/Geode.hpp>
 #include "AddIconLayer.hpp"
+#include "Geode/binding/GameManager.hpp"
 #include "IconConfigLayer.hpp"
 #include "../../constants.hpp"
 
@@ -9,8 +10,8 @@ using namespace changing_icons;
 AddIconLayer* AddIconLayer::create(
             IconType iconType,
             int ID,
-            std::optional<cocos2d::ccColor3B> color1,
-            std::optional<cocos2d::ccColor3B> color2
+            std::optional<int> color1,
+            std::optional<int> color2
         ) {
     auto ret = new AddIconLayer();
     if (ret && ret->initAnchored(420.f, 300.f, iconType, ID, color1, color2)) {
@@ -24,8 +25,8 @@ AddIconLayer* AddIconLayer::create(
 bool AddIconLayer::setup(
             IconType iconType,
             int ID,
-            std::optional<cocos2d::ccColor3B> color1,
-            std::optional<cocos2d::ccColor3B> color2
+            std::optional<int> color1,
+            std::optional<int> color2
         ) {
     m_noElasticity = true;
     m_iconType = iconType;
@@ -125,7 +126,9 @@ bool AddIconLayer::setup(
     m_color1Label->setScale(0.65f);
     if (color1) {
         m_color1Label->setString("1");
-        m_color1Display->setColor(m_selectedIcon.color1.value());
+        m_color1Display->setColor(
+            GameManager::get()->colorForIdx(m_selectedIcon.color1.value())
+        );
     } else m_color1Display->setColor(GameManager::get()->colorForIdx(17));
 
     m_color1Display->addChild(m_color1Label);
@@ -140,7 +143,9 @@ bool AddIconLayer::setup(
     m_color2Label->setScale(0.65f);
     if (color2) {
         m_color2Label->setString("2");
-        m_color2Display->setColor(m_selectedIcon.color2.value());
+        m_color2Display->setColor(
+            GameManager::get()->colorForIdx(m_selectedIcon.color2.value())
+        );
     } else m_color2Display->setColor(GameManager::get()->colorForIdx(12));
 
     m_color2Display->addChild(m_color2Label);
@@ -257,7 +262,7 @@ UnlockType AddIconLayer::convertIconType(IconType type) {
     }
 }
 
-void AddIconLayer::setIconColor(std::optional<cocos2d::ccColor3B> color, int colorType) {
+void AddIconLayer::setIconColor(std::optional<int> color, int colorType) {
     switch(colorType) {
         case 0: m_selectedIcon.color1 = color; break;
         case 1: m_selectedIcon.color2 = color; break;
@@ -268,8 +273,12 @@ void AddIconLayer::setIconColor(std::optional<cocos2d::ccColor3B> color, int col
 void AddIconLayer::updateIconColors() {
     if (m_selectedIcon.color1) {
         m_color1Label->setString("1");
-        m_color1Display->setColor(m_selectedIcon.color1.value());
-        m_iconDisplay->setColor(m_selectedIcon.color1.value());
+        m_color1Display->setColor(
+            GameManager::get()->colorForIdx(m_selectedIcon.color1.value())
+        );
+        m_iconDisplay->setColor(
+            GameManager::get()->colorForIdx(m_selectedIcon.color1.value())
+        );
     } else {
         m_color1Label->setString("1U");
         m_color1Display->setColor(GameManager::get()->colorForIdx(17));
@@ -277,8 +286,12 @@ void AddIconLayer::updateIconColors() {
     }
     if (m_selectedIcon.color2) {
         m_color2Label->setString("2");
-        m_color2Display->setColor(m_selectedIcon.color2.value());
-        m_iconDisplay->setSecondColor(m_selectedIcon.color2.value());
+        m_color2Display->setColor(
+            GameManager::get()->colorForIdx(m_selectedIcon.color2.value())
+        );
+        m_iconDisplay->setSecondColor(
+            GameManager::get()->colorForIdx(m_selectedIcon.color2.value())
+        );
     } else {
         m_color2Label->setString("2U");
         m_color2Display->setColor(GameManager::get()->colorForIdx(12));
@@ -299,14 +312,14 @@ void AddIconLayer::onAddIcon(CCObject* sender) {
 
 void AddIconLayer::onColor(CCObject* sender) {
     AddIconLayer::setIconColor(
-        GameManager::get()->colorForIdx(sender->getTag()),
+        sender->getTag(),
         0
     );
 }
 
 void AddIconLayer::onSecondColor(CCObject* sender) {
     AddIconLayer::setIconColor(
-        GameManager::get()->colorForIdx(sender->getTag()),
+        sender->getTag(),
         1
     );
 }

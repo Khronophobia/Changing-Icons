@@ -8,8 +8,8 @@ namespace changing_icons {
             int index,
             IconType iconType,
             int iconID,
-            std::optional<cocos2d::ccColor3B> color1,
-            std::optional<cocos2d::ccColor3B> color2,
+            std::optional<int> color1,
+            std::optional<int> color2,
             bool isLast
         );
     public:
@@ -17,8 +17,8 @@ namespace changing_icons {
             int index,
             IconType iconType,
             int iconID,
-            std::optional<cocos2d::ccColor3B> color1 = std::nullopt,
-            std::optional<cocos2d::ccColor3B> color2 = std::nullopt,
+            std::optional<int> color1 = std::nullopt,
+            std::optional<int> color2 = std::nullopt,
             bool isLast = false
         );
         void onDelete(CCObject*);

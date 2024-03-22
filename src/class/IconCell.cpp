@@ -8,8 +8,8 @@ IconCell* IconCell::create(
         int index,
         IconType iconType,
         int iconID,
-        std::optional<cocos2d::ccColor3B> color1,
-        std::optional<cocos2d::ccColor3B> color2,
+        std::optional<int> color1,
+        std::optional<int> color2,
         bool isLast
     ) {
     auto ret = new IconCell();
@@ -25,8 +25,8 @@ bool IconCell::init(
         int index,
         IconType iconType,
         int iconID,
-        std::optional<cocos2d::ccColor3B> color1,
-        std::optional<cocos2d::ccColor3B> color2,
+        std::optional<int> color1,
+        std::optional<int> color2,
         bool isLast
     ) {
     if (!CCLayerColor::init()) return false;
@@ -41,22 +41,22 @@ bool IconCell::init(
     if (color1) {
         auto color1Display = ColorChannelSprite::create();
         color1Display->setScale(0.5f);
-        color1Display->setColor(color1.value());
+        color1Display->setColor(GameManager::get()->colorForIdx(color1.value()));
         this->addChildAtPosition(color1Display, Anchor::Left, ccp(55.f, 0.f));
-    } else color1 = GameManager::get()->colorForIdx(17);
+    } else color1 = 17;
 
     if (color2) {
         auto color2Display = ColorChannelSprite::create();
         color2Display->setScale(0.5f);
-        color2Display->setColor(color2.value());
+        color2Display->setColor(GameManager::get()->colorForIdx(color2.value()));
         this->addChildAtPosition(color2Display, Anchor::Left, ccp(75.f, 0.f));
-    } else color2 = GameManager::get()->colorForIdx(12);
+    } else color2 = 12;
 
     auto icon = SimplePlayer::create(0);
     icon->setScale(0.7f);
     icon->updatePlayerFrame(iconID, iconType);
-    icon->setColor(color1.value());
-    icon->setSecondColor(color2.value());
+    icon->setColor(GameManager::get()->colorForIdx(color1.value()));
+    icon->setSecondColor(GameManager::get()->colorForIdx(color2.value()));
     this->addChildAtPosition(icon, Anchor::Left, ccp(24.f, 0.f));
 
     auto menu = CCMenu::create();
