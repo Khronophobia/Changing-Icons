@@ -20,5 +20,12 @@
 			"importance": "required",
 			"version": ">=v1.2.0"
 		}
+	],
+	"incompatibilities": [
+		{
+			"id": "rooot.custom-gamemode-colors",
+			"importance": "conflicting",
+			"version": ">=0.1.1"
+		}
 	]
 }
