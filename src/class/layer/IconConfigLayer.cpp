@@ -364,6 +364,11 @@ void IconConfigLayer::onAddIcon(CCObject*) {
     AddIconLayer::create(m_currentTab, this)->show();
 }
 
+void IconConfigLayer::editIconAtIndex(int index) {
+    auto const& prevIcon = IconConfigLayer::getCurrentConfig().iconSet.at(index);
+    AddIconLayer::create(m_currentTab, this, prevIcon, index)->show();
+}
+
 void IconConfigLayer::onClearList(CCObject*) {
     createQuickPopup(
         "Clear List",
@@ -427,6 +432,13 @@ void IconConfigLayer::swapIcons(int icon1, int icon2) {
     log::debug("Swapped icons in index {} and {}", icon1, icon2);
     auto& iconSet = IconConfigLayer::getCurrentConfig().iconSet;
     std::iter_swap(iconSet.begin() + icon1, iconSet.begin() + icon2);
+    IconConfigLayer::refreshIconList(m_currentTab);
+}
+
+void IconConfigLayer::replaceIcon(IconProperties icon, int index) {
+    log::debug("Replaced icon in index {}", index);
+    auto& iconSet = IconConfigLayer::getCurrentConfig().iconSet;
+    iconSet.at(index) = icon;
     IconConfigLayer::refreshIconList(m_currentTab);
 }
 

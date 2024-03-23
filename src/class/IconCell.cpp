@@ -77,6 +77,15 @@ bool IconCell::init(
     );
     menu->addChildAtPosition(trashBtn, Anchor::Center, CCPointZero, false);
 
+    auto editBtnSpr = CCSprite::createWithSpriteFrameName("geode.loader/pencil.png");
+    editBtnSpr->setScale(0.5f);
+    auto editBtn = CCMenuItemSpriteExtra::create(
+        editBtnSpr,
+        this,
+        menu_selector(IconCell::onEdit)
+    );
+    menu->addChildAtPosition(editBtn, Anchor::Center, ccp(-20.f, 0.f), false);
+
     auto moveDownSpr = CCSprite::createWithSpriteFrameName("edit_downBtn_001.png");
     moveDownSpr->setScale(0.7f);
     auto moveDownBtn = CCMenuItemSpriteExtra::create(
@@ -84,7 +93,7 @@ bool IconCell::init(
         this,
         menu_selector(IconCell::onMoveDown)
     );
-    menu->addChildAtPosition(moveDownBtn, Anchor::Center, ccp(-20.f, -6.f), false);
+    menu->addChildAtPosition(moveDownBtn, Anchor::Center, ccp(-40.f, -6.f), false);
 
     auto moveUpSpr = CCSprite::createWithSpriteFrameName("edit_upBtn_001.png");
     moveUpSpr->setScale(0.7f);
@@ -93,7 +102,7 @@ bool IconCell::init(
         this,
         menu_selector(IconCell::onMoveUp)
     );
-    menu->addChildAtPosition(moveUpBtn, Anchor::Center, ccp(-20.f, 6.f), false);
+    menu->addChildAtPosition(moveUpBtn, Anchor::Center, ccp(-40.f, 6.f), false);
 
     if (index == 0) moveUpBtn->setVisible(false);
     if (isLast) moveDownBtn->setVisible(false);
@@ -103,6 +112,10 @@ bool IconCell::init(
 
 void IconCell::onDelete(CCObject*) {
     m_configLayer->deleteIcon(m_index);
+}
+
+void IconCell::onEdit(CCObject*) {
+    m_configLayer->editIconAtIndex(m_index);
 }
 
 void IconCell::onMoveDown(CCObject*) {

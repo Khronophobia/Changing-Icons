@@ -28,6 +28,7 @@ namespace changing_icons {
             bool isLast = false
         );
         void onDelete(CCObject*);
+        void onEdit(CCObject*);
         void onMoveDown(CCObject*);
         void onMoveUp(CCObject*);
     };

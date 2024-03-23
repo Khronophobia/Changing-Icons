@@ -33,8 +33,10 @@ namespace changing_icons {
         void onOrderArrow(CCObject*);
         void onAddIcon(CCObject*);
         void onClearList(CCObject*);
+        void editIconAtIndex(int index);
         void addIcon(IconProperties properties);
         void swapIcons(int icon1, int icon2);
+        void replaceIcon(IconProperties properties, int index);
         void deleteIcon(int index);
     };
 }

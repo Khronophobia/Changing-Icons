@@ -8,9 +8,9 @@ using namespace changing_icons;
 
 int constexpr ICONS_PER_PAGE = 55;
 
-AddIconLayer* AddIconLayer::create(IconType iconType, IconConfigLayer* configLayer, IconProperties iconProps) {
+AddIconLayer* AddIconLayer::create(IconType iconType, IconConfigLayer* configLayer, IconProperties iconProps, std::optional<int> index) {
     auto ret = new AddIconLayer();
-    if (ret && ret->initAnchored(450.f, 300.f, iconType, configLayer, iconProps, "GJ_square02.png")) {
+    if (ret && ret->initAnchored(450.f, 300.f, iconType, configLayer, iconProps, index, "GJ_square02.png")) {
         ret->autorelease();
         return ret;
     }
@@ -31,7 +31,7 @@ AddIconLayer* AddIconLayer::create(
         .color2 = color2
     };
     auto ret = new AddIconLayer();
-    if (ret && ret->initAnchored(450.f, 300.f, iconType, configLayer, iconProps, "GJ_square02.png")) {
+    if (ret && ret->initAnchored(450.f, 300.f, iconType, configLayer, iconProps, std::nullopt, "GJ_square02.png")) {
         ret->autorelease();
         return ret;
     }
@@ -39,13 +39,15 @@ AddIconLayer* AddIconLayer::create(
     return nullptr;
 }
 
-bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconProperties iconProps) {
+bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconProperties iconProps, std::optional<int> index) {
     m_noElasticity = true;
     m_iconType = iconType;
     m_selectedIcon = iconProps;
     m_configLayer = configLayer;
+    m_index = index;
     m_iconPageMax = GameManager::get()->countForType(iconType) / ICONS_PER_PAGE;
-    this->setTitle("Add Icon");
+    if (m_index) this->setTitle("Edit Icon");
+    else this->setTitle("Add Icon");
 
     static_cast<AnchorLayoutOptions*>(m_closeBtn->getLayoutOptions())
         ->setOffset(ccp(10.f, -10.f));
@@ -81,7 +83,9 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
         ccp(-colorPageBtn->getContentWidth() / 2 - 4.f, 0.f)
     );
 
-    auto addIconSpr = ButtonSprite::create("Add");
+    ButtonSprite* addIconSpr;
+    if (m_index) addIconSpr = ButtonSprite::create("Edit");
+    else addIconSpr = ButtonSprite::create("Add");
     addIconSpr->setScale(0.8f);
     auto addIconBtn = CCMenuItemSpriteExtra::create(
         addIconSpr,
@@ -360,7 +364,11 @@ void AddIconLayer::onSelectIcon(CCObject* sender) {
 }
 
 void AddIconLayer::onAddIcon(CCObject* sender) {
-    m_configLayer->addIcon(m_selectedIcon);
+    if (m_index) {
+        m_configLayer->replaceIcon(m_selectedIcon, m_index.value());
+    } else {
+        m_configLayer->addIcon(m_selectedIcon);
+    }
     AddIconLayer::onClose(nullptr);
 }
 

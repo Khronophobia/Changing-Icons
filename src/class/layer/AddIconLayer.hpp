@@ -5,10 +5,11 @@
 namespace changing_icons {
     class IconConfigLayer;
 
-    class AddIconLayer : public geode::Popup<IconType, IconConfigLayer*, IconProperties> {
+    class AddIconLayer : public geode::Popup<IconType, IconConfigLayer*, IconProperties, std::optional<int>> {
     protected:
         IconConfigLayer* m_configLayer;
         IconProperties m_selectedIcon;
+        std::optional<int> m_index;
         int m_currentPage;
         geode::Ref<cocos2d::CCArray> m_iconPageNodes;
         geode::Ref<cocos2d::CCArray> m_colorPageNodes;
@@ -26,13 +27,13 @@ namespace changing_icons {
         int m_selectedColorType;
         cocos2d::CCSprite* m_selectedColorSpr;
 
-        bool setup(IconType iconType, IconConfigLayer* configLayer, IconProperties iconProps);
+        bool setup(IconType iconType, IconConfigLayer* configLayer, IconProperties iconProps, std::optional<int> index);
         void setupIcons(int page);
         UnlockType convertIconType(IconType type) const;
         void setIconColor(std::optional<int> color, int colorType);
         void updateIconColors();
     public:
-        static AddIconLayer* create(IconType iconType, IconConfigLayer* configLayer, IconProperties iconProps);
+        static AddIconLayer* create(IconType iconType, IconConfigLayer* configLayer, IconProperties iconProps, std::optional<int> index = std::nullopt);
         static AddIconLayer* create(
             IconType iconType,
             IconConfigLayer* configLayer,
