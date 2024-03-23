@@ -1,8 +1,8 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/PlayerObject.hpp>
-#include "class/CIConfigManager.hpp"
-#include "CIUtilities.hpp"
-#include "CIConfigProperties.hpp"
+#include <class/CIConfigManager.hpp>
+#include <CIUtilities.hpp>
+#include <CIConfigProperties.hpp>
 
 using namespace geode::prelude;
 namespace ci = changing_icons;

@@ -10,6 +10,7 @@ file(GLOB SOURCES
     src/*.cpp
     src/class/*.cpp
     src/class/layer/*.cpp
+    src/hooks/*.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
@@ -21,5 +22,7 @@ else()
 endif()
 
 add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
+
+target_include_directories(${PROJECT_NAME} PRIVATE src/)
 
 setup_geode_mod(${PROJECT_NAME})

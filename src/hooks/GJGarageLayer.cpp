@@ -1,6 +1,6 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/GJGarageLayer.hpp>
-#include "class/layer/IconConfigLayer.hpp"
+#include <class/layer/IconConfigLayer.hpp>
 
 using namespace geode::prelude;
 using namespace changing_icons;

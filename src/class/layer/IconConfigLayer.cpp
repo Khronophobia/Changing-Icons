@@ -1,9 +1,9 @@
 #include <Geode/Geode.hpp>
 #include "IconConfigLayer.hpp"
 #include "AddIconLayer.hpp"
-#include "../CIVariableRef.hpp"
-#include "../IconCell.hpp"
-#include "../CIConfigManager.hpp"
+#include <class/CIVariableRef.hpp>
+#include <class/IconCell.hpp>
+#include <class/CIConfigManager.hpp>
 
 using namespace geode::prelude;
 using namespace changing_icons;

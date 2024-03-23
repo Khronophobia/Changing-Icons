@@ -1,7 +1,7 @@
 #include <Geode/Geode.hpp>
 #include "AddIconLayer.hpp"
 #include "IconConfigLayer.hpp"
-#include "../../constants.hpp"
+#include <CIConstants.hpp>
 
 using namespace geode::prelude;
 using namespace changing_icons;

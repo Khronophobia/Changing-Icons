@@ -1,5 +1,5 @@
 #pragma once
-#include "../CIConfigProperties.hpp"
+#include <CIConfigProperties.hpp>
 
 namespace changing_icons {
     class CIConfigManager : public cocos2d::CCObject {
