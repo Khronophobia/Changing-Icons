@@ -105,6 +105,9 @@ class $modify(CIPlayerObject, PlayerObject) {
         PlayerObject::toggleSwingMode(p0, p1);
         if (p0) CIPlayerObject::updateIconsCI(IconType::Swing);
     }
+    void flashPlayer(float p0, float p1, ccColor3B mainColor, ccColor3B secondColor) {
+        // Make this do nothing because it resets the colors
+    }
 
     void setVehicleColor(ccColor3B color) {
         m_vehicleSprite->setColor(color);
