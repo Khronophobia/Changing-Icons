@@ -158,19 +158,11 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
     m_color1Display = ColorChannelSprite::create();
     m_color1Display->setScale(0.7f);
     m_color1Label = CCLabelBMFont::create("1X", "bigFont.fnt");
-    m_color1Label->setColor(cc3x(0x0));
+    m_color1Label->setColor(cc3x(0x7f));
     m_color1Label->setOpacity(127);
     m_color1Label->setScale(0.6f);
     m_color1Label->setPosition(m_color1Display->getContentSize() / 2);
     m_color1Display->addChild(m_color1Label);
-    if (m_selectedIcon.color1) {
-        m_color1Label->setString("1");
-        m_color1Display->setColor(GameManager::get()->colorForIdx(m_selectedIcon.color1.value()));
-        m_iconDisplay->setColor(GameManager::get()->colorForIdx(m_selectedIcon.color1.value()));
-    } else {
-        m_color1Display->setColor(GameManager::get()->colorForIdx(17));
-        m_iconDisplay->setColor(GameManager::get()->colorForIdx(17));
-    }
 
     m_color1Btn = CCMenuItemSpriteExtra::create(
         m_color1Display,
@@ -183,19 +175,11 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
     m_color2Display = ColorChannelSprite::create();
     m_color2Display->setScale(0.7f);
     m_color2Label = CCLabelBMFont::create("2X", "bigFont.fnt");
-    m_color2Label->setColor(cc3x(0x0));
+    m_color2Label->setColor(cc3x(0x7f));
     m_color2Label->setOpacity(127);
     m_color2Label->setScale(0.6f);
     m_color2Label->setPosition(m_color2Display->getContentSize() / 2);
     m_color2Display->addChild(m_color2Label);
-    if (m_selectedIcon.color2) {
-        m_color2Label->setString("2");
-        m_color2Display->setColor(GameManager::get()->colorForIdx(m_selectedIcon.color2.value()));
-        m_iconDisplay->setSecondColor(GameManager::get()->colorForIdx(m_selectedIcon.color2.value()));
-    } else {
-        m_color2Display->setColor(GameManager::get()->colorForIdx(12));
-        m_iconDisplay->setSecondColor(GameManager::get()->colorForIdx(12));
-    }
 
     m_color2Btn = CCMenuItemSpriteExtra::create(
         m_color2Display,
@@ -263,6 +247,7 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
     m_colorPageNodes->addObject(colorMenu);
 
     for (auto& node : CCArrayExt<CCNode*>(m_colorPageNodes)) node->setVisible(false);
+    AddIconLayer::updateIconColors();
 
     return true;
 }
@@ -326,7 +311,9 @@ void AddIconLayer::updateIconColors() {
     } else {
         m_color1Label->setString("1X");
         m_color1Display->setColor(GameManager::get()->colorForIdx(17));
-        m_iconDisplay->setColor(GameManager::get()->colorForIdx(17));
+        m_iconDisplay->setColor(
+            GameManager::get()->colorForIdx(GameManager::get()->getPlayerColor())
+        );
     }
     if (m_selectedIcon.color2) {
         m_color2Label->setString("2");
@@ -339,7 +326,9 @@ void AddIconLayer::updateIconColors() {
     } else {
         m_color2Label->setString("2X");
         m_color2Display->setColor(GameManager::get()->colorForIdx(12));
-        m_iconDisplay->setSecondColor(GameManager::get()->colorForIdx(12));
+        m_iconDisplay->setSecondColor(
+            GameManager::get()->colorForIdx(GameManager::get()->getPlayerColor2())
+        );
     }
 }
 

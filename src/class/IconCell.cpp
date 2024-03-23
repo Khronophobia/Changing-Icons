@@ -47,14 +47,14 @@ bool IconCell::init(
         color1Display->setScale(0.5f);
         color1Display->setColor(GameManager::get()->colorForIdx(color1.value()));
         this->addChildAtPosition(color1Display, Anchor::Left, ccp(55.f, 0.f));
-    } else color1 = 17;
+    } else color1 = GameManager::get()->getPlayerColor();
 
     if (color2) {
         auto color2Display = ColorChannelSprite::create();
         color2Display->setScale(0.5f);
         color2Display->setColor(GameManager::get()->colorForIdx(color2.value()));
         this->addChildAtPosition(color2Display, Anchor::Left, ccp(75.f, 0.f));
-    } else color2 = 12;
+    } else color2 = GameManager::get()->getPlayerColor2();
 
     auto icon = SimplePlayer::create(0);
     icon->setScale(0.7f);
