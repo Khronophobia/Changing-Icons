@@ -104,7 +104,6 @@ class $modify(CIPlayerObject, PlayerObject) {
     void toggleSwingMode(bool p0, bool p1) {
         PlayerObject::toggleSwingMode(p0, p1);
         if (p0) CIPlayerObject::updateIconsCI(IconType::Swing);
-            
     }
 
     void setVehicleColor(ccColor3B color) {
@@ -144,7 +143,7 @@ class $modify(CIPlayerObject, PlayerObject) {
             break;
         case ci::IconOrder::Backward:
             result = index;
-            index--;
+            --index;
             if (index < start) {
                 if (config.mirrorEnd) {
                     index += 2;
@@ -154,7 +153,7 @@ class $modify(CIPlayerObject, PlayerObject) {
             break;
         case ci::IconOrder::Forward:
             result = index;
-            index++;
+            ++index;
             if (index > end) {
                 if (config.mirrorEnd) {
                     index -= 2;
