@@ -1,14 +1,16 @@
 #include <Geode/Geode.hpp>
 #include "AddIconLayer.hpp"
 #include "IconConfigLayer.hpp"
-#include "SelectColorLayer.hpp"
+#include "../../constants.hpp"
 
 using namespace geode::prelude;
 using namespace changing_icons;
 
+int constexpr ICONS_PER_PAGE = 55;
+
 AddIconLayer* AddIconLayer::create(IconType iconType, IconConfigLayer* configLayer, IconProperties iconProps) {
     auto ret = new AddIconLayer();
-    if (ret && ret->initAnchored(400.f, 250.f, iconType, configLayer, iconProps, "GJ_square02.png")) {
+    if (ret && ret->initAnchored(450.f, 300.f, iconType, configLayer, iconProps, "GJ_square02.png")) {
         ret->autorelease();
         return ret;
     }
@@ -29,7 +31,7 @@ AddIconLayer* AddIconLayer::create(
         .color2 = color2
     };
     auto ret = new AddIconLayer();
-    if (ret && ret->initAnchored(400.f, 250.f, iconType, configLayer, iconProps, "GJ_square02.png")) {
+    if (ret && ret->initAnchored(450.f, 300.f, iconType, configLayer, iconProps, "GJ_square02.png")) {
         ret->autorelease();
         return ret;
     }
@@ -42,17 +44,42 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
     m_iconType = iconType;
     m_selectedIcon = iconProps;
     m_configLayer = configLayer;
-    m_pageMax = GameManager::get()->countForType(iconType) / m_iconPerPage;
+    m_iconPageMax = GameManager::get()->countForType(iconType) / ICONS_PER_PAGE;
+    this->setTitle("Add Icon");
 
-    m_closeBtn->removeFromParent();
-    auto closeSpr = ButtonSprite::create("Cancel");
-    closeSpr->setScale(0.8f);
-    m_closeBtn = CCMenuItemSpriteExtra::create(
-        closeSpr,
+    static_cast<AnchorLayoutOptions*>(m_closeBtn->getLayoutOptions())
+        ->setOffset(ccp(10.f, -10.f));
+    m_mainLayer->updateLayout();
+
+    auto screenMenu = CCMenu::create();
+    m_mainLayer->addChildAtPosition(screenMenu, Anchor::Center);
+    
+    auto iconPageSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png");
+    auto iconPageBtn = CCMenuItemSpriteExtra::create(
+        iconPageSpr,
         this,
-        menu_selector(AddIconLayer::onClose)
+        menu_selector(AddIconLayer::onPage)
     );
-    m_buttonMenu->addChildAtPosition(m_closeBtn, Anchor::Bottom, ccp(-40.f, 20.f));
+    iconPageBtn->setTag(0);
+    screenMenu->addChildAtPosition(
+        iconPageBtn,
+        Anchor::Left,
+        ccp(iconPageBtn->getContentWidth() / 2 + 4.f, 0.f)
+    );
+
+    auto colorPageSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png");
+    colorPageSpr->setFlipX(true);
+    auto colorPageBtn = CCMenuItemSpriteExtra::create(
+        colorPageSpr,
+        this,
+        menu_selector(AddIconLayer::onPage)
+    );
+    colorPageBtn->setTag(1);
+    screenMenu->addChildAtPosition(
+        colorPageBtn,
+        Anchor::Right,
+        ccp(-colorPageBtn->getContentWidth() / 2 - 4.f, 0.f)
+    );
 
     auto addIconSpr = ButtonSprite::create("Add");
     addIconSpr->setScale(0.8f);
@@ -61,11 +88,72 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
         this,
         menu_selector(AddIconLayer::onAddIcon)
     );
-    m_buttonMenu->addChildAtPosition(addIconBtn, Anchor::Bottom, ccp(40.f, 20.f));
+    m_buttonMenu->addChildAtPosition(addIconBtn, Anchor::Bottom, ccp(0.f, 20.f));
 
     m_iconDisplay = SimplePlayer::create(0);
     m_iconDisplay->updatePlayerFrame(m_selectedIcon.iconID, m_iconType);
-    m_mainLayer->addChildAtPosition(m_iconDisplay, Anchor::Top, ccp(0.f, -30.f));
+    m_iconDisplay->setScale(1.1f);
+    m_mainLayer->addChildAtPosition(m_iconDisplay, Anchor::Top, ccp(0.f, -50.f));
+
+    // Icons Page
+
+    auto iconListBG = CCScale9Sprite::create("square02_001.png");
+    iconListBG->setContentSize(ccp(350.f, 140.f));
+    iconListBG->setOpacity(95);
+    m_mainLayer->addChildAtPosition(iconListBG, Anchor::Bottom, ccp(0.f, 120.f));
+
+    m_iconList = CCMenu::create();
+    m_iconList->ignoreAnchorPointForPosition(false);
+    m_iconList->setContentSize(iconListBG->getContentSize() - ccp(20.f, 20.f));
+    m_iconList->setLayout(
+        RowLayout::create()
+            ->setGap(18.f)
+            ->setAxisAlignment(AxisAlignment::Start)
+            ->setCrossAxisAlignment(AxisAlignment::End)
+            ->setGrowCrossAxis(true)
+            ->setCrossAxisOverflow(false)
+    );
+    iconListBG->addChildAtPosition(m_iconList, Anchor::Center);
+
+    auto nextIconPageSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_03_001.png");
+    nextIconPageSpr->setScale(0.75f);
+    nextIconPageSpr->setFlipX(true);
+    auto nextIconPageBtn = CCMenuItemSpriteExtra::create(
+        nextIconPageSpr,
+        this,
+        menu_selector(AddIconLayer::onIconPage)
+    );
+    nextIconPageBtn->setTag(1);
+
+    auto prevIconPageSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_03_001.png");
+    prevIconPageSpr->setScale(0.75f);
+    auto prevIconPageBtn = CCMenuItemSpriteExtra::create(
+        prevIconPageSpr,
+        this,
+        menu_selector(AddIconLayer::onIconPage)
+    );
+    prevIconPageBtn->setTag(-1);
+
+    m_buttonMenu->addChildAtPosition(
+        nextIconPageBtn,
+        Anchor::Bottom,
+        ccp(iconListBG->getContentWidth() / 2 + 20.f, 120.f)
+    );
+    m_buttonMenu->addChildAtPosition(
+        prevIconPageBtn,
+        Anchor::Bottom,
+        ccp(-iconListBG->getContentWidth() / 2 - 20.f, 120.f)
+    );
+
+    AddIconLayer::setupIcons(m_currentIconPage);
+
+    m_iconPageNodes = CCArray::create();
+    m_iconPageNodes->addObject(colorPageBtn);
+    m_iconPageNodes->addObject(iconListBG);
+    m_iconPageNodes->addObject(prevIconPageBtn);
+    m_iconPageNodes->addObject(nextIconPageBtn);
+
+    // Colors Page
 
     m_color1Display = ColorChannelSprite::create();
     m_color1Display->setScale(0.7f);
@@ -84,13 +172,13 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
         m_iconDisplay->setColor(GameManager::get()->colorForIdx(17));
     }
 
-    auto color1Btn = CCMenuItemSpriteExtra::create(
+    m_color1Btn = CCMenuItemSpriteExtra::create(
         m_color1Display,
         this,
-        menu_selector(AddIconLayer::onColor)
+        menu_selector(AddIconLayer::onColorType)
     );
-    color1Btn->setTag(0);
-    m_buttonMenu->addChildAtPosition(color1Btn, Anchor::Top, ccp(-20.f, -60.f));
+    m_color1Btn->setTag(0);
+    m_buttonMenu->addChildAtPosition(m_color1Btn, Anchor::Top, ccp(-20.f, -85.f));
 
     m_color2Display = ColorChannelSprite::create();
     m_color2Display->setScale(0.7f);
@@ -109,55 +197,72 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
         m_iconDisplay->setSecondColor(GameManager::get()->colorForIdx(12));
     }
 
-    auto color2Btn = CCMenuItemSpriteExtra::create(
+    m_color2Btn = CCMenuItemSpriteExtra::create(
         m_color2Display,
         this,
-        menu_selector(AddIconLayer::onColor)
+        menu_selector(AddIconLayer::onColorType)
     );
-    color2Btn->setTag(1);
-    m_buttonMenu->addChildAtPosition(color2Btn, Anchor::Top, ccp(20.f, -60.f));
+    m_color2Btn->setTag(1);
+    m_buttonMenu->addChildAtPosition(m_color2Btn, Anchor::Top, ccp(20.f, -85.f));
 
-    auto iconListBG = CCScale9Sprite::create("square02_001.png");
-    iconListBG->setContentSize(ccp(330.f, 130.f));
-    iconListBG->setOpacity(95);
-    m_mainLayer->addChildAtPosition(iconListBG, Anchor::Center, ccp(0.f, -20.f));
+    m_selectedColorSpr = CCSprite::createWithSpriteFrameName("GJ_select_001.png");
+    m_selectedColorSpr->setScale(0.8f);
+    m_selectedColorSpr->setPosition(m_color1Btn->getPosition());
+    m_mainLayer->addChild(m_selectedColorSpr);
 
-    m_iconList = CCMenu::create();
-    m_iconList->ignoreAnchorPointForPosition(false);
-    m_iconList->setContentSize(iconListBG->getContentSize() - ccp(20.f, 20.f));
-    m_iconList->setLayout(
+    auto colorMenu = CCMenu::create();
+    colorMenu->ignoreAnchorPointForPosition(false);
+    colorMenu->setContentSize(ccp(430.f, 160.f));
+    colorMenu->setLayout(
         RowLayout::create()
-            ->setGap(20.f)
-            ->setAxisAlignment(AxisAlignment::Start)
-            ->setCrossAxisAlignment(AxisAlignment::End)
+            ->setGap(2.f)
             ->setGrowCrossAxis(true)
             ->setCrossAxisOverflow(false)
     );
-    iconListBG->addChildAtPosition(m_iconList, Anchor::Center, CCPointZero, false);
+    m_mainLayer->addChildAtPosition(colorMenu, Anchor::Center, ccp(0.f, -35.f));
 
-    auto nextPageSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_03_001.png");
-    nextPageSpr->setScale(0.75f);
-    nextPageSpr->setFlipX(true);
-    auto nextPageBtn = CCMenuItemSpriteExtra::create(
-        nextPageSpr,
+    std::array<int, constants::COLOR_COUNT + 1> constexpr colorOrder{
+        51, 19, 48, 9, 37, 53, 54, 55, 25, 56, 57, 58,
+        62, 63, 10, 29, 26, 59, 60, 61, 30, 64, 65, 66,
+        70, 42, 11, 27, 71, 14, 31, 45, 46, 67, 68, 69,
+        72, 73, 0, 1, 105, 28, 32, 20, 2, 38, 79, 80,
+        74, 75, 44, 3, 40, 76, 77, 78, 33, 21, 81, 82,
+        83, 16, 4, 5, 22, 39, 84, 50, 34, 85, 86, 87, 106, 88, 89, 90,
+        52, 41, 6, 35, 47, 23, 92, 93, 49, 95, 96, 97,
+        98, 8, 36, 103, 7, 13, 24, 104, 43, 99, 100, 101,
+        12, 91, 17, 102, 18, 94, 15
+    };
+    for (auto ID : colorOrder) {
+        auto spr = ColorChannelSprite::create();
+        spr->setScale(0.8f);
+        spr->setColor(GameManager::get()->colorForIdx(ID));
+        auto btn = CCMenuItemSpriteExtra::create(
+            spr,
+            this,
+            menu_selector(AddIconLayer::onSelectColor)
+        );
+        btn->setTag(ID);
+        if (ID == 15)
+            btn->setLayoutOptions(AxisLayoutOptions::create()->setBreakLine(true));
+        colorMenu->addChild(btn);
+    }
+    auto clearColorSpr = CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png");
+    auto clearColorBtn = CCMenuItemSpriteExtra::create(
+        clearColorSpr,
         this,
-        menu_selector(AddIconLayer::onIconPage)
+        menu_selector(AddIconLayer::onClearColor)
     );
-    nextPageBtn->setTag(1);
+    colorMenu->addChild(clearColorBtn);
+    colorMenu->updateLayout();
 
-    auto prevPageSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_03_001.png");
-    prevPageSpr->setScale(0.75f);
-    auto prevPageBtn = CCMenuItemSpriteExtra::create(
-        prevPageSpr,
-        this,
-        menu_selector(AddIconLayer::onIconPage)
-    );
-    prevPageBtn->setTag(-1);
+    m_colorPageNodes = CCArray::create();
+    m_colorPageNodes->addObject(iconPageBtn);
+    m_colorPageNodes->addObject(m_color1Btn);
+    m_colorPageNodes->addObject(m_color2Btn);
+    m_colorPageNodes->addObject(m_selectedColorSpr);
+    m_colorPageNodes->addObject(colorMenu);
 
-    m_buttonMenu->addChildAtPosition(nextPageBtn, Anchor::Right, ccp(-20.f, -20.f));
-    m_buttonMenu->addChildAtPosition(prevPageBtn, Anchor::Left, ccp(20.f, -20.f));
-
-    AddIconLayer::setupIcons(m_currentPage);
+    for (auto& node : CCArrayExt<CCNode*>(m_colorPageNodes)) node->setVisible(false);
 
     return true;
 }
@@ -166,10 +271,10 @@ void AddIconLayer::setupIcons(int page) {
     m_iconList->removeAllChildren();
     for (
             int i = 1;
-            i <= m_iconPerPage;
+            i <= ICONS_PER_PAGE;
             i++
     ) {
-        auto iconID = i + page * m_iconPerPage;
+        auto iconID = i + page * ICONS_PER_PAGE;
         if (iconID > GameManager::get()->countForType(m_iconType)) break;
         auto iconSpr = GJItemIcon::createBrowserItem(convertIconType(m_iconType), iconID);
         auto iconBtn = CCMenuItemSpriteExtra::create(
@@ -186,7 +291,7 @@ void AddIconLayer::setupIcons(int page) {
     m_iconList->updateLayout();
 }
 
-UnlockType AddIconLayer::convertIconType(IconType type) {
+UnlockType AddIconLayer::convertIconType(IconType type) const {
     switch (type) {
         default:
         case IconType::Cube: return UnlockType::Cube;
@@ -238,11 +343,25 @@ void AddIconLayer::updateIconColors() {
     }
 }
 
+void AddIconLayer::onPage(CCObject* sender) {
+    m_currentPage = sender->getTag();
+    switch (m_currentPage) {
+    case 0:
+        for (auto& node : CCArrayExt<CCNode*>(m_iconPageNodes)) node->setVisible(true);
+        for (auto& node : CCArrayExt<CCNode*>(m_colorPageNodes)) node->setVisible(false);
+        break;
+    case 1:
+        for (auto& node : CCArrayExt<CCNode*>(m_iconPageNodes)) node->setVisible(false);
+        for (auto& node : CCArrayExt<CCNode*>(m_colorPageNodes)) node->setVisible(true);
+        break;
+    }
+}
+
 void AddIconLayer::onIconPage(CCObject* sender) {
-    m_currentPage += sender->getTag();
-    if (m_currentPage < 0) m_currentPage = m_pageMax;
-    else if (m_currentPage > m_pageMax) m_currentPage = 0;
-    AddIconLayer::setupIcons(m_currentPage);
+    m_currentIconPage += sender->getTag();
+    if (m_currentIconPage < 0) m_currentIconPage = m_iconPageMax;
+    else if (m_currentIconPage > m_iconPageMax) m_currentIconPage = 0;
+    AddIconLayer::setupIcons(m_currentIconPage);
 }
 
 void AddIconLayer::onSelectIcon(CCObject* sender) {
@@ -256,11 +375,26 @@ void AddIconLayer::onAddIcon(CCObject* sender) {
     AddIconLayer::onClose(nullptr);
 }
 
-void AddIconLayer::onColor(CCObject* sender) {
-    SelectColorLayer::create(
-        this,
-        sender->getTag(),
-        m_selectedIcon,
-        m_iconType
-    )->show();
+void AddIconLayer::onColorType(CCObject* sender) {
+    m_selectedColorType = sender->getTag();
+    switch (m_selectedColorType) {
+        case 0: m_selectedColorSpr->setPosition(m_color1Btn->getPosition()); break;
+        case 1: m_selectedColorSpr->setPosition(m_color2Btn->getPosition()); break;
+    }
+}
+
+void AddIconLayer::onSelectColor(CCObject* sender) {
+    switch (m_selectedColorType) {
+        case 0: m_selectedIcon.color1 = sender->getTag(); break;
+        case 1: m_selectedIcon.color2 = sender->getTag(); break;
+    }
+    AddIconLayer::updateIconColors();
+}
+
+void AddIconLayer::onClearColor(CCObject* sender) {
+    switch (m_selectedColorType) {
+        case 0: m_selectedIcon.color1 = std::nullopt; break;
+        case 1: m_selectedIcon.color2 = std::nullopt; break;
+    }
+    AddIconLayer::updateIconColors();
 }
