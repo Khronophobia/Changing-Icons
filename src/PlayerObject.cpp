@@ -84,8 +84,10 @@ class $modify(CIPlayerObject, PlayerObject) {
     }
 
     void updateIconsCI(IconType type) {
-        auto& config = ci::CIConfigManager::get()->getConfig(type);
         auto gm = GameManager::get();
+        if (!gm->getPlayLayer() && !gm->getEditorLayer()) return;
+
+        auto& config = ci::CIConfigManager::get()->getConfig(type);
 
         int newIcon = 1;
         int newColor1 = gm->getPlayerColor();
