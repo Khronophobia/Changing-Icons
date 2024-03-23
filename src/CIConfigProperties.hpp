@@ -18,7 +18,7 @@ namespace changing_icons {
     struct CIGlobalOverride {
         std::optional<bool> useAll = std::nullopt;
         std::optional<IconOrder> order = std::nullopt;
-        std::optional<bool> disable = std::nullopt;
+        std::optional<bool> disabled = std::nullopt;
     };
 
     struct CIGlobalProperties {
@@ -30,7 +30,14 @@ namespace changing_icons {
     struct CITabProperties {
         std::vector<IconProperties> iconSet;
         IconOrder order = IconOrder::Random;
-        IconOrder tempOrder = IconOrder::Random;
+        bool useAll;
+        bool mirrorEnd;
+        bool disabled;
+    };
+
+    struct CITempProperties {
+        int index;
+        IconOrder order;
         bool useAll;
         bool mirrorEnd;
         bool disabled;
@@ -114,10 +121,10 @@ struct matjson::Serialize<changing_icons::CIGlobalOverride> {
                 "order",
                 changing_icons::CIGlobalOverride().order
             ),
-            .disable = changing_icons::utils::tryGetJsonValue<std::optional<bool>>(
+            .disabled = changing_icons::utils::tryGetJsonValue<std::optional<bool>>(
                 value,
-                "disable",
-                changing_icons::CIGlobalOverride().disable
+                "disabled",
+                changing_icons::CIGlobalOverride().disabled
             )
         };
     }
@@ -125,7 +132,7 @@ struct matjson::Serialize<changing_icons::CIGlobalOverride> {
         auto obj = matjson::Object();
         obj["use-all"] = value.useAll;
         obj["order"] = value.order;
-        obj["disable"] = value.disable;
+        obj["disabled"] = value.disabled;
         return obj;
     }
     static bool is_json(matjson::Value const& value) {
