@@ -27,6 +27,7 @@ namespace changing_icons {
     public:
         static IconConfigLayer* create();
         CITabProperties& getCurrentConfig();
+        void onGlobalConfig(CCObject*);
         void onSwitchTab(CCObject*);
         void onVarInfo(CCObject*);
         void onVarToggle(CCObject*);

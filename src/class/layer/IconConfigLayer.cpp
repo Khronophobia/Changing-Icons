@@ -1,6 +1,7 @@
 #include <Geode/Geode.hpp>
 #include "IconConfigLayer.hpp"
 #include "AddIconLayer.hpp"
+#include "GlobalConfigLayer.hpp"
 #include <class/CIVariableRef.hpp>
 #include <class/IconCell.hpp>
 #include <class/CIConfigManager.hpp>
@@ -23,7 +24,18 @@ bool IconConfigLayer::setup() {
 
     m_noElasticity = true;
     m_currentTab = m_configManager->getGlobalConfig().currentTab;
-    this->setTitle("Changing Icons Config");
+    this->setTitle("Changing Icons");
+
+    auto globalConfigBtn = CCMenuItemSpriteExtra::create(
+        CCSprite::createWithSpriteFrameName("GJ_optionsBtn02_001.png"),
+        this,
+        menu_selector(IconConfigLayer::onGlobalConfig)
+    );
+    m_buttonMenu->addChildAtPosition(
+        globalConfigBtn,
+        Anchor::TopRight,
+        ccp(-3.f, -3.f)
+    );
 
     m_gamemodeBar = CCMenu::create();
     m_gamemodeBar->setTouchPriority(CCTouchDispatcher::get()->getForcePrio() - 1);
@@ -285,6 +297,10 @@ bool IconConfigLayer::setup() {
 
 CITabProperties& IconConfigLayer::getCurrentConfig() {
     return m_configManager->getConfig(m_currentTab);
+}
+
+void IconConfigLayer::onGlobalConfig(CCObject* sender) {
+    GlobalConfigLayer::create()->show();
 }
 
 void IconConfigLayer::onSwitchTab(CCObject* sender) {
