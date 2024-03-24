@@ -10,7 +10,7 @@ int constexpr ICONS_PER_PAGE = 55;
 
 AddIconLayer* AddIconLayer::create(IconType iconType, IconConfigLayer* configLayer, IconProperties iconProps, std::optional<int> index) {
     auto ret = new AddIconLayer();
-    if (ret && ret->initAnchored(450.f, 300.f, iconType, configLayer, iconProps, index, "GJ_square02.png")) {
+    if (ret && ret->initAnchored(480.f, 300.f, iconType, configLayer, iconProps, index, "GJ_square02.png")) {
         ret->autorelease();
         return ret;
     }
@@ -31,7 +31,7 @@ AddIconLayer* AddIconLayer::create(
         .color2 = color2
     };
     auto ret = new AddIconLayer();
-    if (ret && ret->initAnchored(450.f, 300.f, iconType, configLayer, iconProps, std::nullopt, "GJ_square02.png")) {
+    if (ret && ret->initAnchored(480.f, 300.f, iconType, configLayer, iconProps, std::nullopt, "GJ_square02.png")) {
         ret->autorelease();
         return ret;
     }
@@ -200,7 +200,7 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
 
     auto colorMenu = CCMenu::create();
     colorMenu->ignoreAnchorPointForPosition(false);
-    colorMenu->setContentSize(ccp(430.f, 160.f));
+    colorMenu->setContentSize(ccp(450.f, 150.f));
     colorMenu->setLayout(
         RowLayout::create()
             ->setGap(2.f)
@@ -230,18 +230,18 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
             menu_selector(AddIconLayer::onSelectColor)
         );
         btn->setTag(ID);
-        if (ID == 15)
-            btn->setLayoutOptions(AxisLayoutOptions::create()->setBreakLine(true));
         colorMenu->addChild(btn);
     }
+    colorMenu->updateLayout();
+
     auto clearColorSpr = CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png");
+    clearColorSpr->setScale(0.8f);
     auto clearColorBtn = CCMenuItemSpriteExtra::create(
         clearColorSpr,
         this,
         menu_selector(AddIconLayer::onClearColor)
     );
-    colorMenu->addChild(clearColorBtn);
-    colorMenu->updateLayout();
+    m_buttonMenu->addChildAtPosition(clearColorBtn, Anchor::Right, ccp(-30.f, 60.f));
 
     m_colorPageNodes = CCArray::create();
     m_colorPageNodes->addObject(iconPageBtn);
@@ -249,6 +249,7 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
     m_colorPageNodes->addObject(m_color2Btn);
     m_colorPageNodes->addObject(m_selectedColorSpr);
     m_colorPageNodes->addObject(colorMenu);
+    m_colorPageNodes->addObject(clearColorBtn);
 
     for (auto& node : CCArrayExt<CCNode*>(m_colorPageNodes)) node->setVisible(false);
     AddIconLayer::updateIconColors();
