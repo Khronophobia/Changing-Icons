@@ -2,7 +2,7 @@
 #include "IconConfigLayer.hpp"
 #include "AddIconLayer.hpp"
 #include "GlobalConfigLayer.hpp"
-#include <class/CIVariableRef.hpp>
+#include <class/CCVariableRef.hpp>
 #include <class/IconCell.hpp>
 #include <class/CIConfigManager.hpp>
 

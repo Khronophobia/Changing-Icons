@@ -2,13 +2,13 @@
 
 namespace changing_icons {
     template<typename T>
-    class CIVariableRef : public cocos2d::CCObject {
+    class CCVariableRef : public cocos2d::CCObject {
     protected:
         T& m_varRef;
     public:
-        CIVariableRef(T& varRef) : m_varRef(varRef) {}
-        static CIVariableRef* create(T& varRef) {
-            auto ret = new CIVariableRef(varRef);
+        CCVariableRef(T& varRef) : m_varRef(varRef) {}
+        static CCVariableRef* create(T& varRef) {
+            auto ret = new CCVariableRef(varRef);
             if (ret) {
                 ret->autorelease();
                 return ret;
