@@ -1,4 +1,5 @@
 #pragma once
+#include <CIConfigProperties.hpp>
 
 namespace changing_icons {
     class IconConfigLayer;
@@ -12,9 +13,7 @@ namespace changing_icons {
             IconConfigLayer* configLayer,
             int index,
             IconType iconType,
-            int iconID,
-            std::optional<int> color1,
-            std::optional<int> color2,
+            IconProperties const& icon,
             bool isLast
         );
     public:
@@ -22,9 +21,7 @@ namespace changing_icons {
             IconConfigLayer* m_configLayer,
             int index,
             IconType iconType,
-            int iconID,
-            std::optional<int> color1 = std::nullopt,
-            std::optional<int> color2 = std::nullopt,
+            IconProperties const& icon,
             bool isLast = false
         );
         void onDelete(CCObject*);

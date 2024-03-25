@@ -8,13 +8,11 @@ IconCell* IconCell::create(
         IconConfigLayer* configLayer,
         int index,
         IconType iconType,
-        int iconID,
-        std::optional<int> color1,
-        std::optional<int> color2,
+        IconProperties const& icon,
         bool isLast
     ) {
     auto ret = new IconCell();
-    if (ret && ret->init(configLayer, index, iconType, iconID, color1, color2, isLast)) {
+    if (ret && ret->init(configLayer, index, iconType, icon, isLast)) {
         ret->autorelease();
         return ret;
     }
@@ -26,9 +24,7 @@ bool IconCell::init(
         IconConfigLayer* configLayer,
         int index,
         IconType iconType,
-        int iconID,
-        std::optional<int> color1,
-        std::optional<int> color2,
+        IconProperties const& icon,
         bool isLast
     ) {
     if (!CCLayerColor::init()) return false;
@@ -42,26 +38,31 @@ bool IconCell::init(
         this->setOpacity(50);
     m_index = index;
 
-    if (color1) {
+    auto playerColor1 = GameManager::get()->getPlayerColor();
+    auto playerColor2 = GameManager::get()->getPlayerColor2();
+
+    if (icon.color1) {
         auto color1Display = ColorChannelSprite::create();
         color1Display->setScale(0.5f);
-        color1Display->setColor(GameManager::get()->colorForIdx(color1.value()));
+        color1Display->setColor(GameManager::get()->colorForIdx(icon.color1.value()));
         this->addChildAtPosition(color1Display, Anchor::Left, ccp(55.f, 0.f));
-    } else color1 = GameManager::get()->getPlayerColor();
+        playerColor1 = icon.color1.value();
+    }
 
-    if (color2) {
+    if (icon.color2) {
         auto color2Display = ColorChannelSprite::create();
         color2Display->setScale(0.5f);
-        color2Display->setColor(GameManager::get()->colorForIdx(color2.value()));
+        color2Display->setColor(GameManager::get()->colorForIdx(icon.color2.value()));
         this->addChildAtPosition(color2Display, Anchor::Left, ccp(75.f, 0.f));
-    } else color2 = GameManager::get()->getPlayerColor2();
+        playerColor2 = icon.color2.value();
+    }
 
-    auto icon = SimplePlayer::create(0);
-    icon->setScale(0.7f);
-    icon->updatePlayerFrame(iconID, iconType);
-    icon->setColor(GameManager::get()->colorForIdx(color1.value()));
-    icon->setSecondColor(GameManager::get()->colorForIdx(color2.value()));
-    this->addChildAtPosition(icon, Anchor::Left, ccp(24.f, 0.f));
+    auto iconDisplay = SimplePlayer::create(0);
+    iconDisplay->setScale(0.7f);
+    iconDisplay->updatePlayerFrame(icon.iconID, iconType);
+    iconDisplay->setColor(GameManager::get()->colorForIdx(playerColor1));
+    iconDisplay->setSecondColor(GameManager::get()->colorForIdx(playerColor2));
+    this->addChildAtPosition(iconDisplay, Anchor::Left, ccp(24.f, 0.f));
 
     auto menu = CCMenu::create();
     menu->ignoreAnchorPointForPosition(false);
