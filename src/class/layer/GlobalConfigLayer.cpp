@@ -19,18 +19,14 @@ GlobalConfigLayer* GlobalConfigLayer::create() {
 bool GlobalConfigLayer::setup() {
     m_configManager = CIConfigManager::get();
     m_noElasticity = true;
-    this->setTitle("Mod Configurations");
+    this->setTitle("Global Overrides");
     auto& globalConfig = m_configManager->getGlobalConfig();
 
-    auto globalOverrideLabel = CCLabelBMFont::create("Global Overrides", "bigFont.fnt");
-    globalOverrideLabel->setScale(0.5f);
-    m_mainLayer->addChildAtPosition(globalOverrideLabel, Anchor::Left, ccp(120.f, 95.f));
-
     auto globalOverrideBg = CCScale9Sprite::create("square02_001.png");
-    globalOverrideBg->setAnchorPoint(ccp(0.f, 0.5f));
+    globalOverrideBg->setAnchorPoint(ccp(0.5f, 0.5f));
     globalOverrideBg->setContentSize(ccp(200.f, 150.f));
     globalOverrideBg->setOpacity(95);
-    m_mainLayer->addChildAtPosition(globalOverrideBg, Anchor::Left, ccp(20.f, 10.f));
+    m_mainLayer->addChildAtPosition(globalOverrideBg, Anchor::Center, ccp(0.f, 20.f));
 
     auto globalOverrideMenu = CCMenu::create();
     globalOverrideMenu->ignoreAnchorPointForPosition(false);
@@ -221,7 +217,7 @@ bool GlobalConfigLayer::setup() {
     mirrorEndBtn->setState(globalConfig.override.mirrorEnd);
     for (auto btn : CCArrayExt<CCMenuItemToggler*>(m_gamemodeBar->getChildren())) {
         auto btnType = static_cast<IconType>(btn->getTag());
-        if (std::find(globalConfig.globalOverrides.begin(), globalConfig.globalOverrides.end(), btnType) != globalConfig.globalOverrides.end()) {
+        if (globalConfig.globalOverrides.find(btnType) != globalConfig.globalOverrides.end()) {
             btn->toggle(true);
         } else {
             btn->toggle(false);
@@ -282,7 +278,7 @@ void GlobalConfigLayer::onDisableOrder(CCObject* sender) {
 void GlobalConfigLayer::onAddToOverride(CCObject* sender) {
     auto& overrideList = m_configManager->getGlobalConfig().globalOverrides;
     auto type = static_cast<IconType>(sender->getTag());
-    if (std::find(overrideList.begin(), overrideList.end(), type) != overrideList.end()) {
+    if (overrideList.find(type) != overrideList.end()) {
         overrideList.erase(type);
     } else {
         overrideList.insert(type);
