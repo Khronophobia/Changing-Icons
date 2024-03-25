@@ -9,6 +9,7 @@
 	"name": "Changing Icons",
 	"developer": "Khronophobia",
 	"description": "Randomly change icons during gameplay",
+	"repository": "https://github.com/Khronophobia/Changing-Icons",
 	"resources": {
 		"sprites": [
 			"resources/*.png"
