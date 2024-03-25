@@ -19,7 +19,7 @@ SavePresetLayer* SavePresetLayer::create(IconType type, std::vector<IconProperti
 bool SavePresetLayer::setup(IconType type) {
     m_noElasticity = true;
     m_iconType = type;
-    this->setTitle("Save List");
+    this->setTitle("Save Set");
     m_closeBtn->setLayoutOptions(
         AnchorLayoutOptions::create()
             ->setAnchor(Anchor::TopLeft)
@@ -27,7 +27,7 @@ bool SavePresetLayer::setup(IconType type) {
     );
     // m_mainLayer->updateLayout();
 
-    m_textInput = TextInput::create(200.f, "List Name");
+    m_textInput = TextInput::create(200.f, "Set Name");
     m_textInput->setMaxCharCount(20);
     m_textInput->setCommonFilter(CommonFilter::Name);
     m_buttonMenu->addChildAtPosition(m_textInput, Anchor::Center);
@@ -59,9 +59,9 @@ void SavePresetLayer::onSave(CCObject*) {
     if (ghc::filesystem::exists(presetDir)) {
         createQuickPopup(
             "Overwrite List",
-            "A list with the name <cy>" + name +
-            "</c> already exists. Are you sure you want to overwrite it?",
-            "Cancel", "Yes",
+            "A set with the name <cy>" + name +
+            "</c> already exists. Do you want to overwrite it?",
+            "No", "Yes",
             [this, presetDir](auto, bool btn2) {
                 if (btn2) {
                     savePreset(presetDir);
