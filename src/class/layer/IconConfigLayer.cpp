@@ -26,15 +26,17 @@ bool IconConfigLayer::setup() {
     m_currentTab = m_configManager->getGlobalConfig().currentTab;
     this->setTitle("Changing Icons");
 
+    auto globalConfigSpr = CCSprite::createWithSpriteFrameName("GJ_optionsBtn02_001.png");
+    globalConfigSpr->setScale(0.7f);
     auto globalConfigBtn = CCMenuItemSpriteExtra::create(
-        CCSprite::createWithSpriteFrameName("GJ_optionsBtn02_001.png"),
+        globalConfigSpr,
         this,
         menu_selector(IconConfigLayer::onGlobalConfig)
     );
     m_buttonMenu->addChildAtPosition(
         globalConfigBtn,
         Anchor::TopRight,
-        ccp(-3.f, -3.f)
+        ccp(-18.f, -18.f)
     );
 
     m_gamemodeBar = CCMenu::create();
@@ -322,11 +324,11 @@ void IconConfigLayer::refreshTab() {
 
     auto& currentConfig = IconConfigLayer::getCurrentConfig();
     m_randomBtn->toggle(currentConfig.useAll);
-    m_randomBtn->setUserObject(CIVariableRef<bool>::create(currentConfig.useAll));
+    m_randomBtn->setUserObject(CCVariableRef<bool>::create(currentConfig.useAll));
     m_disableBtn->toggle(currentConfig.disabled);
-    m_disableBtn->setUserObject(CIVariableRef<bool>::create(currentConfig.disabled));
+    m_disableBtn->setUserObject(CCVariableRef<bool>::create(currentConfig.disabled));
     m_mirrorEndBtn->toggle(currentConfig.mirrorEnd);
-    m_mirrorEndBtn->setUserObject(CIVariableRef<bool>::create(currentConfig.mirrorEnd));
+    m_mirrorEndBtn->setUserObject(CCVariableRef<bool>::create(currentConfig.mirrorEnd));
 
     IconConfigLayer::setOrderChoice(currentConfig.order);
     IconConfigLayer::refreshIconList(m_currentTab, true);
@@ -351,7 +353,7 @@ void IconConfigLayer::onVarInfo(CCObject* sender) {
 void IconConfigLayer::onVarToggle(CCObject* sender) {
     auto btn = static_cast<CCMenuItemToggler*>(sender);
     auto obj = static_cast<CCNode*>(sender)->getUserObject();
-    if (auto ref = typeinfo_cast<CIVariableRef<bool>*>(obj)) {
+    if (auto ref = typeinfo_cast<CCVariableRef<bool>*>(obj)) {
         ref->getVarRef() = !btn->m_toggled;
     }
 }
