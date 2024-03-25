@@ -132,7 +132,7 @@ bool IconConfigLayer::setup() {
     );
     m_buttonMenu->addChildAtPosition(m_randomBtn, Anchor::TopLeft, randomBtnOffset);
 
-    auto randomText = CCLabelBMFont::create("Use all icons", "bigFont.fnt");
+    auto randomText = CCLabelBMFont::create("Use All Icons", "bigFont.fnt");
     randomText->setAnchorPoint(ccp(0.f, 0.5f));
     randomText->setScale(0.5f);
     m_mainLayer->addChildAtPosition(
@@ -146,7 +146,7 @@ bool IconConfigLayer::setup() {
         this,
         menu_selector(IconConfigLayer::onVarInfo)
     );
-    randomInfoBtn->setUserObject(CCString::create("Select from <cj>all icons</c> instead of the <cj>list</c>."));
+    randomInfoBtn->setUserObject(CCString::create("Select from <cj>all icons</c> instead of the <cy>list</c>."));
     m_buttonMenu->addChildAtPosition(
         randomInfoBtn, Anchor::TopLeft, randomBtnOffset + toggleInfoOffset
     );
@@ -231,7 +231,7 @@ bool IconConfigLayer::setup() {
     );
     m_buttonMenu->addChildAtPosition(m_mirrorEndBtn, Anchor::Left, mirrorEndOffset);
     
-    auto mirrorEndText = CCLabelBMFont::create("Mirror after End", "bigFont.fnt");
+    auto mirrorEndText = CCLabelBMFont::create("Mirror After End", "bigFont.fnt");
     mirrorEndText->setAnchorPoint(ccp(0.f, 0.5f));
     mirrorEndText->setScale(0.5f);
     m_mainLayer->addChildAtPosition(
@@ -293,7 +293,7 @@ bool IconConfigLayer::setup() {
     iconListMenu->addChild(iconListLoadBtn);
     iconListMenu->updateLayout();
 
-    IconConfigLayer::refreshTab();
+    refreshTab();
     return true;
 }
 
@@ -308,7 +308,7 @@ void IconConfigLayer::onGlobalConfig(CCObject* sender) {
 void IconConfigLayer::onSwitchTab(CCObject* sender) {
     m_currentTab = static_cast<IconType>(sender->getTag());
     m_configManager->getGlobalConfig().currentTab = m_currentTab;
-    IconConfigLayer::refreshTab();
+    refreshTab();
 }
 
 void IconConfigLayer::refreshTab() {
@@ -322,7 +322,7 @@ void IconConfigLayer::refreshTab() {
         btn->toggle(false);
     }
 
-    auto& currentConfig = IconConfigLayer::getCurrentConfig();
+    auto& currentConfig = getCurrentConfig();
     m_randomBtn->toggle(currentConfig.useAll);
     m_randomBtn->setUserObject(CCVariableRef<bool>::create(currentConfig.useAll));
     m_disableBtn->toggle(currentConfig.disabled);
@@ -330,8 +330,8 @@ void IconConfigLayer::refreshTab() {
     m_mirrorEndBtn->toggle(currentConfig.mirrorEnd);
     m_mirrorEndBtn->setUserObject(CCVariableRef<bool>::create(currentConfig.mirrorEnd));
 
-    IconConfigLayer::setOrderChoice(currentConfig.order);
-    IconConfigLayer::refreshIconList(m_currentTab, true);
+    setOrderChoice(currentConfig.order);
+    refreshIconList(m_currentTab, true);
 }
 
 void IconConfigLayer::onVarInfo(CCObject* sender) {
@@ -359,14 +359,14 @@ void IconConfigLayer::onVarToggle(CCObject* sender) {
 }
 
 void IconConfigLayer::onOrderArrow(CCObject* sender) {
-    auto& currentConfig = IconConfigLayer::getCurrentConfig();
+    auto& currentConfig = getCurrentConfig();
     int choiceTemp = static_cast<int>(currentConfig.order) + sender->getTag();
     if (choiceTemp < 0)
         choiceTemp = m_iconOrderList.size() - 1;
     else if (choiceTemp >= m_iconOrderList.size())
         choiceTemp = 0;
 
-    IconConfigLayer::setOrderChoice(choiceTemp);
+    setOrderChoice(choiceTemp);
     currentConfig.order = static_cast<IconOrder>(choiceTemp);
 }
 
@@ -383,7 +383,7 @@ void IconConfigLayer::onAddIcon(CCObject*) {
 }
 
 void IconConfigLayer::editIconAtIndex(int index) {
-    auto const& prevIcon = IconConfigLayer::getCurrentConfig().iconSet.at(index);
+    auto const& prevIcon = getCurrentConfig().iconSet.at(index);
     AddIconLayer::create(m_currentTab, this, prevIcon, index)->show();
 }
 
@@ -402,7 +402,7 @@ void IconConfigLayer::onClearList(CCObject*) {
 }
 
 void IconConfigLayer::refreshIconList(IconType currentTab, bool toTop) {
-    auto& currentConfig = IconConfigLayer::getCurrentConfig();
+    auto& currentConfig = getCurrentConfig();
     auto iconList = currentConfig.iconSet;
     auto content = m_iconList->m_contentLayer;
 
@@ -442,29 +442,29 @@ void IconConfigLayer::refreshIconList(IconType currentTab, bool toTop) {
 
 void IconConfigLayer::addIcon(IconProperties icon) {
     log::debug("Added icon ID {}", icon.iconID);
-    IconConfigLayer::getCurrentConfig().iconSet.push_back(icon);
-    IconConfigLayer::refreshIconList(m_currentTab);
+    getCurrentConfig().iconSet.push_back(icon);
+    refreshIconList(m_currentTab);
 }
 
 void IconConfigLayer::swapIcons(int icon1, int icon2) {
     log::debug("Swapped icons in index {} and {}", icon1, icon2);
-    auto& iconSet = IconConfigLayer::getCurrentConfig().iconSet;
+    auto& iconSet = getCurrentConfig().iconSet;
     std::iter_swap(iconSet.begin() + icon1, iconSet.begin() + icon2);
-    IconConfigLayer::refreshIconList(m_currentTab);
+    refreshIconList(m_currentTab);
 }
 
 void IconConfigLayer::replaceIcon(IconProperties icon, int index) {
     log::debug("Replaced icon in index {}", index);
-    auto& iconSet = IconConfigLayer::getCurrentConfig().iconSet;
+    auto& iconSet = getCurrentConfig().iconSet;
     iconSet.at(index) = icon;
-    IconConfigLayer::refreshIconList(m_currentTab);
+    refreshIconList(m_currentTab);
 }
 
 void IconConfigLayer::deleteIcon(int index) {
     log::debug("Removed icon at index {}", index);
-    auto& iconSet = IconConfigLayer::getCurrentConfig().iconSet;
+    auto& iconSet = getCurrentConfig().iconSet;
     iconSet.erase(iconSet.begin() + index);
-    IconConfigLayer::refreshIconList(m_currentTab);
+    refreshIconList(m_currentTab);
 }
 
 IconConfigLayer::~IconConfigLayer() {

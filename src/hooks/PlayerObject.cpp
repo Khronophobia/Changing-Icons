@@ -20,15 +20,15 @@ class $modify(CIPlayerObject, PlayerObject) {
     bool init(int p0, int p1, GJBaseGameLayer* p2, CCLayer* p3, bool p4) {
         if (!PlayerObject::init(p0, p1, p2, p3, p4)) return false;
 
-        CIPlayerObject::initCIValues(IconType::Cube);
-        if (m_isPlatformer) CIPlayerObject::initCIValues(IconType::Jetpack);
-        else CIPlayerObject::initCIValues(IconType::Ship);
-        CIPlayerObject::initCIValues(IconType::Ball);
-        CIPlayerObject::initCIValues(IconType::Ufo);
-        CIPlayerObject::initCIValues(IconType::Wave);
-        CIPlayerObject::initCIValues(IconType::Robot);
-        CIPlayerObject::initCIValues(IconType::Spider);
-        CIPlayerObject::initCIValues(IconType::Swing);
+        initCIValues(IconType::Cube);
+        if (m_isPlatformer) initCIValues(IconType::Jetpack);
+        else initCIValues(IconType::Ship);
+        initCIValues(IconType::Ball);
+        initCIValues(IconType::Ufo);
+        initCIValues(IconType::Wave);
+        initCIValues(IconType::Robot);
+        initCIValues(IconType::Spider);
+        initCIValues(IconType::Swing);
 
         return true;
     }
@@ -73,37 +73,37 @@ class $modify(CIPlayerObject, PlayerObject) {
 
     void toggleFlyMode(bool p0, bool p1) {
         PlayerObject::toggleFlyMode(p0, p1);
-        CIPlayerObject::updateIconsCI(IconType::Cube);
+        updateIconsCI(IconType::Cube);
         if (p0) {
-            if (m_isPlatformer) CIPlayerObject::updateIconsCI(IconType::Jetpack);
-            else CIPlayerObject::updateIconsCI(IconType::Ship);
+            if (m_isPlatformer) updateIconsCI(IconType::Jetpack);
+            else updateIconsCI(IconType::Ship);
         }
     }
     void toggleRollMode(bool p0, bool p1) {
         PlayerObject::toggleRollMode(p0, p1);
-        if (p0) CIPlayerObject::updateIconsCI(IconType::Ball);
+        if (p0) updateIconsCI(IconType::Ball);
     }
     void toggleBirdMode(bool p0, bool p1) {
         PlayerObject::toggleBirdMode(p0, p1);
         if (p0) {
-            CIPlayerObject::updateIconsCI(IconType::Ufo);
+            updateIconsCI(IconType::Ufo);
         }
     }
     void toggleDartMode(bool p0, bool p1) {
         PlayerObject::toggleDartMode(p0, p1);
-        if (p0) CIPlayerObject::updateIconsCI(IconType::Wave);
+        if (p0) updateIconsCI(IconType::Wave);
     }
     void toggleRobotMode(bool p0, bool p1) {
         PlayerObject::toggleRobotMode(p0, p1);
-        if (p0) CIPlayerObject::updateIconsCI(IconType::Robot);
+        if (p0) updateIconsCI(IconType::Robot);
     }
     void toggleSpiderMode(bool p0, bool p1) {
         PlayerObject::toggleSpiderMode(p0, p1);
-        if (p0) CIPlayerObject::updateIconsCI(IconType::Spider);
+        if (p0) updateIconsCI(IconType::Spider);
     }
     void toggleSwingMode(bool p0, bool p1) {
         PlayerObject::toggleSwingMode(p0, p1);
-        if (p0) CIPlayerObject::updateIconsCI(IconType::Swing);
+        if (p0) updateIconsCI(IconType::Swing);
     }
     void flashPlayer(float p0, float p1, ccColor3B mainColor, ccColor3B secondColor) {
         // Make this do nothing because it resets the colors
@@ -119,7 +119,7 @@ class $modify(CIPlayerObject, PlayerObject) {
     void updateIconsCI(IconType type) {
         auto gm = GameManager::get();
         if (!gm->getPlayLayer() && !gm->getEditorLayer()) return;
-        auto& config = CIPlayerObject::getActiveProperties(type);
+        auto& config = getActiveProperties(type);
 
         auto const& iconSet = ci::CIConfigManager::get()->getConfig(type).iconSet;
         int newIcon = 1;

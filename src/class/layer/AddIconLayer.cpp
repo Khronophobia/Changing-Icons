@@ -149,7 +149,7 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
         ccp(-iconListBG->getContentWidth() / 2 - 20.f, 120.f)
     );
 
-    AddIconLayer::setupIcons(m_currentIconPage);
+    setupIcons(m_currentIconPage);
 
     m_iconPageNodes = CCArray::create();
     m_iconPageNodes->addObject(colorPageBtn);
@@ -252,7 +252,7 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
     m_colorPageNodes->addObject(clearColorBtn);
 
     for (auto& node : CCArrayExt<CCNode*>(m_colorPageNodes)) node->setVisible(false);
-    AddIconLayer::updateIconColors();
+    updateIconColors();
 
     return true;
 }
@@ -301,7 +301,7 @@ void AddIconLayer::setIconColor(std::optional<int> color, int colorType) {
         case 0: m_selectedIcon.color1 = color; break;
         case 1: m_selectedIcon.color2 = color; break;
     }
-    AddIconLayer::updateIconColors();
+    updateIconColors();
 }
 
 void AddIconLayer::updateIconColors() {
@@ -386,7 +386,7 @@ void AddIconLayer::onSelectColor(CCObject* sender) {
         case 0: m_selectedIcon.color1 = sender->getTag(); break;
         case 1: m_selectedIcon.color2 = sender->getTag(); break;
     }
-    AddIconLayer::updateIconColors();
+    updateIconColors();
 }
 
 void AddIconLayer::onClearColor(CCObject* sender) {
@@ -394,5 +394,5 @@ void AddIconLayer::onClearColor(CCObject* sender) {
         case 0: m_selectedIcon.color1 = std::nullopt; break;
         case 1: m_selectedIcon.color2 = std::nullopt; break;
     }
-    AddIconLayer::updateIconColors();
+    updateIconColors();
 }

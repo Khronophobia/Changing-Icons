@@ -5,7 +5,7 @@
 using namespace geode::prelude;
 using namespace changing_icons;
 
-class $modify(ModGarageLayer, GJGarageLayer) {
+class $modify(CIGarageLayer, GJGarageLayer) {
     bool init() {
         if (!GJGarageLayer::init()) return false;
 
@@ -18,7 +18,7 @@ class $modify(ModGarageLayer, GJGarageLayer) {
                 CircleBaseSize::Small
             ),
             this,
-            menu_selector(ModGarageLayer::onIconConfig)
+            menu_selector(CIGarageLayer::onIconConfig)
         );
 
         menu->addChild(configBtn);
