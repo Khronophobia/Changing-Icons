@@ -18,7 +18,7 @@ namespace changing_icons {
         std::array<std::string, 3> const m_iconOrderList{"Random", "Forward", "Backward"};
         cocos2d::CCLabelBMFont* m_iconOrderLabel;
         
-        bool setup();
+        bool setup() override;
         void refreshTab();
         void setOrderChoice(IconOrder choice);
         void setOrderChoice(int choice);
@@ -27,6 +27,7 @@ namespace changing_icons {
     public:
         static IconConfigLayer* create();
         CITabProperties& getCurrentConfig();
+
         void onGlobalConfig(CCObject*);
         void onSwitchTab(CCObject*);
         void onVarInfo(CCObject*);
@@ -34,6 +35,9 @@ namespace changing_icons {
         void onOrderArrow(CCObject*);
         void onAddIcon(CCObject*);
         void onClearList(CCObject*);
+        void onSaveList(CCObject*);
+        void onLoadList(CCObject*);
+
         void editIconAtIndex(int index);
         void addIcon(IconProperties properties);
         void swapIcons(int icon1, int icon2);
