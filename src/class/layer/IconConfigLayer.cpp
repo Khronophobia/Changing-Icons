@@ -430,9 +430,7 @@ void IconConfigLayer::refreshIconList(IconType currentTab, bool toTop) {
             this,
             i,
             currentTab,
-            icon.iconID,
-            icon.color1,
-            icon.color2,
+            icon,
             isLast
         );
         cell->setPositionY(height - (i + 1) * 30.f);
