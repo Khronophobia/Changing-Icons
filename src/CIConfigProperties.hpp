@@ -18,6 +18,7 @@ namespace changing_icons {
     struct CIGlobalOverride {
         std::optional<bool> useAll = std::nullopt;
         std::optional<IconOrder> order = std::nullopt;
+        std::optional<bool> mirrorEnd = std::nullopt;
         std::optional<bool> disabled = std::nullopt;
     };
 
@@ -121,6 +122,11 @@ struct matjson::Serialize<changing_icons::CIGlobalOverride> {
                 "order",
                 changing_icons::CIGlobalOverride().order
             ),
+            .mirrorEnd = changing_icons::utils::tryGetJsonValue<std::optional<bool>>(
+                value,
+                "mirror-end",
+                changing_icons::CIGlobalOverride().mirrorEnd
+            ),
             .disabled = changing_icons::utils::tryGetJsonValue<std::optional<bool>>(
                 value,
                 "disabled",
@@ -132,6 +138,7 @@ struct matjson::Serialize<changing_icons::CIGlobalOverride> {
         auto obj = matjson::Object();
         obj["use-all"] = value.useAll;
         obj["order"] = value.order;
+        obj["mirror-end"] = value.mirrorEnd;
         obj["disabled"] = value.disabled;
         return obj;
     }
