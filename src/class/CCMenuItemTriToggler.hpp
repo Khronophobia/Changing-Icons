@@ -9,15 +9,21 @@ namespace changing_icons {
         CCMenuItemSpriteExtra* m_disabledButton;
         CCMenuItemSpriteExtra* m_offButton;
         CCMenuItemSpriteExtra* m_onButton;
-        int m_state = -1;
+        cocos2d::CCLabelBMFont* m_label;
+        std::optional<bool> m_state;
     public:
-        static CCMenuItemTriToggler* create(CCNode* disabled, CCNode* off, CCNode* on, CCObject* target, cocos2d::SEL_MenuHandler callback, float scale = 1.f);
-        bool init(CCNode* disabled, CCNode* off, CCNode* on, CCObject* target, cocos2d::SEL_MenuHandler callback, float scale);
-        void setState(int state);
-        int getState();
-        // setState alternative that takes std::optional<bool>
-        void toggle(std::optional<bool>);
-        // getState alternative that returns std::optional<bool>
+        static CCMenuItemTriToggler* create(
+            CCNode* disabledNode, CCNode* offNode, CCNode* onNode, CCObject* target, cocos2d::SEL_MenuHandler callback, float scale = 1.f
+        );
+        static CCMenuItemTriToggler* createWithLabel(
+            CCNode* disabledNode, CCNode* offNode, CCNode* onNode, CCObject* target, cocos2d::SEL_MenuHandler callback, char const* text, float scale = 1.f
+        );
+        bool init(CCNode* disabled, CCNode* off, CCNode* on, CCObject* target, cocos2d::SEL_MenuHandler callback, char const* text, float scale);
+        void setState(std::optional<bool> state);
+        std::optional<bool> getState();
+        // Alias for setState
+        void toggle(std::optional<bool> value);
+        // Alias for getState
         std::optional<bool> isToggled();
 
         void activate() override;
