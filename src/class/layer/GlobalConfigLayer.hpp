@@ -13,7 +13,7 @@ namespace changing_icons {
         std::array<std::string, 3> const m_iconOrderList{"Random", "Forward", "Backward"};
         cocos2d::CCMenu* m_gamemodeBar;
 
-        bool setup();
+        bool setup() override;
         void setOrderChoice(IconOrder choice);
         void setOrderChoice(int choice);
         void disableOrder();
