@@ -45,3 +45,19 @@ CITabProperties& CIConfigManager::getConfig(IconType type) {
         case IconType::Jetpack: return m_jetpackConfig;
     }
 }
+
+ghc::filesystem::path CIConfigManager::getPresetDir(IconType type) {
+    auto presetDir = Mod::get()->getConfigDir() / "icon-sets";
+    switch (type) {
+        default:
+        case IconType::Cube: return presetDir / "cube";
+        case IconType::Ship: return presetDir / "ship";
+        case IconType::Ball: return presetDir / "ball";
+        case IconType::Ufo: return presetDir / "ufo";
+        case IconType::Wave: return presetDir / "wave";
+        case IconType::Robot: return presetDir / "robot";
+        case IconType::Spider: return presetDir / "spider";
+        case IconType::Swing: return presetDir / "swing";
+        case IconType::Jetpack: return presetDir / "jetpack";
+    }
+}

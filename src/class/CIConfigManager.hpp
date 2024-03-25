@@ -21,5 +21,6 @@ namespace changing_icons {
         static CIConfigManager* get();
         CIGlobalProperties& getGlobalConfig();
         CITabProperties& getConfig(IconType type);
+        static ghc::filesystem::path getPresetDir(IconType type);
     };
 }

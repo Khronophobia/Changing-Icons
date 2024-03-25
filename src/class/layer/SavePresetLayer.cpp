@@ -1,6 +1,7 @@
 #include <Geode/Geode.hpp>
 #include <Geode/ui/TextInput.hpp>
 #include "SavePresetLayer.hpp"
+#include <class/CIConfigManager.hpp>
 
 using namespace geode::prelude;
 using namespace changing_icons;
@@ -48,19 +49,7 @@ void SavePresetLayer::onSave(CCObject*) {
         return;
     }
 
-    auto presetDir = Mod::get()->getConfigDir() / "icon-sets";
-    switch (m_iconType) {
-        default:
-        case IconType::Cube: presetDir /= "cube"; break;
-        case IconType::Ship: presetDir /= "ship"; break;
-        case IconType::Ball: presetDir /= "ball"; break;
-        case IconType::Ufo: presetDir /= "ufo"; break;
-        case IconType::Wave: presetDir /= "wave"; break;
-        case IconType::Robot: presetDir /= "robot"; break;
-        case IconType::Spider: presetDir /= "spider"; break;
-        case IconType::Swing: presetDir /= "swing"; break;
-        case IconType::Jetpack: presetDir /= "jetpack"; break;
-    }
+    auto presetDir = CIConfigManager::getPresetDir(m_iconType);
     if (auto res = file::createDirectoryAll(presetDir); res.isErr()) {
         log::error("{}", res.error());
         Notification::create(res.error(), NotificationIcon::Error)->show();
