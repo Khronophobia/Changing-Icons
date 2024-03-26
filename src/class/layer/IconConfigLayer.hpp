@@ -1,8 +1,10 @@
 #pragma once
 #include <Geode/ui/Popup.hpp>
-#include <CIConfigProperties.hpp>
 
 namespace changing_icons {
+    enum class IconOrder;
+    struct CITabProperties;
+    struct IconProperties;
     class CIConfigManager;
 
     class IconConfigLayer : public geode::Popup<> {
@@ -43,5 +45,6 @@ namespace changing_icons {
         void swapIcons(int icon1, int icon2);
         void replaceIcon(IconProperties properties, int index);
         void deleteIcon(int index);
+        void replaceList(std::vector<IconProperties> const& list);
     };
 }

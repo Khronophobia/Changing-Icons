@@ -14,6 +14,7 @@ namespace changing_icons {
             int index,
             IconType iconType,
             IconProperties const& icon,
+            bool readOnly,
             bool isLast
         );
     public:
@@ -24,6 +25,7 @@ namespace changing_icons {
             IconProperties const& icon,
             bool isLast = false
         );
+        static IconCell* create(int index, IconType iconType, IconProperties const& icon);
         void onDelete(CCObject*);
         void onEdit(CCObject*);
         void onMoveDown(CCObject*);

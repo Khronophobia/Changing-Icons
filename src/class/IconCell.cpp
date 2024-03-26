@@ -13,7 +13,17 @@ IconCell* IconCell::create(
         bool isLast
     ) {
     auto ret = new IconCell();
-    if (ret && ret->init(configLayer, index, iconType, icon, isLast)) {
+    if (ret && ret->init(configLayer, index, iconType, icon, false, isLast)) {
+        ret->autorelease();
+        return ret;
+    }
+    CC_SAFE_DELETE(ret);
+    return nullptr;
+}
+
+IconCell* IconCell::create(int index, IconType type, IconProperties const& icon) {
+    auto ret = new IconCell();
+    if (ret && ret->init(nullptr, index, type, icon, true, false)) {
         ret->autorelease();
         return ret;
     }
@@ -26,6 +36,7 @@ bool IconCell::init(
         int index,
         IconType iconType,
         IconProperties const& icon,
+        bool readOnly,
         bool isLast
     ) {
     if (!CCLayerColor::init()) return false;
@@ -64,6 +75,8 @@ bool IconCell::init(
     iconDisplay->setColor(GameManager::get()->colorForIdx(playerColor1));
     iconDisplay->setSecondColor(GameManager::get()->colorForIdx(playerColor2));
     this->addChildAtPosition(iconDisplay, Anchor::Left, ccp(24.f, 0.f));
+
+    if (readOnly) return true;
 
     auto menu = CCMenu::create();
     menu->ignoreAnchorPointForPosition(false);

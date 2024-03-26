@@ -1,9 +1,10 @@
 #pragma once
 #include <Geode/ui/Popup.hpp>
 #include <Geode/ui/TextInput.hpp>
-#include <CIConfigProperties.hpp>
 
 namespace changing_icons {
+    struct IconProperties;
+
     class SavePresetLayer : public geode::Popup<IconType>, TextInputDelegate {
     protected:
         IconType m_iconType;

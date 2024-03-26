@@ -3,6 +3,7 @@
 #include "AddIconLayer.hpp"
 #include "GlobalConfigLayer.hpp"
 #include "SavePresetLayer.hpp"
+#include "LoadPresetLayer.hpp"
 #include <class/CCVariableRef.hpp>
 #include <class/IconCell.hpp>
 #include <class/CIConfigManager.hpp>
@@ -412,14 +413,16 @@ void IconConfigLayer::onSaveList(CCObject* sender) {
     SavePresetLayer::create(m_currentTab, currentConfig.iconSet)->show();
 }
 
-void IconConfigLayer::onLoadList(CCObject* sender) {}
+void IconConfigLayer::onLoadList(CCObject* sender) {
+    LoadPresetLayer::create(this, m_currentTab)->show();
+}
 
 void IconConfigLayer::refreshIconList(IconType currentTab, bool toTop) {
     auto& currentConfig = getCurrentConfig();
     auto iconList = currentConfig.iconSet;
     auto content = m_iconList->m_contentLayer;
 
-    auto height = std::max<int>(m_iconList->getContentHeight(), iconList.size() * constants::ICONCELL_HEIGHT);
+    auto height = std::max(m_iconList->getContentHeight(), iconList.size() * constants::ICONCELL_HEIGHT);
     content->setContentHeight(height);
 
     m_iconList->m_contentLayer->removeAllChildren();
@@ -435,7 +438,7 @@ void IconConfigLayer::refreshIconList(IconType currentTab, bool toTop) {
             isLast
         );
         cell->setPositionY(height - (i + 1) * constants::ICONCELL_HEIGHT);
-        cell->setTag(i);
+        // cell->setTag(i);
         content->addChild(cell);
         i++;
     }
@@ -452,34 +455,39 @@ void IconConfigLayer::refreshIconList(IconType currentTab, bool toTop) {
 }
 
 void IconConfigLayer::addIcon(IconProperties icon) {
-    log::debug("Added icon ID {}", icon.iconID);
+    log::info("Added icon ID {}", icon.iconID);
     getCurrentConfig().iconSet.push_back(icon);
     refreshIconList(m_currentTab);
 }
 
 void IconConfigLayer::swapIcons(int icon1, int icon2) {
-    log::debug("Swapped icons in index {} and {}", icon1, icon2);
+    log::info("Swapped icons in index {} and {}", icon1, icon2);
     auto& iconSet = getCurrentConfig().iconSet;
     std::iter_swap(iconSet.begin() + icon1, iconSet.begin() + icon2);
     refreshIconList(m_currentTab);
 }
 
 void IconConfigLayer::replaceIcon(IconProperties icon, int index) {
-    log::debug("Replaced icon in index {}", index);
+    log::info("Replaced icon in index {}", index);
     auto& iconSet = getCurrentConfig().iconSet;
     iconSet.at(index) = icon;
     refreshIconList(m_currentTab);
 }
 
 void IconConfigLayer::deleteIcon(int index) {
-    log::debug("Removed icon at index {}", index);
+    log::info("Removed icon at index {}", index);
     auto& iconSet = getCurrentConfig().iconSet;
     iconSet.erase(iconSet.begin() + index);
     refreshIconList(m_currentTab);
 }
 
+void IconConfigLayer::replaceList(std::vector<IconProperties> const& list) {
+    getCurrentConfig().iconSet = list;
+    refreshIconList(m_currentTab, true);
+}
+
 IconConfigLayer::~IconConfigLayer() {
-    log::debug("Saving config.");
+    log::info("Saving config.");
     Mod::get()->setSavedValue("global", m_configManager->getGlobalConfig());
     Mod::get()->setSavedValue("cube", m_configManager->getConfig(IconType::Cube));
     Mod::get()->setSavedValue("ship", m_configManager->getConfig(IconType::Ship));

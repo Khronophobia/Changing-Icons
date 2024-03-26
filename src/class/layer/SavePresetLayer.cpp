@@ -21,7 +21,7 @@ SavePresetLayer* SavePresetLayer::create(IconType type, std::vector<IconProperti
 bool SavePresetLayer::setup(IconType type) {
     m_noElasticity = true;
     m_iconType = type;
-    this->setTitle("Save Set");
+    this->setTitle("Save Icon Set");
     m_closeBtn->setLayoutOptions(
         AnchorLayoutOptions::create()
             ->setAnchor(Anchor::TopLeft)
@@ -57,7 +57,7 @@ bool SavePresetLayer::setup(IconType type) {
 
 std::string SavePresetLayer::convertToFileName(std::string name) {
     for (auto character : constants::ILLEGAL_CHARS) {
-        name = string::replace(name, character, "_");
+        name = string::replace(name, std::string(1, character), "_");
     }
     name = string::trimRight(name);
     return name;

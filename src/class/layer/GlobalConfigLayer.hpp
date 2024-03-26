@@ -1,8 +1,8 @@
 #pragma once
 #include <Geode/ui/Popup.hpp>
-#include <CIConfigProperties.hpp>
 
 namespace changing_icons {
+    enum class IconOrder;
     class CIConfigManager;
 
     class GlobalConfigLayer : public geode::Popup<> {
