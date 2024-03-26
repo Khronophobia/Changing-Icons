@@ -43,6 +43,12 @@ namespace changing_icons {
         bool mirrorEnd;
         bool disabled;
     };
+
+    struct CIPreset {
+        std::string name;
+        std::vector<IconProperties> iconSet;
+        int formatVersion;
+    };
 }
 
 template<>
@@ -218,6 +224,39 @@ struct matjson::Serialize<changing_icons::CITabProperties> {
         obj["use-all"] = value.useAll;
         obj["mirror-end"] = value.mirrorEnd;
         obj["disabled"] = value.disabled;
+        return obj;
+    }
+    static bool is_json(matjson::Value const& value) {
+        return value.is_object();
+    }
+};
+
+template<>
+struct matjson::Serialize<changing_icons::CIPreset> {
+    static changing_icons::CIPreset from_json(matjson::Value const& value) {
+        return changing_icons::CIPreset{
+            .name = changing_icons::utils::tryGetJsonValue(
+                value,
+                "name",
+                changing_icons::CIPreset().name
+            ),
+            .iconSet = changing_icons::utils::tryGetJsonValue(
+                value,
+                "icon-set",
+                changing_icons::CIPreset().iconSet
+            ),
+            .formatVersion = changing_icons::utils::tryGetJsonValue(
+                value,
+                "version",
+                changing_icons::CIPreset().formatVersion
+            )
+        };
+    }
+    static matjson::Value to_json(changing_icons::CIPreset const& value) {
+        auto obj = matjson::Object();
+        obj["name"] = value.name;
+        obj["icon-set"] = value.iconSet;
+        obj["version"] = value.formatVersion;
         return obj;
     }
     static bool is_json(matjson::Value const& value) {

@@ -2,6 +2,8 @@
 #include <Geode/ui/TextInput.hpp>
 #include "SavePresetLayer.hpp"
 #include <class/CIConfigManager.hpp>
+#include <CIConstants.hpp>
+#include <CIConfigProperties.hpp>
 
 using namespace geode::prelude;
 using namespace changing_icons;
@@ -27,10 +29,21 @@ bool SavePresetLayer::setup(IconType type) {
     );
     // m_mainLayer->updateLayout();
 
-    m_textInput = TextInput::create(200.f, "Set Name");
+    m_textInput = TextInput::create(200.f, "Name");
     m_textInput->setMaxCharCount(20);
-    m_textInput->setCommonFilter(CommonFilter::Name);
+    m_textInput->setCommonFilter(CommonFilter::Any);
+    m_textInput->setDelegate(this);
     m_buttonMenu->addChildAtPosition(m_textInput, Anchor::Center);
+
+    m_filenameHint = CCLabelBMFont::create("", "bigFont.fnt");
+    m_filenameHint->setVisible(false);
+    m_mainLayer->addChildAtPosition(m_filenameHint, Anchor::Center, ccp(0.f, -20.f));
+
+    m_inputWarning = CCLabelBMFont::create("Trailing whitespaces will be trimmed", "bigFont.fnt");
+    m_inputWarning->setVisible(false);
+    m_inputWarning->setColor(cc3x(0xff0));
+    m_inputWarning->limitLabelWidth(200.f, 0.4f, 0.1f);
+    m_mainLayer->addChildAtPosition(m_inputWarning, Anchor::Center, ccp(0.f, 24.f));
 
     auto saveBtnSpr = ButtonSprite::create("Save");
     saveBtnSpr->setScale(0.8f);
@@ -42,10 +55,25 @@ bool SavePresetLayer::setup(IconType type) {
     return true;
 }
 
+std::string SavePresetLayer::convertToFileName(std::string name) {
+    for (auto character : constants::ILLEGAL_CHARS) {
+        name = string::replace(name, character, "_");
+    }
+    name = string::trimRight(name);
+    return name;
+}
+
+std::optional<std::string> SavePresetLayer::checkForNameError(std::string_view name) {
+    if (name.empty()) return "Name must not be empty";
+    if (name.starts_with(" ")) return "Name cannot start with a space";
+
+    return std::nullopt;
+}
+
 void SavePresetLayer::onSave(CCObject*) {
-    auto const& name = m_textInput->getString();
-    if (name.empty()) {
-        Notification::create("Name must not be empty", NotificationIcon::Error)->show();
+    auto const& name = convertToFileName(m_textInput->getString());
+    if (auto const& err = checkForNameError(name)) {
+        Notification::create(err.value(), NotificationIcon::Error)->show();
         return;
     }
 
@@ -55,26 +83,46 @@ void SavePresetLayer::onSave(CCObject*) {
         createQuickPopup(
             "Overwrite List",
             "A set with the name <cy>" + name +
-            "</c> already exists. Do you want to overwrite it?",
+            ".json</c> already exists. Do you want to overwrite it?",
             "No", "Yes",
             [this, presetDir](auto, bool btn2) {
                 if (btn2) {
-                    savePreset(presetDir);
+                    if (savePreset(presetDir).isErr()) return;
                     SavePresetLayer::onClose(nullptr);
                 }
             }
         );
         return;
     }
-    savePreset(presetDir);
+    if (savePreset(presetDir).isErr()) return;
     SavePresetLayer::onClose(nullptr);
 }
 
-void SavePresetLayer::savePreset(ghc::filesystem::path const& path) const {
-    if (auto res = file::writeToJson(path, m_iconSet); res.isErr()) {
+geode::Result<> SavePresetLayer::savePreset(ghc::filesystem::path const& path) const {
+    auto contents = CIPreset{
+        .name = string::trimRight(m_textInput->getString()),
+        .iconSet = m_iconSet,
+        .formatVersion = 0,
+    };
+    auto res = file::writeToJson(path, contents);
+    if (res.isErr()) {
         log::error("{}", res.error());
         Notification::create(res.error(), NotificationIcon::Error)->show();
+    } else {
+        Notification::create("Save successful", NotificationIcon::Success)->show();
+    }
+    return res;
+}
+
+void SavePresetLayer::textChanged(CCTextInputNode* input) {
+    auto const& str = convertToFileName(input->getString());
+    if (checkForNameError(str)) {
+        m_filenameHint->setVisible(false);
         return;
     }
-    Notification::create("Save successful", NotificationIcon::Success)->show();
+    if (string::endsWith(input->getString(), " ")) m_inputWarning->setVisible(true);
+    else m_inputWarning->setVisible(false);
+    m_filenameHint->setVisible(true);
+    m_filenameHint->setCString(fmt::format("Will be saved as: {}.json", str).c_str());
+    m_filenameHint->limitLabelWidth(200.f, 0.4f, 0.1f);
 }
