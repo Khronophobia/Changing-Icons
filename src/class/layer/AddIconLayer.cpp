@@ -6,8 +6,6 @@
 using namespace geode::prelude;
 using namespace changing_icons;
 
-int constexpr ICONS_PER_PAGE = 55;
-
 AddIconLayer* AddIconLayer::create(IconType iconType, IconConfigLayer* configLayer, IconProperties iconProps, std::optional<int> index) {
     auto ret = new AddIconLayer();
     if (ret && ret->initAnchored(480.f, 300.f, iconType, configLayer, iconProps, index, "GJ_square02.png")) {
@@ -45,7 +43,7 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
     m_selectedIcon = iconProps;
     m_configLayer = configLayer;
     m_index = index;
-    m_iconPageMax = GameManager::get()->countForType(iconType) / ICONS_PER_PAGE;
+    m_iconPageMax = GameManager::get()->countForType(iconType) / constants::ICONS_PER_PAGE;
     if (m_index) this->setTitle("Edit Icon");
     else this->setTitle("Add Icon");
 
@@ -261,10 +259,10 @@ void AddIconLayer::setupIcons(int page) {
     m_iconList->removeAllChildren();
     for (
             int i = 1;
-            i <= ICONS_PER_PAGE;
+            i <= constants::ICONS_PER_PAGE;
             i++
     ) {
-        auto iconID = i + page * ICONS_PER_PAGE;
+        auto iconID = i + page * constants::ICONS_PER_PAGE;
         if (iconID > GameManager::get()->countForType(m_iconType)) break;
         auto iconSpr = GJItemIcon::createBrowserItem(convertIconType(m_iconType), iconID);
         auto iconBtn = CCMenuItemSpriteExtra::create(
