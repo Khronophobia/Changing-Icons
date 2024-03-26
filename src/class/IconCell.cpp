@@ -1,5 +1,6 @@
 #include "IconCell.hpp"
 #include <class/layer/IconConfigLayer.hpp>
+#include <CIConstants.hpp>
 
 using namespace geode::prelude;
 using namespace changing_icons;
@@ -30,7 +31,7 @@ bool IconCell::init(
     if (!CCLayerColor::init()) return false;
     m_configLayer = configLayer;
 
-    this->setContentSize(ccp(160.f, 30.f));
+    this->setContentSize(ccp(constants::ICONCELL_WIDTH, constants::ICONCELL_HEIGHT));
     this->setAnchorPoint(ccp(0.f, 0.f));
     if (index % 2 == 0)
         this->setOpacity(100);

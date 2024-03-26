@@ -6,6 +6,7 @@
 #include <class/CCVariableRef.hpp>
 #include <class/IconCell.hpp>
 #include <class/CIConfigManager.hpp>
+#include <CIConstants.hpp>
 
 using namespace geode::prelude;
 using namespace changing_icons;
@@ -170,7 +171,7 @@ bool IconConfigLayer::setup() {
     auto iconListBG = CCLayerColor::create({0, 0, 0, 95});
     iconListBG->setAnchorPoint(ccp(1.f, 0.5f));
     iconListBG->ignoreAnchorPointForPosition(false);
-    iconListBG->setContentSize(ccp(160.f, 190.f));
+    iconListBG->setContentSize(ccp(constants::ICONCELL_WIDTH, 190.f));
     m_mainLayer->addChildAtPosition(iconListBG, Anchor::Right, ccp(-20.f, 10.f));
 
     m_iconList = ScrollLayer::create(iconListBG->getContentSize());
@@ -418,7 +419,7 @@ void IconConfigLayer::refreshIconList(IconType currentTab, bool toTop) {
     auto iconList = currentConfig.iconSet;
     auto content = m_iconList->m_contentLayer;
 
-    auto height = std::max<int>(m_iconList->getContentHeight(), iconList.size() * 30.f);
+    auto height = std::max<int>(m_iconList->getContentHeight(), iconList.size() * constants::ICONCELL_HEIGHT);
     content->setContentHeight(height);
 
     m_iconList->m_contentLayer->removeAllChildren();
@@ -433,7 +434,7 @@ void IconConfigLayer::refreshIconList(IconType currentTab, bool toTop) {
             icon,
             isLast
         );
-        cell->setPositionY(height - (i + 1) * 30.f);
+        cell->setPositionY(height - (i + 1) * constants::ICONCELL_HEIGHT);
         cell->setTag(i);
         content->addChild(cell);
         i++;
@@ -444,7 +445,7 @@ void IconConfigLayer::refreshIconList(IconType currentTab, bool toTop) {
     }
     auto maxScrollPos = m_iconList->getContentHeight() - content->getContentHeight();
     content->setPositionY(std::clamp<float>(
-        content->getPositionY() + 30.f,
+        content->getPositionY() + constants::ICONCELL_HEIGHT,
         maxScrollPos,
         0.f
     ));
