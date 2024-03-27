@@ -1,3 +1,5 @@
 # Changing Icons
 
-Geometry Dash mod for Geode that changes your icon during gameplay.
+Geode mod for Geometry Dash that changes your icon during gameplay.
+
+![Example Mod](screenshot.png)
