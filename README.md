@@ -1,3 +1,3 @@
-# ChangingIcons
+# Changing Icons
 
-This is where she makes a mod.
+Geometry Dash mod for Geode that changes your icon during gameplay.
