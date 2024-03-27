@@ -40,7 +40,7 @@ bool LoadPresetLayer::setup(IconConfigLayer* configLayer, IconType type) {
         m_setsScrollbar, Anchor::Right, ccp(5.f, 0.f), false
     );
 
-    refreshSets();
+    refreshSets(true);
 
     m_presetViewBg = CCLayerColor::create({0, 0, 0, 95});
     m_presetViewBg->ignoreAnchorPointForPosition(false);
@@ -117,9 +117,9 @@ void LoadPresetLayer::refreshSets(bool toTop) {
 void LoadPresetLayer::viewPreset(CIPreset const& preset) {
     this->setTitle(preset.name);
 
+    m_setsScrollbar->removeFromParent();
     m_setsListBg->setVisible(false);
     m_setsList->m_disableMovement = true;
-    m_setsScrollbar->removeFromParent();
 
     m_presetViewBg->setVisible(true);
     m_presetViewList->m_disableMovement = false;
@@ -149,12 +149,19 @@ void LoadPresetLayer::loadPreset(CIPreset const& preset) {
 }
 
 void LoadPresetLayer::deletePreset(ghc::filesystem::path const& filename) {
+    auto presetDir = CIConfigManager::getPresetDir(m_iconType) / filename.filename();
+    std::error_code error;
+    if (!ghc::filesystem::remove(presetDir, error)) {
+        log::error("Error deleting {}: {}", filename.filename(), error);
+        return;
+    }
+    refreshSets();
 }
 
 void LoadPresetLayer::onBack(CCObject*) {
     this->setTitle("Load Icon Set");
-    m_presetBackBtn->setVisible(false);
     m_presetScrollbar->removeFromParent();
+    m_presetBackBtn->setVisible(false);
     m_presetViewBg->setVisible(false);
     m_presetViewList->m_disableMovement = true;
 
