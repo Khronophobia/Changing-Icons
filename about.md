@@ -1,6 +1,6 @@
 # Changing Icons
 
-Change your icon during gameplay everytime you enter a portal. Configurations available in the Icon Kit menu.
+Change your icon during gameplay everytime you change gamemode. Configurations available in the Icon Kit menu.
 
 # Known Incompabilities
 

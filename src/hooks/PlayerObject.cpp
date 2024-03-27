@@ -1,7 +1,7 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/PlayerObject.hpp>
 #include <class/CIConfigManager.hpp>
-#include <CIUtilities.hpp>
+#include <Random.hpp>
 #include <CIConfigProperties.hpp>
 
 using namespace geode::prelude;
@@ -17,8 +17,12 @@ class $modify(CIPlayerObject, PlayerObject) {
     ci::CITempProperties m_spiderProperties;
     ci::CITempProperties m_swingProperties;
 
+    int m_ogColor1 = GameManager::get()->getPlayerColor();
+    int m_ogColor2 = GameManager::get()->getPlayerColor2();
+
     bool init(int p0, int p1, GJBaseGameLayer* p2, CCLayer* p3, bool p4) {
         if (!PlayerObject::init(p0, p1, p2, p3, p4)) return false;
+        if (!PlayLayer::get() && !LevelEditorLayer::get()) return true;
 
         initCIValues(IconType::Cube);
         if (m_isPlatformer) initCIValues(IconType::Jetpack);
@@ -71,40 +75,6 @@ class $modify(CIPlayerObject, PlayerObject) {
         };
     }
 
-    void toggleFlyMode(bool p0, bool p1) {
-        PlayerObject::toggleFlyMode(p0, p1);
-        updateIconsCI(IconType::Cube);
-        if (p0) {
-            if (m_isPlatformer) updateIconsCI(IconType::Jetpack);
-            else updateIconsCI(IconType::Ship);
-        }
-    }
-    void toggleRollMode(bool p0, bool p1) {
-        PlayerObject::toggleRollMode(p0, p1);
-        if (p0) updateIconsCI(IconType::Ball);
-    }
-    void toggleBirdMode(bool p0, bool p1) {
-        PlayerObject::toggleBirdMode(p0, p1);
-        if (p0) {
-            updateIconsCI(IconType::Ufo);
-        }
-    }
-    void toggleDartMode(bool p0, bool p1) {
-        PlayerObject::toggleDartMode(p0, p1);
-        if (p0) updateIconsCI(IconType::Wave);
-    }
-    void toggleRobotMode(bool p0, bool p1) {
-        PlayerObject::toggleRobotMode(p0, p1);
-        if (p0) updateIconsCI(IconType::Robot);
-    }
-    void toggleSpiderMode(bool p0, bool p1) {
-        PlayerObject::toggleSpiderMode(p0, p1);
-        if (p0) updateIconsCI(IconType::Spider);
-    }
-    void toggleSwingMode(bool p0, bool p1) {
-        PlayerObject::toggleSwingMode(p0, p1);
-        if (p0) updateIconsCI(IconType::Swing);
-    }
     void flashPlayer(float p0, float p1, ccColor3B mainColor, ccColor3B secondColor) {
         // Make this do nothing because it resets the colors
     }
@@ -116,21 +86,106 @@ class $modify(CIPlayerObject, PlayerObject) {
         m_vehicleSpriteSecondary->setColor(color);
     }
 
-    void updateIconsCI(IconType type) {
-        auto gm = GameManager::get();
-        if (!gm->getPlayLayer() && !gm->getEditorLayer()) return;
-        auto& config = getActiveProperties(type);
+    void updateColorsCI(int const color1, int const color2) {
+        if (m_isShip || m_isBird) {
+            setVehicleColor(GameManager::get()->colorForIdx(color1));
+            setVehicleSecondColor(GameManager::get()->colorForIdx(color2));
+        } else {
+            PlayerObject::setColor(GameManager::get()->colorForIdx(color1));
+            PlayerObject::setSecondColor(GameManager::get()->colorForIdx(color2));
+        }
+    }
 
-        auto const& iconSet = ci::CIConfigManager::get()->getConfig(type).iconSet;
-        int newIcon = 1;
-        int newColor1 = gm->getPlayerColor();
-        int newColor2 = gm->getPlayerColor2();
+    void switchedToMode(GameObjectType p0) { // Need to do this because updatePlayerRobotFrame
+        PlayerObject::switchedToMode(p0);    // and updatePlayerSpiderFrame are inlined
+        if (!PlayLayer::get() && !LevelEditorLayer::get()) return;
+        switch (p0) {
+        default: return;
+        case GameObjectType::RobotPortal:
+            PlayerObject::updatePlayerRobotFrame(getNextIconCI(IconType::Robot, GameManager::get()->getPlayerRobot()));
+            break;
+        case GameObjectType::SpiderPortal:
+            PlayerObject::updatePlayerSpiderFrame(getNextIconCI(IconType::Spider, GameManager::get()->getPlayerSpider()));
+            break;
+        }
+    }
 
-        if (config.disabled || (iconSet.empty() && !config.useAll)) {
-            PlayerObject::setColor(gm->colorForIdx(newColor1));
-            PlayerObject::setSecondColor(gm->colorForIdx(newColor2));
+    void updatePlayerFrame(int frame) {
+        if (!PlayLayer::get() && !LevelEditorLayer::get()) {
+            PlayerObject::updatePlayerFrame(frame);
             return;
-        };
+        }
+        PlayerObject::updatePlayerFrame(getNextIconCI(IconType::Cube, frame));
+    }
+
+    void updatePlayerShipFrame(int frame) {
+        if (!PlayLayer::get() && !LevelEditorLayer::get()) {
+            PlayerObject::updatePlayerShipFrame(frame);
+            return;
+        }
+        PlayerObject::updatePlayerShipFrame(getNextIconCI(IconType::Ship, frame));
+    }
+
+    void updatePlayerJetpackFrame(int frame) {
+        if (!PlayLayer::get() && !LevelEditorLayer::get()) {
+            PlayerObject::updatePlayerJetpackFrame(frame);
+            return;
+        }
+        PlayerObject::updatePlayerJetpackFrame(getNextIconCI(IconType::Jetpack, frame));
+    }
+
+    void updatePlayerRollFrame(int frame) {
+        if (!PlayLayer::get() && !LevelEditorLayer::get()) {
+            PlayerObject::updatePlayerRollFrame(frame);
+            return;
+        }
+        PlayerObject::updatePlayerRollFrame(getNextIconCI(IconType::Ball, frame));
+    }
+
+    void updatePlayerBirdFrame(int frame) {
+        if (!PlayLayer::get() && !LevelEditorLayer::get()) {
+            PlayerObject::updatePlayerBirdFrame(frame);
+            return;
+        }
+        PlayerObject::updatePlayerBirdFrame(getNextIconCI(IconType::Ufo, frame));
+    }
+
+    void updatePlayerDartFrame(int frame) {
+        if (!PlayLayer::get() && !LevelEditorLayer::get()) {
+            PlayerObject::updatePlayerDartFrame(frame);
+            return;
+        }
+        PlayerObject::updatePlayerDartFrame(getNextIconCI(IconType::Wave, frame));
+    }
+
+    void updatePlayerSwingFrame(int frame) {
+        if (!PlayLayer::get() && !LevelEditorLayer::get()) {
+            PlayerObject::updatePlayerSwingFrame(frame);
+            return;
+        }
+        PlayerObject::updatePlayerSwingFrame(getNextIconCI(IconType::Swing, frame));
+    }
+
+    int getNextIconCI(IconType type, int originalFrame, bool updateIndex = true) {
+        auto gm = GameManager::get();
+        auto& config = getActiveProperties(type);
+        auto const& iconSet = ci::CIConfigManager::get()->getConfig(type).iconSet;
+
+        int color1 = m_fields->m_ogColor1;
+        int color2 = m_fields->m_ogColor2;
+
+        if (config.disabled || (!config.useAll && iconSet.empty())) {
+            updateColorsCI(color1, color2);
+            return originalFrame;
+        }
+
+        if (!config.useAll && iconSet.size() == 1) {
+            auto const& iconProps = iconSet.at(0);
+            if (iconProps.color1) color1 = iconProps.color1.value();
+            if (iconProps.color2) color2 = iconProps.color2.value();
+            updateColorsCI(color1, color2);
+            return iconProps.iconID;
+        }
 
         int start = 0;
         int end = iconSet.size() - 1;
@@ -142,11 +197,22 @@ class $modify(CIPlayerObject, PlayerObject) {
         }
         switch (config.order) {
         case ci::IconOrder::Random:
-            result = ci::utils::randomIntInRange(start, end);
+            // https://www.learncpp.com/cpp-tutorial/global-random-numbers-random-h/
+            result = Random::get(start, end);
+            break;
+        case ci::IconOrder::Forward:
+            result = index;
+            if (updateIndex) ++index;
+            if (index > end) {
+                if (config.mirrorEnd) {
+                    index -= 2;
+                    config.order = ci::IconOrder::Backward;
+                } else index = start;
+            }
             break;
         case ci::IconOrder::Backward:
             result = index;
-            --index;
+            if (updateIndex) --index;
             if (index < start) {
                 if (config.mirrorEnd) {
                     index += 2;
@@ -154,83 +220,19 @@ class $modify(CIPlayerObject, PlayerObject) {
                 } else index = end;
             }
             break;
-        case ci::IconOrder::Forward:
-            result = index;
-            ++index;
-            if (index > end) {
-                if (config.mirrorEnd) {
-                    index -= 2;
-                    config.order = ci::IconOrder::Backward;
-                } else index = start;
-            }
         }
 
-        if (config.useAll) {
-            newIcon = result;
-        } else {
+        int newIcon;
+        if (config.useAll) newIcon = result;
+        else {
             auto const& iconProps = iconSet.at(result);
             newIcon = iconProps.iconID;
-            if (iconProps.color1) newColor1 = iconProps.color1.value();
-            if (iconProps.color2) newColor2 = iconProps.color2.value();
+            if (iconProps.color1) color1 = iconProps.color1.value();
+            if (iconProps.color2) color2 = iconProps.color2.value();
         }
-
-        switch (type) {
-        default: break;
-        case IconType::Cube:
-            PlayerObject::updatePlayerFrame(newIcon);
-            PlayerObject::setColor(gm->colorForIdx(newColor1));
-            PlayerObject::setSecondColor(gm->colorForIdx(newColor2));
-            log::debug("Cube icon changed to ID {}", newIcon);
-            break;
-        case IconType::Ship:
-            PlayerObject::updatePlayerShipFrame(newIcon);
-            CIPlayerObject::setVehicleColor(gm->colorForIdx(newColor1));
-            CIPlayerObject::setVehicleSecondColor(gm->colorForIdx(newColor2));
-            log::debug("Ship icon changed to ID {}", newIcon);
-            break;
-        case IconType::Ball:
-            PlayerObject::updatePlayerRollFrame(newIcon);
-            PlayerObject::setColor(gm->colorForIdx(newColor1));
-            PlayerObject::setSecondColor(gm->colorForIdx(newColor2));
-            log::debug("Ball icon changed to ID {}", newIcon);
-            break;
-        case IconType::Ufo:
-            PlayerObject::updatePlayerBirdFrame(newIcon);
-            CIPlayerObject::setVehicleColor(gm->colorForIdx(newColor1));
-            CIPlayerObject::setVehicleSecondColor(gm->colorForIdx(newColor2));
-            log::debug("UFO icon changed to ID {}", newIcon);
-            break;
-        case IconType::Wave:
-            PlayerObject::updatePlayerDartFrame(newIcon);
-            PlayerObject::setColor(gm->colorForIdx(newColor1));
-            PlayerObject::setSecondColor(gm->colorForIdx(newColor2));
-            log::debug("Wave icon changed to ID {}", newIcon);
-            break;
-        case IconType::Robot:
-            PlayerObject::updatePlayerRobotFrame(newIcon);
-            PlayerObject::setColor(gm->colorForIdx(newColor1));
-            PlayerObject::setSecondColor(gm->colorForIdx(newColor2));
-            log::debug("Robot icon changed to ID {}", newIcon);
-            break;
-        case IconType::Spider:
-            PlayerObject::updatePlayerSpiderFrame(newIcon);
-            PlayerObject::setColor(gm->colorForIdx(newColor1));
-            PlayerObject::setSecondColor(gm->colorForIdx(newColor2));
-            log::debug("Spider icon changed to ID {}", newIcon);
-            break;
-        case IconType::Swing:
-            PlayerObject::updatePlayerSwingFrame(newIcon);
-            PlayerObject::setColor(gm->colorForIdx(newColor1));
-            PlayerObject::setSecondColor(gm->colorForIdx(newColor2));
-            log::debug("Swing icon changed to ID {}", newIcon);
-            break;
-        case IconType::Jetpack:
-            PlayerObject::updatePlayerJetpackFrame(newIcon);
-            CIPlayerObject::setVehicleColor(gm->colorForIdx(newColor1));
-            CIPlayerObject::setVehicleSecondColor(gm->colorForIdx(newColor2));
-            log::debug("Jetpack icon changed to ID {}", newIcon);
-            break;
-        }
+        updateColorsCI(color1, color2);
+        log::info("Changed icon to ID {}", newIcon);
+        return newIcon;
     }
 
     ci::CITempProperties& getActiveProperties(IconType type) {
