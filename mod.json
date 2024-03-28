@@ -15,6 +15,7 @@
 			"resources/*.png"
 		]
 	},
+	"tags": ["customization", "gameplay", "interface"],
 	"dependencies": [
 		{
 			"id": "geode.node-ids",
