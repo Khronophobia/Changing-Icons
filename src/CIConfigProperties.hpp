@@ -37,6 +37,7 @@ namespace changing_icons {
     };
 
     struct CITempProperties {
+        int current;
         int index;
         IconOrder order;
         bool useAll;

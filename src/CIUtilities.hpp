@@ -6,3 +6,8 @@ namespace changing_icons::utils {
         return value.contains(key) ? value[key].as<T>() : defaultVar;
     }
 }
+
+template<>
+struct fmt::formatter<IconType> : formatter<string_view> {
+    fmt::appender format(IconType type, format_context& ctx) const;
+};
