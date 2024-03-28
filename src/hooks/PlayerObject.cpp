@@ -48,11 +48,11 @@ void CIPlayerObject::flashPlayer(float p0, float p1, ccColor3B mainColor, ccColo
     // Make this do nothing because it resets the colors
 }
 
-void CIPlayerObject::setVehicleColor(ccColor3B color) {
+void CIPlayerObject::setVehicleColor(ccColor3B const& color) {
     m_vehicleSprite->setColor(color);
 }
 
-void CIPlayerObject::setVehicleSecondColor(ccColor3B color) {
+void CIPlayerObject::setVehicleSecondColor(ccColor3B const& color) {
     m_vehicleSpriteSecondary->setColor(color);
 }
 

@@ -19,8 +19,8 @@ class $modify(CIPlayerObject, PlayerObject) {
 
     void setupCIValues(IconType type);
     void flashPlayer(float p0, float p1, cocos2d::ccColor3B mainColor, cocos2d::ccColor3B secondColor);
-    void setVehicleColor(cocos2d::ccColor3B color);
-    void setVehicleSecondColor(cocos2d::ccColor3B color);
+    void setVehicleColor(cocos2d::ccColor3B const& color);
+    void setVehicleSecondColor(cocos2d::ccColor3B const& color);
     void setColorsCI(IconType type, cocos2d::ccColor3B const& color1, cocos2d::ccColor3B const& color2);
     void setColorsCI(IconType type, int color1, int color2);
     void switchedToMode(GameObjectType p0);
