@@ -57,55 +57,44 @@ bool GlobalConfigLayer::setup() {
     useAllBtn->setUserObject(CCVariableRef<std::optional<bool>>::create(globalConfig.override.useAll));
     globalOverrideMenu->addChildAtPosition(useAllBtn, Anchor::Left, ccp(20.f, 30.f));
 
-    auto constexpr iconOrderYOffset = -20.f;
+    auto iconOrderLabel = CCLabelBMFont::create("Icon Order", "goldFont.fnt");
+    iconOrderLabel->setScale(0.65f);
+    globalOverrideBg->addChildAtPosition(iconOrderLabel, Anchor::Center, ccp(0.f, 12.f));
 
-    m_iconOrderLabel = CCLabelBMFont::create(
-        "Forward",
-        "bigFont.fnt"
-    );
-    m_iconOrderLabel->setScale(0.75f);
-    globalOverrideBg->addChildAtPosition(
-        m_iconOrderLabel, Anchor::Left, ccp(100.f, iconOrderYOffset)
-    );
+    m_iconOrderMenu = CCMenu::create();
+    m_iconOrderMenu->ignoreAnchorPointForPosition(false);
+    m_iconOrderMenu->setContentSize(ccp(20.f, 20.f));
+    globalOverrideBg->addChildAtPosition(m_iconOrderMenu, Anchor::Center, ccp(0.f, -10.f));
 
-    auto iconOrderRArrowSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png");
-    iconOrderRArrowSpr->setScale(0.7f);
-    iconOrderRArrowSpr->setFlipX(true);
-    auto iconOrderRArrowBtn = CCMenuItemSpriteExtra::create(
-        iconOrderRArrowSpr,
+    auto randomOrderSpr = ButtonSprite::create("Random", "bigFont.fnt", "GJ_button_04.png");
+    randomOrderSpr->setScale(0.5f);
+    auto randomOrderBtn = CCMenuItemSpriteExtra::create(
+        randomOrderSpr,
         this,
-        menu_selector(GlobalConfigLayer::onOrderArrow)
+        menu_selector(GlobalConfigLayer::onOrderButton)
     );
-    iconOrderRArrowBtn->setTag(1);
+    randomOrderBtn->setTag(0);
+    m_iconOrderMenu->addChildAtPosition(randomOrderBtn, Anchor::Center);
 
-    auto iconOrderLArrowSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png");
-    iconOrderLArrowSpr->setScale(0.7f);
-    auto iconOrderLArrowBtn = CCMenuItemSpriteExtra::create(
-        iconOrderLArrowSpr,
+    auto forwardOrderSpr = ButtonSprite::create("Forward", "bigFont.fnt", "GJ_button_04.png");
+    forwardOrderSpr->setScale(0.5f);
+    auto forwardOrderBtn = CCMenuItemSpriteExtra::create(
+        forwardOrderSpr,
         this,
-        menu_selector(GlobalConfigLayer::onOrderArrow)
+        menu_selector(GlobalConfigLayer::onOrderButton)
     );
-    iconOrderLArrowBtn->setTag(-1);
+    forwardOrderBtn->setTag(1);
+    m_iconOrderMenu->addChildAtPosition(forwardOrderBtn, Anchor::Center, ccp(-45.f, -20.f));
 
-    globalOverrideMenu->addChildAtPosition(
-        iconOrderRArrowBtn, Anchor::Left, ccp(175.f, iconOrderYOffset)
+    auto backwardOrderSpr = ButtonSprite::create("Backward", "bigFont.fnt", "GJ_button_04.png");
+    backwardOrderSpr->setScale(0.5f);
+    auto backwardOrderBtn = CCMenuItemSpriteExtra::create(
+        backwardOrderSpr,
+        this,
+        menu_selector(GlobalConfigLayer::onOrderButton)
     );
-    globalOverrideMenu->addChildAtPosition(
-        iconOrderLArrowBtn, Anchor::Left, ccp(25.f, iconOrderYOffset)
-    );
-
-    auto iconOrderTitle = CCLabelBMFont::create("Icon Order", "goldFont.fnt");
-    iconOrderTitle->setScale(0.7f);
-    globalOverrideBg->addChildAtPosition(
-        iconOrderTitle, Anchor::Left, ccp(100.f, iconOrderYOffset + 25.f)
-    );
-
-    auto enableIconOrderBtn = CCMenuItemToggler::createWithStandardSprites(
-        this, menu_selector(GlobalConfigLayer::onDisableOrder), 0.5f
-    );
-    globalOverrideMenu->addChildAtPosition(
-        enableIconOrderBtn, Anchor::Left, ccp(162.f, iconOrderYOffset + 25.f)
-    );
+    backwardOrderBtn->setTag(2);
+    m_iconOrderMenu->addChildAtPosition(backwardOrderBtn, Anchor::Center, ccp(45.f, -20.f));
 
     auto mirrorEndBtn = CCMenuItemTriToggler::createWithLabel(
         CCSprite::create("CI_checkDisabled.png"_spr),
@@ -210,10 +199,8 @@ bool GlobalConfigLayer::setup() {
     // Initialize values
     disableBtn->setState(globalConfig.override.disabled);
     useAllBtn->setState(globalConfig.override.useAll);
-    m_iconOrderEnabled = globalConfig.override.order.has_value();
-    enableIconOrderBtn->toggle(m_iconOrderEnabled);
-    if (!m_iconOrderEnabled) disableOrder();
-    else setOrderChoice(globalConfig.override.order.value());
+    if (globalConfig.override.order)
+        setOrderChoice(globalConfig.override.order.value());
     mirrorEndBtn->setState(globalConfig.override.mirrorEnd);
     for (auto btn : CCArrayExt<CCMenuItemToggler*>(m_gamemodeBar->getChildren())) {
         auto btnType = static_cast<IconType>(btn->getTag());
@@ -235,43 +222,35 @@ void GlobalConfigLayer::onVarTriToggle(CCObject* sender) {
     }
 }
 
-void GlobalConfigLayer::disableOrder() {
-    m_iconOrderLabel->setString("Disabled");
-    m_iconOrderLabel->setColor(cc3x(0x7f));
-}
-
-void GlobalConfigLayer::onOrderArrow(CCObject* sender) {
-    if (!m_iconOrderEnabled) return;
-    auto& globalConfig = m_configManager->getGlobalConfig();
-    int choiceTemp = static_cast<int>(globalConfig.override.order.value_or(IconOrder::Random)) + sender->getTag();
-    if (choiceTemp < 0)
-        choiceTemp = m_iconOrderList.size() - 1;
-    else if (choiceTemp >= m_iconOrderList.size())
-        choiceTemp = 0;
-
-    setOrderChoice(choiceTemp);
-    globalConfig.override.order = static_cast<IconOrder>(choiceTemp);
+void GlobalConfigLayer::onOrderButton(CCObject* sender) {
+    auto& overrideVars = m_configManager->getGlobalConfig().override;
+    auto btn = static_cast<CCMenuItemSpriteExtra*>(sender);
+    auto spr = static_cast<ButtonSprite*>(btn->getNormalImage());
+    if (static_cast<IconOrder>(btn->getTag()) == overrideVars.order) {
+        overrideVars.order = std::nullopt;
+        spr->updateBGImage("GJ_button_04.png");
+        btn->setContentSize(spr->getScaledContentSize());
+        spr->setPosition(btn->getContentSize() / 2);
+        return;
+    }
+    overrideVars.order = static_cast<IconOrder>(btn->getTag());
+    setOrderChoice(btn->getTag());
 }
 
 void GlobalConfigLayer::setOrderChoice(IconOrder choice) {
-    m_iconOrderLabel->setString(m_iconOrderList.at(static_cast<int>(choice)).c_str());
-    m_iconOrderLabel->setColor(cc3x(0xf));
+    GlobalConfigLayer::setOrderChoice(static_cast<int>(choice));
 }
 
 void GlobalConfigLayer::setOrderChoice(int choice) {
-    m_iconOrderLabel->setString(m_iconOrderList.at(choice).c_str());
-}
-
-void GlobalConfigLayer::onDisableOrder(CCObject* sender) {
-    auto& globalConfig = m_configManager->getGlobalConfig();
-    auto btn = static_cast<CCMenuItemToggler*>(sender);
-    m_iconOrderEnabled = !btn->m_toggled;
-    if (!m_iconOrderEnabled) {
-        globalConfig.override.order = std::nullopt;
-        disableOrder();
-    } else {
-        globalConfig.override.order = IconOrder::Random;
-        setOrderChoice(IconOrder::Random);
+    for (auto btn : CCArrayExt<CCMenuItemSpriteExtra*>(m_iconOrderMenu->getChildren())) {
+        auto spr = static_cast<ButtonSprite*>(btn->getNormalImage());
+        if (btn->getTag() == choice)
+            spr->updateBGImage("GJ_button_01.png");
+        else
+            spr->updateBGImage("GJ_button_04.png");
+        // I need to do this for some reason??
+        btn->setContentSize(spr->getScaledContentSize());
+        spr->setPosition(btn->getContentSize() / 2);
     }
 }
 

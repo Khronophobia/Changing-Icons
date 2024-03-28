@@ -17,8 +17,7 @@ namespace changing_icons {
         CCMenuItemToggler* m_disableBtn;
         CCMenuItemToggler* m_mirrorEndBtn;
         CIConfigManager* m_configManager;
-        std::array<std::string, 3> const m_iconOrderList{"Random", "Forward", "Backward"};
-        cocos2d::CCLabelBMFont* m_iconOrderLabel;
+        cocos2d::CCMenu* m_iconOrderMenu;
         
         bool setup() override;
         void refreshTab();
@@ -34,7 +33,7 @@ namespace changing_icons {
         void onSwitchTab(CCObject*);
         void onVarInfo(CCObject*);
         void onVarToggle(CCObject*);
-        void onOrderArrow(CCObject*);
+        void onOrderButton(CCObject*);
         void onAddIcon(CCObject*);
         void onClearList(CCObject*);
         void onSaveList(CCObject*);

@@ -183,50 +183,46 @@ bool IconConfigLayer::setup() {
         m_iconListScrollbar, Anchor::Right, ccp(5.f, 0.f), false
     );
 
-    auto constexpr iconOrderYOffset = 10.f;
+    auto iconOrderLabel = CCLabelBMFont::create("Icon Order", "goldFont.fnt");
+    iconOrderLabel->setScale(0.65f);
+    m_mainLayer->addChildAtPosition(iconOrderLabel, Anchor::Left, ccp(110.f, 40.f));
 
-    m_iconOrderLabel = CCLabelBMFont::create(
-        "",
-        "bigFont.fnt"
-    );
-    m_iconOrderLabel->setScale(0.75f);
-    m_mainLayer->addChildAtPosition(
-        m_iconOrderLabel, Anchor::Left, ccp(110.f, iconOrderYOffset)
-    );
+    m_iconOrderMenu = CCMenu::create();
+    m_iconOrderMenu->ignoreAnchorPointForPosition(false);
+    m_iconOrderMenu->setContentSize(ccp(20.f, 20.f));
+    m_mainLayer->addChildAtPosition(m_iconOrderMenu, Anchor::Left, ccp(110.f, 18.f));
 
-    auto iconOrderRArrowSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png");
-    iconOrderRArrowSpr->setScale(0.7f);
-    iconOrderRArrowSpr->setFlipX(true);
-    auto iconOrderRArrowBtn = CCMenuItemSpriteExtra::create(
-        iconOrderRArrowSpr,
+    auto randomOrderSpr = ButtonSprite::create("Random", "bigFont.fnt", "GJ_button_04.png");
+    randomOrderSpr->setScale(0.5f);
+    auto randomOrderBtn = CCMenuItemSpriteExtra::create(
+        randomOrderSpr,
         this,
-        menu_selector(IconConfigLayer::onOrderArrow)
+        menu_selector(IconConfigLayer::onOrderButton)
     );
-    iconOrderRArrowBtn->setTag(1);
+    randomOrderBtn->setTag(0);
+    m_iconOrderMenu->addChildAtPosition(randomOrderBtn, Anchor::Center);
 
-    auto iconOrderLArrowSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png");
-    iconOrderLArrowSpr->setScale(0.7f);
-    auto iconOrderLArrowBtn = CCMenuItemSpriteExtra::create(
-        iconOrderLArrowSpr,
+    auto forwardOrderSpr = ButtonSprite::create("Forward", "bigFont.fnt", "GJ_button_04.png");
+    forwardOrderSpr->setScale(0.5f);
+    auto forwardOrderBtn = CCMenuItemSpriteExtra::create(
+        forwardOrderSpr,
         this,
-        menu_selector(IconConfigLayer::onOrderArrow)
+        menu_selector(IconConfigLayer::onOrderButton)
     );
-    iconOrderLArrowBtn->setTag(-1);
+    forwardOrderBtn->setTag(1);
+    m_iconOrderMenu->addChildAtPosition(forwardOrderBtn, Anchor::Center, ccp(-45.f, -20.f));
 
-    m_buttonMenu->addChildAtPosition(
-        iconOrderRArrowBtn, Anchor::Left, ccp(185.f, iconOrderYOffset)
+    auto backwardOrderSpr = ButtonSprite::create("Backward", "bigFont.fnt", "GJ_button_04.png");
+    backwardOrderSpr->setScale(0.5f);
+    auto backwardOrderBtn = CCMenuItemSpriteExtra::create(
+        backwardOrderSpr,
+        this,
+        menu_selector(IconConfigLayer::onOrderButton)
     );
-    m_buttonMenu->addChildAtPosition(
-        iconOrderLArrowBtn, Anchor::Left, ccp(35.f, iconOrderYOffset)
-    );
+    backwardOrderBtn->setTag(2);
+    m_iconOrderMenu->addChildAtPosition(backwardOrderBtn, Anchor::Center, ccp(45.f, -20.f));
 
-    auto iconOrderTitle = CCLabelBMFont::create("Icon Order", "goldFont.fnt");
-    iconOrderTitle->setScale(0.7f);
-    m_mainLayer->addChildAtPosition(
-        iconOrderTitle, Anchor::Left, ccp(110.f, iconOrderYOffset + 20.f)
-    );
-
-    auto const mirrorEndOffset = ccp(30.f, -20.f);
+    auto const mirrorEndOffset = ccp(30.f, -30.f);
     m_mirrorEndBtn = CCMenuItemToggler::createWithStandardSprites(
         this,
         menu_selector(IconConfigLayer::onVarToggle),
@@ -361,24 +357,26 @@ void IconConfigLayer::onVarToggle(CCObject* sender) {
     }
 }
 
-void IconConfigLayer::onOrderArrow(CCObject* sender) {
-    auto& currentConfig = getCurrentConfig();
-    int choiceTemp = static_cast<int>(currentConfig.order) + sender->getTag();
-    if (choiceTemp < 0)
-        choiceTemp = m_iconOrderList.size() - 1;
-    else if (choiceTemp >= m_iconOrderList.size())
-        choiceTemp = 0;
-
-    setOrderChoice(choiceTemp);
-    currentConfig.order = static_cast<IconOrder>(choiceTemp);
+void IconConfigLayer::onOrderButton(CCObject* sender) {
+    setOrderChoice(sender->getTag());
+    getCurrentConfig().order = static_cast<IconOrder>(sender->getTag());
 }
 
 void IconConfigLayer::setOrderChoice(IconOrder choice) {
-    m_iconOrderLabel->setString(m_iconOrderList.at(static_cast<int>(choice)).c_str());
+    setOrderChoice(static_cast<int>(choice));
 }
 
 void IconConfigLayer::setOrderChoice(int choice) {
-    m_iconOrderLabel->setString(m_iconOrderList.at(choice).c_str());
+    for (auto btn : CCArrayExt<CCMenuItemSpriteExtra*>(m_iconOrderMenu->getChildren())) {
+        auto spr = static_cast<ButtonSprite*>(btn->getNormalImage());
+        if (btn->getTag() == choice)
+            spr->updateBGImage("GJ_button_01.png");
+        else
+            spr->updateBGImage("GJ_button_04.png");
+        // I need to do this for some reason??
+        btn->setContentSize(spr->getScaledContentSize());
+        spr->setPosition(btn->getContentSize() / 2);
+    }
 }
 
 void IconConfigLayer::onAddIcon(CCObject*) {
