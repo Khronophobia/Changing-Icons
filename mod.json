@@ -28,6 +28,16 @@
 			"id": "rooot.custom-gamemode-colors",
 			"importance": "conflicting",
 			"version": ">=0.1.1"
+		},
+		{
+			"id": "TheSillyDoggo.Cheats",
+			"importance": "conflicting",
+			"version": ">=1.0.0"
+		},
+		{
+			"id": "weebify.separate_dual_icons",
+			"importance": "conflicting",
+			"version": ">=v1.0.0"
 		}
 	]
 }
