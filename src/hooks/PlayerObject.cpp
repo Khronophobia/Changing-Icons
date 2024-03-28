@@ -37,6 +37,7 @@ void CIPlayerObject::setupCIValues(IconType type) {
     }
     CIPlayerObject::getActiveProperties(type) = {
         .current = index,
+        .index = index,
         .order = order,
         .useAll = useAll,
         .mirrorEnd = mirrorEnd,
