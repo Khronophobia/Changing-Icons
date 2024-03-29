@@ -162,7 +162,7 @@ bool IconConfigLayer::setup() {
     auto iconListBG = CCLayerColor::create({0, 0, 0, 95});
     iconListBG->setAnchorPoint(ccp(1.f, 0.5f));
     iconListBG->ignoreAnchorPointForPosition(false);
-    iconListBG->setContentSize(ccp(constants::ICONCELL_WIDTH, 220.f));
+    iconListBG->setContentSize(ccp(constants::ICONCELL_WIDTH, 216.f));
     m_mainLayer->addChildAtPosition(iconListBG, Anchor::Right, ccp(-20.f, 5.f));
 
     m_iconList = ScrollLayer::create(iconListBG->getContentSize());

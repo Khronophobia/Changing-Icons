@@ -82,8 +82,8 @@ void SavePresetLayer::onSave(CCObject*) {
     presetDir /= name + ".json";
     if (ghc::filesystem::exists(presetDir)) {
         createQuickPopup(
-            "Overwrite List",
-            "A set with the name <cy>" + name +
+            "Overwrite File",
+            "A file with the name <cy>" + name +
             ".json</c> already exists. Do you want to overwrite it?",
             "No", "Yes",
             [this, presetDir](auto, bool btn2) {

@@ -44,7 +44,7 @@ bool LoadPresetLayer::setup(IconConfigLayer* configLayer, IconType type) {
 
     m_presetViewBg = CCLayerColor::create({0, 0, 0, 95});
     m_presetViewBg->ignoreAnchorPointForPosition(false);
-    m_presetViewBg->setContentSize(ccp(constants::ICONCELL_WIDTH, 230.f));
+    m_presetViewBg->setContentSize(ccp(constants::ICONCELL_WIDTH, 216.f));
     m_mainLayer->addChildAtPosition(m_presetViewBg, Anchor::Center);
 
     m_presetViewList = ScrollLayer::create(m_presetViewBg->getContentSize(), false);
