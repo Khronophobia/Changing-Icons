@@ -11,6 +11,7 @@ file(GLOB SOURCES
     src/class/*.cpp
     src/class/layer/*.cpp
     src/hooks/*.cpp
+    src/properties/*.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES})

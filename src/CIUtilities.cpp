@@ -1,5 +1,5 @@
 #include "CIUtilities.hpp"
-#include <CIConfigProperties.hpp>
+#include <properties/Enums.hpp>
 
 using namespace geode::prelude;
 using namespace changing_icons;

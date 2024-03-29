@@ -1,5 +1,5 @@
 #pragma once
-#include <CIConfigProperties.hpp>
+#include <properties/IconProperties.hpp>
 
 namespace changing_icons {
     class IconConfigLayer;

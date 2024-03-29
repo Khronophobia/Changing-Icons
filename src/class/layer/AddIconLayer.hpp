@@ -1,6 +1,6 @@
 #pragma once
 #include <Geode/ui/Popup.hpp>
-#include <CIConfigProperties.hpp>
+#include <properties/IconProperties.hpp>
 
 namespace changing_icons {
     class IconConfigLayer;

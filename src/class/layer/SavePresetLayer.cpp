@@ -3,7 +3,8 @@
 #include "SavePresetLayer.hpp"
 #include <class/CIConfigManager.hpp>
 #include <CIConstants.hpp>
-#include <CIConfigProperties.hpp>
+#include <properties/IconProperties.hpp>
+#include <properties/Preset.hpp>
 
 using namespace geode::prelude;
 using namespace changing_icons;

@@ -1,5 +1,5 @@
 #pragma once
-#include <CIConfigProperties.hpp>
+#include <properties/Preset.hpp>
 
 namespace changing_icons {
     class LoadPresetLayer;

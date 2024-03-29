@@ -1,6 +1,9 @@
 #pragma once
 #include <Geode/modify/PlayerObject.hpp>
-#include <CIConfigProperties.hpp>
+
+namespace changing_icons {
+    struct CITempProperties;
+}
 
 class $modify(CIPlayerObject, PlayerObject) {
     bool m_ciHasInit;

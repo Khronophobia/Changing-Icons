@@ -1,6 +1,7 @@
 #include "PresetCell.hpp"
 #include <CIConstants.hpp>
 #include <class/layer/LoadPresetLayer.hpp>
+#include <properties/ConfigProperties.hpp>
 
 using namespace geode::prelude;
 using namespace changing_icons;

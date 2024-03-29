@@ -1,6 +1,6 @@
 #pragma once
 #include <Geode/modify/GJBaseGameLayer.hpp>
-#include <CIConfigProperties.hpp>
+#include <properties/TempProperties.hpp>
 
 class $modify(CIBaseGameLayer, GJBaseGameLayer) {
     bool m_ciHasInit;
