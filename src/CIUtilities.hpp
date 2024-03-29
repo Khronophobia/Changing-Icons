@@ -1,5 +1,9 @@
 #pragma once
 
+namespace changing_icons {
+    enum class IconOrder;
+}
+
 namespace changing_icons::utils {
     template<class T>
     T tryGetJsonValue(matjson::Value const& value, std::string_view key, T defaultVar) {
@@ -33,4 +37,9 @@ namespace changing_icons::utils {
 template<>
 struct fmt::formatter<IconType> : formatter<string_view> {
     fmt::appender format(IconType type, format_context& ctx) const;
+};
+
+template<>
+struct fmt::formatter<changing_icons::IconOrder> : formatter<string_view> {
+    fmt::appender format(changing_icons::IconOrder order, format_context& ctx) const;
 };

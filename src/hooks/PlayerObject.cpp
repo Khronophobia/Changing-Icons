@@ -191,7 +191,11 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
         if (iconProps.color2) color2 = iconProps.color2.value();
     }
     setColorsCI(type, color1, color2);
-    log::info("{} Changed {} icon to ID {} (Index: {})", this, type, newIcon, config.current);
+
+    std::string_view playerName = "P1";
+    if (this == PlayLayer::get()->m_player2) playerName = "P2";
+
+    log::info("{}: Changed {} icon to ID {} (Index: {}, Order: {})", playerName, type, newIcon, config.current, config.order);
     return newIcon;
 }
 

@@ -1,6 +1,8 @@
 #include "CIUtilities.hpp"
+#include <CIConfigProperties.hpp>
 
 using namespace geode::prelude;
+using namespace changing_icons;
 
 CCMenuItemToggler* changing_icons::utils::createToggleButton(
     CCMenu* menu, CCLayer* layer, Anchor anchor, CCPoint offset, char const* label,
@@ -78,5 +80,13 @@ fmt::appender fmt::formatter<IconType>::format(IconType type, format_context& ct
         case IconType::Spider: return formatter<string_view>::format("Spider", ctx);
         case IconType::Swing: return formatter<string_view>::format("Swing", ctx);
         case IconType::Jetpack: return formatter<string_view>::format("Jetpack", ctx);
+    }
+}
+
+fmt::appender fmt::formatter<IconOrder>::format(IconOrder order, format_context& ctx) const {
+    switch(order) {
+        case IconOrder::Random: return formatter<string_view>::format("Random", ctx);
+        case IconOrder::Forward: return formatter<string_view>::format("Forward", ctx);
+        case IconOrder::Backward: return formatter<string_view>::format("Backward", ctx);
     }
 }
