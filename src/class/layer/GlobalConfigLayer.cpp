@@ -2,6 +2,7 @@
 #include <class/CIConfigManager.hpp>
 #include <class/CCMenuItemTriToggler.hpp>
 #include <class/CCVariableRef.hpp>
+#include "TriTogglerInfoLayer.hpp"
 
 using namespace geode::prelude;
 using namespace changing_icons;
@@ -24,7 +25,7 @@ bool GlobalConfigLayer::setup() {
 
     auto globalOverrideBg = CCScale9Sprite::create("square02_001.png");
     globalOverrideBg->setAnchorPoint(ccp(0.5f, 0.5f));
-    globalOverrideBg->setContentSize(ccp(200.f, 150.f));
+    globalOverrideBg->setContentSize(ccp(200.f, 170.f));
     globalOverrideBg->setOpacity(95);
     m_mainLayer->addChildAtPosition(globalOverrideBg, Anchor::Center, ccp(0.f, 20.f));
 
@@ -32,6 +33,16 @@ bool GlobalConfigLayer::setup() {
     globalOverrideMenu->ignoreAnchorPointForPosition(false);
     globalOverrideMenu->setContentSize(globalOverrideBg->getContentSize());
     globalOverrideBg->addChildAtPosition(globalOverrideMenu, Anchor::Center);
+
+    auto triTogglerInfoSpr = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
+    triTogglerInfoSpr->setScale(0.7f);
+    auto triTogglerInfoBtn = CCMenuItemSpriteExtra::create(
+        triTogglerInfoSpr, this, menu_selector(GlobalConfigLayer::onTriTogglerInfo)
+    );
+    globalOverrideMenu->addChildAtPosition(triTogglerInfoBtn, Anchor::TopRight, ccp(-10.f, -10.f));
+
+    auto constexpr toggleYPos = 65.f;
+    auto constexpr toggleOffset = 24.f;
 
     auto disableBtn = CCMenuItemTriToggler::createWithLabel(
         CCSprite::create("CI_checkDisabled.png"_spr),
@@ -43,7 +54,7 @@ bool GlobalConfigLayer::setup() {
         0.6f
     );
     disableBtn->setUserObject(CCVariableRef<std::optional<bool>>::create(globalConfig.override.disabled));
-    globalOverrideMenu->addChildAtPosition(disableBtn, Anchor::Left, ccp(20.f, 55.f));
+    globalOverrideMenu->addChildAtPosition(disableBtn, Anchor::Left, ccp(20.f, toggleYPos));
 
     auto useAllBtn = CCMenuItemTriToggler::createWithLabel(
         CCSprite::create("CI_checkDisabled.png"_spr),
@@ -55,16 +66,29 @@ bool GlobalConfigLayer::setup() {
         0.6f
     );
     useAllBtn->setUserObject(CCVariableRef<std::optional<bool>>::create(globalConfig.override.useAll));
-    globalOverrideMenu->addChildAtPosition(useAllBtn, Anchor::Left, ccp(20.f, 30.f));
+    globalOverrideMenu->addChildAtPosition(useAllBtn, Anchor::Left, ccp(20.f, toggleYPos - toggleOffset));
 
+    auto includePlayerBtn = CCMenuItemTriToggler::createWithLabel(
+        CCSprite::create("CI_checkDisabled.png"_spr),
+        CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png"),
+        CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png"),
+        this,
+        menu_selector(GlobalConfigLayer::onVarTriToggle),
+        "Include Player Icon",
+        0.6f
+    );
+    includePlayerBtn->setUserObject(CCVariableRef<std::optional<bool>>::create(globalConfig.override.includePlayerIcon));
+    globalOverrideMenu->addChildAtPosition(includePlayerBtn, Anchor::Left, ccp(20.f, toggleYPos - toggleOffset * 2));
+
+    auto constexpr iconOrderYPos = 2.f;
     auto iconOrderLabel = CCLabelBMFont::create("Icon Order", "goldFont.fnt");
     iconOrderLabel->setScale(0.65f);
-    globalOverrideBg->addChildAtPosition(iconOrderLabel, Anchor::Center, ccp(0.f, 12.f));
+    globalOverrideBg->addChildAtPosition(iconOrderLabel, Anchor::Center, ccp(0.f, iconOrderYPos));
 
     m_iconOrderMenu = CCMenu::create();
     m_iconOrderMenu->ignoreAnchorPointForPosition(false);
     m_iconOrderMenu->setContentSize(ccp(20.f, 20.f));
-    globalOverrideBg->addChildAtPosition(m_iconOrderMenu, Anchor::Center, ccp(0.f, -10.f));
+    globalOverrideBg->addChildAtPosition(m_iconOrderMenu, Anchor::Center, ccp(0.f, iconOrderYPos - 22.f));
 
     auto randomOrderSpr = ButtonSprite::create("Random", "bigFont.fnt", "GJ_button_04.png");
     randomOrderSpr->setScale(0.5f);
@@ -106,7 +130,7 @@ bool GlobalConfigLayer::setup() {
         0.6f
     );
     mirrorEndBtn->setUserObject(CCVariableRef<std::optional<bool>>::create(globalConfig.override.mirrorEnd));
-    globalOverrideMenu->addChildAtPosition(mirrorEndBtn, Anchor::Left, ccp(20.f, -55.f));
+    globalOverrideMenu->addChildAtPosition(mirrorEndBtn, Anchor::Left, ccp(20.f, -65.f));
 
     m_gamemodeBar = CCMenu::create();
     m_gamemodeBar->setTouchPriority(CCTouchDispatcher::get()->getForcePrio() - 1);
@@ -199,6 +223,7 @@ bool GlobalConfigLayer::setup() {
     // Initialize values
     disableBtn->setState(globalConfig.override.disabled);
     useAllBtn->setState(globalConfig.override.useAll);
+    includePlayerBtn->setState(globalConfig.override.includePlayerIcon);
     if (globalConfig.override.order)
         setOrderChoice(globalConfig.override.order.value());
     mirrorEndBtn->setState(globalConfig.override.mirrorEnd);
@@ -212,6 +237,10 @@ bool GlobalConfigLayer::setup() {
     }
 
     return true;
+}
+
+void GlobalConfigLayer::onTriTogglerInfo(CCObject* sender) {
+    TriTogglerInfoLayer::create()->show();
 }
 
 void GlobalConfigLayer::onVarTriToggle(CCObject* sender) {

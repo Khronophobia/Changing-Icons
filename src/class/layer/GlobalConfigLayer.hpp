@@ -17,6 +17,7 @@ namespace changing_icons {
         void setOrderChoice(int choice);
     public:
         static GlobalConfigLayer* create();
+        void onTriTogglerInfo(CCObject* sender);
         void onVarTriToggle(CCObject* sender);
         void onOrderButton(CCObject* sender);
         void onAddToOverride(CCObject* sender);
