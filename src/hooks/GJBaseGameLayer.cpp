@@ -44,12 +44,14 @@ CITempProperties CIBaseGameLayer::setupCIValues(IconType type) {
     auto order = config.order;
     auto disabled = config.disabled;
     auto useAll = config.useAll;
+    auto includePlayerIcon = config.includePlayerIcon;
     auto mirrorEnd = config.mirrorEnd;
     if (globalConfig.globalOverrides.find(type) != globalConfig.globalOverrides.end()) {
         log::info("Gamemode {} listed in global overrides", static_cast<int>(type));
         if (globalConfig.override.order) order = globalConfig.override.order.value();
         if (globalConfig.override.disabled) disabled = globalConfig.override.disabled.value();
         if (globalConfig.override.useAll) useAll = globalConfig.override.useAll.value();
+        if (globalConfig.override.includePlayerIcon) includePlayerIcon = globalConfig.override.includePlayerIcon.value();
     }
     int index;
     if (useAll) {
@@ -66,6 +68,22 @@ CITempProperties CIBaseGameLayer::setupCIValues(IconType type) {
         }
     }
     auto iconSet = config.iconSet;
+    if (includePlayerIcon && !iconSet.empty()) {
+        int playerIconID;
+        switch (type) {
+            default:
+            case IconType::Cube: playerIconID = gm->getPlayerFrame(); break;
+            case IconType::Ship: playerIconID = gm->getPlayerShip(); break;
+            case IconType::Ball: playerIconID = gm->getPlayerBall(); break;
+            case IconType::Ufo: playerIconID = gm->getPlayerBird(); break;
+            case IconType::Wave: playerIconID = gm->getPlayerDart(); break;
+            case IconType::Robot: playerIconID = gm->getPlayerRobot(); break;
+            case IconType::Spider: playerIconID = gm->getPlayerSpider(); break;
+            case IconType::Swing: playerIconID = gm->getPlayerSwing(); break;
+            case IconType::Jetpack: playerIconID = gm->getPlayerJetpack(); break;
+        }
+        iconSet.push_back(IconProperties{ .iconID = playerIconID });
+    }
 
     return CITempProperties{
         .current = index,

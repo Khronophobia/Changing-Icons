@@ -17,6 +17,7 @@ namespace changing_icons {
 
     struct CIGlobalOverride {
         std::optional<bool> useAll = std::nullopt;
+        std::optional<bool> includePlayerIcon = std::nullopt;
         std::optional<IconOrder> order = std::nullopt;
         std::optional<bool> mirrorEnd = std::nullopt;
         std::optional<bool> disabled = std::nullopt;
@@ -32,6 +33,7 @@ namespace changing_icons {
         std::vector<IconProperties> iconSet;
         IconOrder order = IconOrder::Random;
         bool useAll;
+        bool includePlayerIcon;
         bool mirrorEnd;
         bool disabled;
     };
@@ -125,6 +127,11 @@ struct matjson::Serialize<changing_icons::CIGlobalOverride> {
                 "use-all",
                 changing_icons::CIGlobalOverride().useAll
             ),
+            .includePlayerIcon = changing_icons::utils::tryGetJsonValue<std::optional<bool>>(
+                value,
+                "include-player-icon",
+                changing_icons::CIGlobalOverride().includePlayerIcon
+            ),
             .order = changing_icons::utils::tryGetJsonValue<std::optional<changing_icons::IconOrder>>(
                 value,
                 "order",
@@ -145,6 +152,7 @@ struct matjson::Serialize<changing_icons::CIGlobalOverride> {
     static matjson::Value to_json(changing_icons::CIGlobalOverride const& value) {
         auto obj = matjson::Object();
         obj["use-all"] = value.useAll;
+        obj["include-player-icon"] = value.includePlayerIcon;
         obj["order"] = value.order;
         obj["mirror-end"] = value.mirrorEnd;
         obj["disabled"] = value.disabled;
@@ -207,6 +215,11 @@ struct matjson::Serialize<changing_icons::CITabProperties> {
                 "use-all",
                 changing_icons::CITabProperties().useAll
             ),
+            .includePlayerIcon = changing_icons::utils::tryGetJsonValue<bool>(
+                value,
+                "include-player-icon",
+                changing_icons::CITabProperties().includePlayerIcon
+            ),
             .mirrorEnd = changing_icons::utils::tryGetJsonValue(
                 value,
                 "mirror-end",
@@ -224,6 +237,7 @@ struct matjson::Serialize<changing_icons::CITabProperties> {
         obj["icon-set"] = value.iconSet;
         obj["order"] = static_cast<int>(value.order);
         obj["use-all"] = value.useAll;
+        obj["include-player-icon"] = value.includePlayerIcon;
         obj["mirror-end"] = value.mirrorEnd;
         obj["disabled"] = value.disabled;
         return obj;

@@ -13,8 +13,9 @@ namespace changing_icons {
         cocos2d::CCMenu* m_gamemodeBar;
         geode::ScrollLayer* m_iconList;
         geode::Scrollbar* m_iconListScrollbar;
-        CCMenuItemToggler* m_randomBtn;
         CCMenuItemToggler* m_disableBtn;
+        CCMenuItemToggler* m_useAllBtn;
+        CCMenuItemToggler* m_includePlayerBtn;
         CCMenuItemToggler* m_mirrorEndBtn;
         CIConfigManager* m_configManager;
         cocos2d::CCMenu* m_iconOrderMenu;

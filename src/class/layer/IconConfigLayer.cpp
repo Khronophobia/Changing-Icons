@@ -8,13 +8,14 @@
 #include <class/IconCell.hpp>
 #include <class/CIConfigManager.hpp>
 #include <CIConstants.hpp>
+#include <CIUtilities.hpp>
 
 using namespace geode::prelude;
 using namespace changing_icons;
 
 IconConfigLayer* IconConfigLayer::create() {
     auto ret = new IconConfigLayer();
-    if (ret && ret->initAnchored(400.f, 280.f)) {
+    if (ret && ret->initAnchored(400.f, 300.f)) {
         ret->autorelease();
         return ret;
     }
@@ -29,8 +30,11 @@ bool IconConfigLayer::setup() {
     m_currentTab = m_configManager->getGlobalConfig().currentTab;
     this->setTitle("Changing Icons");
 
+    static_cast<AnchorLayoutOptions*>(m_closeBtn->getLayoutOptions())
+        ->setOffset(ccp(10.f, -10.f));
+    m_buttonMenu->updateLayout();
+
     auto globalConfigSpr = CCSprite::createWithSpriteFrameName("GJ_optionsBtn02_001.png");
-    globalConfigSpr->setScale(0.7f);
     auto globalConfigBtn = CCMenuItemSpriteExtra::create(
         globalConfigSpr,
         this,
@@ -39,7 +43,7 @@ bool IconConfigLayer::setup() {
     m_buttonMenu->addChildAtPosition(
         globalConfigBtn,
         Anchor::TopRight,
-        ccp(-18.f, -18.f)
+        ccp(-10.f, -10.f)
     );
 
     m_gamemodeBar = CCMenu::create();
@@ -124,56 +128,42 @@ bool IconConfigLayer::setup() {
     m_gamemodeBar->addChild(jetpackBtn);
     m_gamemodeBar->updateLayout();
 
-    auto const toggleTextOffset = ccp(15.f, 0.f);
-    auto const toggleInfoOffset = ccp(-12.f, 12.f);
-
-    auto const randomBtnOffset = ccp(30.f, -75.f);
-    m_randomBtn = CCMenuItemToggler::createWithStandardSprites(
-        this,
-        menu_selector(IconConfigLayer::onVarToggle),
-        0.6f
-    );
-    m_buttonMenu->addChildAtPosition(m_randomBtn, Anchor::TopLeft, randomBtnOffset);
-
-    auto randomText = CCLabelBMFont::create("Use All Icons", "bigFont.fnt");
-    randomText->setAnchorPoint(ccp(0.f, 0.5f));
-    randomText->setScale(0.5f);
-    m_mainLayer->addChildAtPosition(
-        randomText, Anchor::TopLeft, randomBtnOffset + toggleTextOffset
+    m_disableBtn = utils::createToggleButton(
+        m_buttonMenu, m_mainLayer,
+        Anchor::TopLeft, ccp(30.f, -45.f),
+        "Disable",
+        this, menu_selector(IconConfigLayer::onVarToggle), 0.6f
     );
 
-    auto randomInfoSpr = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
-    randomInfoSpr->setScale(0.4f);
-    auto randomInfoBtn = CCMenuItemSpriteExtra::create(
-        randomInfoSpr,
-        this,
-        menu_selector(IconConfigLayer::onVarInfo)
+    m_useAllBtn = utils::createToggleButton(
+        m_buttonMenu, m_mainLayer,
+        Anchor::TopLeft, ccp(30.f, -75.f),
+        "Use All Icons",
+        this, menu_selector(IconConfigLayer::onVarToggle), 0.6f
     );
-    randomInfoBtn->setUserObject(CCString::create("Select from <cj>all icons</c> instead of the <cy>list</c>."));
-    m_buttonMenu->addChildAtPosition(
-        randomInfoBtn, Anchor::TopLeft, randomBtnOffset + toggleInfoOffset
+    auto useAllInfoBtn = utils::createToggleInfo(
+        m_buttonMenu, m_useAllBtn,
+        this, menu_selector(IconConfigLayer::onVarInfo),
+        "Select from <cj>all icons</c> instead of the <cy>list</c>."
     );
 
-    auto const disableBtnOffset = ccp(30.f, -45.f);
-    m_disableBtn = CCMenuItemToggler::createWithStandardSprites(
-        this,
-        menu_selector(IconConfigLayer::onVarToggle),
-        0.6f
+    m_includePlayerBtn = utils::createToggleButton(
+        m_buttonMenu, m_mainLayer,
+        Anchor::TopLeft, ccp(30.f, -105.f),
+        "Include Player Icon",
+        this, menu_selector(IconConfigLayer::onVarToggle), 0.6f
     );
-    m_buttonMenu->addChildAtPosition(m_disableBtn, Anchor::TopLeft, disableBtnOffset);
-
-    auto disableText = CCLabelBMFont::create("Disable", "bigFont.fnt");
-    disableText->setAnchorPoint(ccp(0.f, 0.5f));
-    disableText->setScale(0.5f);
-    m_mainLayer->addChildAtPosition(
-        disableText, Anchor::TopLeft, disableBtnOffset + toggleTextOffset
+    auto includePlayerInfoBtn = utils::createToggleInfo(
+        m_buttonMenu, m_includePlayerBtn,\
+        this, menu_selector(IconConfigLayer::onVarInfo),
+        "Include the player's icon on the <cy>list</c>"
     );
 
     auto iconListBG = CCLayerColor::create({0, 0, 0, 95});
     iconListBG->setAnchorPoint(ccp(1.f, 0.5f));
     iconListBG->ignoreAnchorPointForPosition(false);
-    iconListBG->setContentSize(ccp(constants::ICONCELL_WIDTH, 190.f));
-    m_mainLayer->addChildAtPosition(iconListBG, Anchor::Right, ccp(-20.f, 10.f));
+    iconListBG->setContentSize(ccp(constants::ICONCELL_WIDTH, 220.f));
+    m_mainLayer->addChildAtPosition(iconListBG, Anchor::Right, ccp(-20.f, 5.f));
 
     m_iconList = ScrollLayer::create(iconListBG->getContentSize());
     iconListBG->addChild(m_iconList);
@@ -183,14 +173,15 @@ bool IconConfigLayer::setup() {
         m_iconListScrollbar, Anchor::Right, ccp(5.f, 0.f), false
     );
 
+    auto constexpr iconOrderYPos = 25.f;
     auto iconOrderLabel = CCLabelBMFont::create("Icon Order", "goldFont.fnt");
     iconOrderLabel->setScale(0.65f);
-    m_mainLayer->addChildAtPosition(iconOrderLabel, Anchor::Left, ccp(110.f, 40.f));
+    m_mainLayer->addChildAtPosition(iconOrderLabel, Anchor::Left, ccp(110.f, iconOrderYPos));
 
     m_iconOrderMenu = CCMenu::create();
     m_iconOrderMenu->ignoreAnchorPointForPosition(false);
     m_iconOrderMenu->setContentSize(ccp(20.f, 20.f));
-    m_mainLayer->addChildAtPosition(m_iconOrderMenu, Anchor::Left, ccp(110.f, 18.f));
+    m_mainLayer->addChildAtPosition(m_iconOrderMenu, Anchor::Left, ccp(110.f, iconOrderYPos - 22.f));
 
     auto randomOrderSpr = ButtonSprite::create("Random", "bigFont.fnt", "GJ_button_04.png");
     randomOrderSpr->setScale(0.5f);
@@ -222,7 +213,7 @@ bool IconConfigLayer::setup() {
     backwardOrderBtn->setTag(2);
     m_iconOrderMenu->addChildAtPosition(backwardOrderBtn, Anchor::Center, ccp(45.f, -20.f));
 
-    auto const mirrorEndOffset = ccp(30.f, -30.f);
+    /* auto const mirrorEndOffset = ccp(30.f, -30.f);
     m_mirrorEndBtn = CCMenuItemToggler::createWithStandardSprites(
         this,
         menu_selector(IconConfigLayer::onVarToggle),
@@ -249,6 +240,19 @@ bool IconConfigLayer::setup() {
     ));
     m_buttonMenu->addChildAtPosition(
         mirrorEndInfoBtn, Anchor::Left, mirrorEndOffset + toggleInfoOffset
+    ); */
+
+    m_mirrorEndBtn = utils::createToggleButton(
+        m_buttonMenu, m_mainLayer,
+        Anchor::Left, ccp(30.f, -50.f),
+        "Mirror After End",
+        this, menu_selector(IconConfigLayer::onVarToggle), 0.6f
+    );
+    auto mirrorEndInfoBtn = utils::createToggleInfo(
+        m_buttonMenu, m_mirrorEndBtn,
+        this, menu_selector(IconConfigLayer::onVarInfo),
+        "Only applicable when <cy>Icon Order</c> is set to <cj>Up</c> or <cj>Down</c>. "
+        "Mirror the list when reaching the end instead of wrapping around."
     );
 
     auto iconListMenu = CCMenu::create();
@@ -257,7 +261,7 @@ bool IconConfigLayer::setup() {
     iconListMenu->setLayout(
         RowLayout::create()
     );
-    m_mainLayer->addChildAtPosition(iconListMenu, Anchor::Left, ccp(110.f, -65.f));
+    m_mainLayer->addChildAtPosition(iconListMenu, Anchor::Left, ccp(110.f, -85.f));
 
     auto iconListAddSpr = CCSprite::createWithSpriteFrameName("GJ_plusBtn_001.png");
     iconListAddSpr->setScale(0.83f);
@@ -322,8 +326,10 @@ void IconConfigLayer::refreshTab() {
     }
 
     auto& currentConfig = getCurrentConfig();
-    m_randomBtn->toggle(currentConfig.useAll);
-    m_randomBtn->setUserObject(CCVariableRef<bool>::create(currentConfig.useAll));
+    m_useAllBtn->toggle(currentConfig.useAll);
+    m_useAllBtn->setUserObject(CCVariableRef<bool>::create(currentConfig.useAll));
+    m_includePlayerBtn->toggle(currentConfig.includePlayerIcon);
+    m_includePlayerBtn->setUserObject(CCVariableRef<bool>::create(currentConfig.includePlayerIcon));
     m_disableBtn->toggle(currentConfig.disabled);
     m_disableBtn->setUserObject(CCVariableRef<bool>::create(currentConfig.disabled));
     m_mirrorEndBtn->toggle(currentConfig.mirrorEnd);
