@@ -5,7 +5,7 @@ using namespace changing_icons;
 
 CCMenuItemTriToggler* CCMenuItemTriToggler::create(CCNode* disabledNode, CCNode* offNode, CCNode* onNode, CCObject* target, SEL_MenuHandler callback, float scale) {
     auto ret = new CCMenuItemTriToggler();
-    if (ret && ret->init(disabledNode, offNode, onNode, target, callback, nullptr, scale)) {
+    if (ret && ret->init(disabledNode, offNode, onNode, target, callback, nullptr, scale, 150.f)) {
         ret->autorelease();
         return ret;
     }
@@ -13,9 +13,9 @@ CCMenuItemTriToggler* CCMenuItemTriToggler::create(CCNode* disabledNode, CCNode*
     return nullptr;
 }
 
-CCMenuItemTriToggler* CCMenuItemTriToggler::createWithLabel(CCNode* disabledNode, CCNode* offNode, CCNode* onNode, CCObject* target, cocos2d::SEL_MenuHandler callback, char const* text, float scale) {
+CCMenuItemTriToggler* CCMenuItemTriToggler::createWithLabel(CCNode* disabledNode, CCNode* offNode, CCNode* onNode, CCObject* target, cocos2d::SEL_MenuHandler callback, char const* text, float scale, float width) {
     auto ret = new CCMenuItemTriToggler();
-    if (ret && ret->init(disabledNode, offNode, onNode, target, callback, text, scale)) {
+    if (ret && ret->init(disabledNode, offNode, onNode, target, callback, text, scale, width)) {
         ret->autorelease();
         return ret;
     }
@@ -23,7 +23,7 @@ CCMenuItemTriToggler* CCMenuItemTriToggler::createWithLabel(CCNode* disabledNode
     return nullptr;
 }
 
-bool CCMenuItemTriToggler::init(CCNode* disabledNode, CCNode* offNode, CCNode* onNode, CCObject* target, SEL_MenuHandler callback, char const* text, float scale) {
+bool CCMenuItemTriToggler::init(CCNode* disabledNode, CCNode* offNode, CCNode* onNode, CCObject* target, SEL_MenuHandler callback, char const* text, float scale, float width) {
     if (!CCMenuItem::initWithTarget(target, callback)) return false;
 
     disabledNode->setScale(scale);
@@ -39,7 +39,7 @@ bool CCMenuItemTriToggler::init(CCNode* disabledNode, CCNode* offNode, CCNode* o
     if (text) {
         m_label = CCLabelBMFont::create(text, "bigFont.fnt");
         m_label->setAnchorPoint(ccp(0.f, 0.5f));
-        m_label->setScale(0.85f * scale);
+        m_label->limitLabelWidth(width, 0.85f * scale, 0.1f);
         this->addChildAtPosition(m_label, Anchor::Center, ccp(24.f, 0.f) * scale);
     }
 

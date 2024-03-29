@@ -16,9 +16,9 @@ namespace changing_icons {
             CCNode* disabledNode, CCNode* offNode, CCNode* onNode, CCObject* target, cocos2d::SEL_MenuHandler callback, float scale = 1.f
         );
         static CCMenuItemTriToggler* createWithLabel(
-            CCNode* disabledNode, CCNode* offNode, CCNode* onNode, CCObject* target, cocos2d::SEL_MenuHandler callback, char const* text, float scale = 1.f
+            CCNode* disabledNode, CCNode* offNode, CCNode* onNode, CCObject* target, cocos2d::SEL_MenuHandler callback, char const* text, float scale = 1.f, float width = 150.f
         );
-        bool init(CCNode* disabled, CCNode* off, CCNode* on, CCObject* target, cocos2d::SEL_MenuHandler callback, char const* text, float scale);
+        bool init(CCNode* disabled, CCNode* off, CCNode* on, CCObject* target, cocos2d::SEL_MenuHandler callback, char const* text, float scale, float width);
         void setState(std::optional<bool> state);
         std::optional<bool> getState();
         // Alias for setState
