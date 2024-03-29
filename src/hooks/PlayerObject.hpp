@@ -5,19 +5,10 @@
 class $modify(CIPlayerObject, PlayerObject) {
     bool m_ciHasInit;
     bool m_levelStarted;
-    changing_icons::CITempProperties m_cubeProperties;
-    changing_icons::CITempProperties m_shipProperties;
-    changing_icons::CITempProperties m_ballProperties;
-    changing_icons::CITempProperties m_birdProperties;
-    changing_icons::CITempProperties m_dartProperties;
-    changing_icons::CITempProperties m_robotProperties;
-    changing_icons::CITempProperties m_spiderProperties;
-    changing_icons::CITempProperties m_swingProperties;
 
     int m_ogColor1 = GameManager::get()->getPlayerColor();
     int m_ogColor2 = GameManager::get()->getPlayerColor2();
 
-    void setupCIValues(IconType type);
     void flashPlayer(float p0, float p1, cocos2d::ccColor3B mainColor, cocos2d::ccColor3B secondColor);
     void setVehicleColor(cocos2d::ccColor3B const& color);
     void setVehicleSecondColor(cocos2d::ccColor3B const& color);
