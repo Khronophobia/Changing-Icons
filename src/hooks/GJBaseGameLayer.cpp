@@ -9,26 +9,30 @@ void CIBaseGameLayer::setupLevelStart(LevelSettingsObject* p0) {
 
     if (!m_fields->m_ciHasInit) {
         m_fields->m_player1CIProperties = {
-            setupCIValues(IconType::Cube),
-            (m_player1->m_isPlatformer ? setupCIValues(IconType::Jetpack) : setupCIValues(IconType::Ship)),
-            setupCIValues(IconType::Ball),
-            setupCIValues(IconType::Ufo),
-            setupCIValues(IconType::Wave),
-            setupCIValues(IconType::Robot),
-            setupCIValues(IconType::Spider),
-            setupCIValues(IconType::Swing)
+            {IconType::Cube, setupCIValues(IconType::Cube)},
+            {IconType::Ship,
+            (m_player1->m_isPlatformer ? setupCIValues(IconType::Jetpack) : setupCIValues(IconType::Ship))},
+            {IconType::Ball, setupCIValues(IconType::Ball)},
+            {IconType::Ufo, setupCIValues(IconType::Ufo)},
+            {IconType::Wave, setupCIValues(IconType::Wave)},
+            {IconType::Robot, setupCIValues(IconType::Robot)},
+            {IconType::Spider, setupCIValues(IconType::Spider)},
+            {IconType::Swing, setupCIValues(IconType::Swing)}
         };
         log::info("Player 1 CI values initialized");
 
         m_fields->m_player2CIProperties = {
-            setupCIValues(IconType::Cube),
-            (m_player1->m_isPlatformer ? setupCIValues(IconType::Jetpack) : setupCIValues(IconType::Ship)),
-            setupCIValues(IconType::Ball),
-            setupCIValues(IconType::Ufo),
-            setupCIValues(IconType::Wave),
-            setupCIValues(IconType::Robot),
-            setupCIValues(IconType::Spider),
-            setupCIValues(IconType::Swing)
+            {IconType::Cube, setupCIValues(IconType::Cube)},
+            {
+                IconType::Ship,
+                (m_player1->m_isPlatformer ? setupCIValues(IconType::Jetpack) : setupCIValues(IconType::Ship))
+            },
+            {IconType::Ball, setupCIValues(IconType::Ball)},
+            {IconType::Ufo, setupCIValues(IconType::Ufo)},
+            {IconType::Wave, setupCIValues(IconType::Wave)},
+            {IconType::Robot, setupCIValues(IconType::Robot)},
+            {IconType::Spider, setupCIValues(IconType::Spider)},
+            {IconType::Swing, setupCIValues(IconType::Swing)}
         };
         log::info("Player 2 CI values initialized");
 

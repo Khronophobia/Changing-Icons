@@ -6,9 +6,7 @@ namespace changing_icons {
 }
 
 class $modify(CIPlayerObject, PlayerObject) {
-    bool m_ciHasInit;
     bool m_levelStarted;
-
     int m_ogColor1 = GameManager::get()->getPlayerColor();
     int m_ogColor2 = GameManager::get()->getPlayerColor2();
 

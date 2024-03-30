@@ -214,8 +214,9 @@ void CIPlayerObject::refreshColorsCI() {
 }
 
 CITempProperties& CIPlayerObject::getActiveProperties(IconType type) {
+    auto ciGameLayer = static_cast<CIBaseGameLayer*>(m_gameLayer);
     if (this == PlayLayer::get()->m_player1)
-        return static_cast<CIBaseGameLayer*>(m_gameLayer)->m_fields->m_player1CIProperties.at(static_cast<int>(type));
+        return ciGameLayer->m_fields->m_player1CIProperties.at(type);
     else
-        return static_cast<CIBaseGameLayer*>(m_gameLayer)->m_fields->m_player2CIProperties.at(static_cast<int>(type));
+        return ciGameLayer->m_fields->m_player2CIProperties.at(type);
 }
