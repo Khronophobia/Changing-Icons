@@ -5,6 +5,8 @@ namespace changing_icons {
         int iconID;
         std::optional<int> color1 = std::nullopt;
         std::optional<int> color2 = std::nullopt;
+        bool overrideGlow;
+        std::optional<int> glowColor = std::nullopt;
     };
 }
 

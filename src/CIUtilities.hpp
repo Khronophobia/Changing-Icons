@@ -18,6 +18,14 @@ namespace changing_icons::utils {
         cocos2d::CCObject* target, cocos2d::SEL_MenuHandler callback, float scale
     );
     /*
+        Create a toggle button inside a menu with AnchorLayout with the label as an out parameter.
+        Meant to be used inside a Popup class.
+    */
+    CCMenuItemToggler* createToggleButton(
+        cocos2d::CCMenu* menu, cocos2d::CCLayer* mainLayer, cocos2d::Anchor anchor, cocos2d::CCPoint offset, char const* label,
+        cocos2d::CCObject* target, cocos2d::SEL_MenuHandler callback, float scale, cocos2d::CCLabelBMFont*& labelOut
+    );
+    /*
         Create a toggle button inside a menu.
         Meant to be used inside a Popup class.
     */

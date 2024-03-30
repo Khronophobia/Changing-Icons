@@ -2,6 +2,7 @@
 #include "AddIconLayer.hpp"
 #include "IconConfigLayer.hpp"
 #include <CIConstants.hpp>
+#include <CIUtilities.hpp>
 
 using namespace geode::prelude;
 using namespace changing_icons;
@@ -94,8 +95,8 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
 
     m_iconDisplay = SimplePlayer::create(0);
     m_iconDisplay->updatePlayerFrame(m_selectedIcon.iconID, m_iconType);
-    m_iconDisplay->setScale(1.1f);
-    m_mainLayer->addChildAtPosition(m_iconDisplay, Anchor::Top, ccp(0.f, -50.f));
+    m_iconDisplay->setScale(1.2f);
+    m_mainLayer->addChildAtPosition(m_iconDisplay, Anchor::Top, ccp(0.f, -60.f));
 
     // Icons Page
     auto iconListBG = CCScale9Sprite::create("square02_001.png");
@@ -160,9 +161,12 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
 
     m_color1Display = ColorChannelSprite::create();
     m_color1Display->setScale(0.7f);
-    m_color1Label = CCLabelBMFont::create("1X", "bigFont.fnt");
-    m_color1Label->setColor(cc3x(0x7f));
-    m_color1Label->setOpacity(127);
+    m_color1DisabledSpr = CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png");
+    m_color1DisabledSpr->setPosition(m_color1Display->getContentSize() / 2);
+    m_color1Display->addChild(m_color1DisabledSpr);
+    m_color1Label = CCLabelBMFont::create("1", "bigFont.fnt");
+    // m_color1Label->setColor(cc3x(0x7f));
+    // m_color1Label->setOpacity(127);
     m_color1Label->setScale(0.6f);
     m_color1Label->setPosition(m_color1Display->getContentSize() / 2);
     m_color1Display->addChild(m_color1Label);
@@ -173,13 +177,16 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
         menu_selector(AddIconLayer::onColorType)
     );
     m_color1Btn->setTag(0);
-    m_buttonMenu->addChildAtPosition(m_color1Btn, Anchor::Top, ccp(-20.f, -85.f));
+    m_buttonMenu->addChildAtPosition(m_color1Btn, Anchor::TopRight, ccp(-90.f, -80.f));
 
     m_color2Display = ColorChannelSprite::create();
     m_color2Display->setScale(0.7f);
-    m_color2Label = CCLabelBMFont::create("2X", "bigFont.fnt");
-    m_color2Label->setColor(cc3x(0x7f));
-    m_color2Label->setOpacity(127);
+    m_color2DisabledSpr = CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png");
+    m_color2DisabledSpr->setPosition(m_color2Display->getContentSize() / 2);
+    m_color2Display->addChild(m_color2DisabledSpr);
+    m_color2Label = CCLabelBMFont::create("2", "bigFont.fnt");
+    // m_color2Label->setColor(cc3x(0x7f));
+    // m_color2Label->setOpacity(127);
     m_color2Label->setScale(0.6f);
     m_color2Label->setPosition(m_color2Display->getContentSize() / 2);
     m_color2Display->addChild(m_color2Label);
@@ -190,7 +197,37 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
         menu_selector(AddIconLayer::onColorType)
     );
     m_color2Btn->setTag(1);
-    m_buttonMenu->addChildAtPosition(m_color2Btn, Anchor::Top, ccp(20.f, -85.f));
+    m_buttonMenu->addChildAtPosition(m_color2Btn, Anchor::TopRight, ccp(-60.f, -80.f));
+
+    m_glowColorDisplay = ColorChannelSprite::create();
+    m_glowColorDisplay->setScale(0.7f);
+    m_glowColorDisabledSpr = CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png");
+    m_glowColorDisabledSpr->setPosition(m_glowColorDisplay->getContentSize() / 2);
+    m_glowColorDisplay->addChild(m_glowColorDisabledSpr);
+    m_glowColorLabel = CCLabelBMFont::create("G", "bigFont.fnt");
+    // m_glowColorLabel->setColor(cc3x(0x7f));
+    // m_glowColorLabel->setOpacity(127);
+    m_glowColorLabel->setScale(0.6f);
+    m_glowColorLabel->setPosition(m_glowColorDisplay->getContentSize() / 2);
+    m_glowColorDisplay->addChild(m_glowColorLabel);
+
+    m_glowColorBtn = CCMenuItemSpriteExtra::create(
+        m_glowColorDisplay,
+        this,
+        menu_selector(AddIconLayer::onColorType)
+    );
+    m_glowColorBtn->setTag(2);
+    m_buttonMenu->addChildAtPosition(m_glowColorBtn, Anchor::TopRight, ccp(-30.f, -80.f));
+
+    CCLabelBMFont* overrideGlowLabel;
+    m_overrideGlowBtn = utils::createToggleButton(
+        m_buttonMenu, m_mainLayer,
+        Anchor::TopLeft, ccp(30.f, -80.f),
+        "Override Glow",
+        this, menu_selector(AddIconLayer::onToggleGlow), 0.6f,
+        overrideGlowLabel
+    );
+    m_overrideGlowBtn->toggle(m_selectedIcon.overrideGlow);
 
     m_selectedColorSpr = CCSprite::createWithSpriteFrameName("GJ_select_001.png");
     m_selectedColorSpr->setScale(0.8f);
@@ -199,14 +236,14 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
 
     auto colorMenu = CCMenu::create();
     colorMenu->ignoreAnchorPointForPosition(false);
-    colorMenu->setContentSize(ccp(450.f, 150.f));
+    colorMenu->setContentSize(ccp(450.f, 160.f));
     colorMenu->setLayout(
         RowLayout::create()
             ->setGap(2.f)
             ->setGrowCrossAxis(true)
             ->setCrossAxisOverflow(false)
     );
-    m_mainLayer->addChildAtPosition(colorMenu, Anchor::Center, ccp(0.f, -35.f));
+    m_mainLayer->addChildAtPosition(colorMenu, Anchor::Center, ccp(0.f, -30.f));
 
     std::array<int, constants::COLOR_COUNT + 1> constexpr colorOrder{
         51, 19, 48, 9, 37, 53, 54, 55, 25, 56, 57, 58,
@@ -240,11 +277,14 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
         this,
         menu_selector(AddIconLayer::onClearColor)
     );
-    m_buttonMenu->addChildAtPosition(clearColorBtn, Anchor::Right, ccp(-30.f, 60.f));
+    m_buttonMenu->addChildAtPosition(clearColorBtn, Anchor::TopRight, ccp(-120.f, -80.f));
 
     m_colorPageNodes->addObject(iconPageBtn);
     m_colorPageNodes->addObject(m_color1Btn);
     m_colorPageNodes->addObject(m_color2Btn);
+    m_colorPageNodes->addObject(m_glowColorBtn);
+    m_colorPageNodes->addObject(m_overrideGlowBtn);
+    m_colorPageNodes->addObject(overrideGlowLabel);
     m_colorPageNodes->addObject(m_selectedColorSpr);
     m_colorPageNodes->addObject(colorMenu);
     m_colorPageNodes->addObject(clearColorBtn);
@@ -299,40 +339,59 @@ void AddIconLayer::setIconColor(std::optional<int> color, int colorType) {
     switch(colorType) {
         case 0: m_selectedIcon.color1 = color; break;
         case 1: m_selectedIcon.color2 = color; break;
+        case 2: m_selectedIcon.glowColor = color; break;
     }
     updateIconColors();
 }
 
 void AddIconLayer::updateIconColors() {
-    if (m_selectedIcon.color1) {
-        m_color1Label->setString("1");
-        m_color1Display->setColor(
-            GameManager::get()->colorForIdx(m_selectedIcon.color1.value())
-        );
-        m_iconDisplay->setColor(
-            GameManager::get()->colorForIdx(m_selectedIcon.color1.value())
-        );
+    auto gm = GameManager::get();
+    if (m_selectedIcon.color1)
+        m_color1DisabledSpr->setVisible(false);
+    else
+        m_color1DisabledSpr->setVisible(true);
+    m_color1Display->setColor(
+        gm->colorForIdx(m_selectedIcon.color1.value_or(17))
+    );
+    m_iconDisplay->setColor(
+        gm->colorForIdx(m_selectedIcon.color1.value_or(gm->getPlayerColor()))
+    );
+
+    if (m_selectedIcon.color2)
+        m_color2DisabledSpr->setVisible(false);
+    else
+        m_color2DisabledSpr->setVisible(true);
+    m_color2Display->setColor(
+        gm->colorForIdx(m_selectedIcon.color2.value_or(12))
+    );
+    m_iconDisplay->setSecondColor(
+        gm->colorForIdx(m_selectedIcon.color2.value_or(gm->getPlayerColor2()))
+    );
+
+    if (m_selectedIcon.glowColor)
+        m_glowColorDisabledSpr->setVisible(false);
+    else
+        m_glowColorDisabledSpr->setVisible(true);
+    m_glowColorDisplay->setColor(
+        gm->colorForIdx(m_selectedIcon.glowColor.value_or(17))
+    );
+
+    if (m_selectedIcon.overrideGlow) {
+        if (m_selectedIcon.glowColor) {
+            m_iconDisplay->setGlowOutline(
+                gm->colorForIdx(m_selectedIcon.glowColor.value())
+            );
+        } else {
+            m_iconDisplay->disableGlowOutline();
+        }
     } else {
-        m_color1Label->setString("1X");
-        m_color1Display->setColor(GameManager::get()->colorForIdx(17));
-        m_iconDisplay->setColor(
-            GameManager::get()->colorForIdx(GameManager::get()->getPlayerColor())
-        );
-    }
-    if (m_selectedIcon.color2) {
-        m_color2Label->setString("2");
-        m_color2Display->setColor(
-            GameManager::get()->colorForIdx(m_selectedIcon.color2.value())
-        );
-        m_iconDisplay->setSecondColor(
-            GameManager::get()->colorForIdx(m_selectedIcon.color2.value())
-        );
-    } else {
-        m_color2Label->setString("2X");
-        m_color2Display->setColor(GameManager::get()->colorForIdx(12));
-        m_iconDisplay->setSecondColor(
-            GameManager::get()->colorForIdx(GameManager::get()->getPlayerColor2())
-        );
+        if (gm->getPlayerGlow()) {
+            m_iconDisplay->setGlowOutline(
+                gm->colorForIdx(gm->getPlayerGlowColor())
+            );
+        } else {
+            m_iconDisplay->disableGlowOutline();
+        }
     }
 }
 
@@ -377,21 +436,20 @@ void AddIconLayer::onColorType(CCObject* sender) {
     switch (m_selectedColorType) {
         case 0: m_selectedColorSpr->setPosition(m_color1Btn->getPosition()); break;
         case 1: m_selectedColorSpr->setPosition(m_color2Btn->getPosition()); break;
+        case 2: m_selectedColorSpr->setPosition(m_glowColorBtn->getPosition()); break;
     }
 }
 
 void AddIconLayer::onSelectColor(CCObject* sender) {
-    switch (m_selectedColorType) {
-        case 0: m_selectedIcon.color1 = sender->getTag(); break;
-        case 1: m_selectedIcon.color2 = sender->getTag(); break;
-    }
-    updateIconColors();
+    setIconColor(sender->getTag(), m_selectedColorType);
 }
 
 void AddIconLayer::onClearColor(CCObject* sender) {
-    switch (m_selectedColorType) {
-        case 0: m_selectedIcon.color1 = std::nullopt; break;
-        case 1: m_selectedIcon.color2 = std::nullopt; break;
-    }
+    setIconColor(std::nullopt, m_selectedColorType);
+}
+
+void AddIconLayer::onToggleGlow(CCObject* sender) {
+    auto btn = static_cast<CCMenuItemToggler*>(sender);
+    m_selectedIcon.overrideGlow = !btn->isToggled();
     updateIconColors();
 }

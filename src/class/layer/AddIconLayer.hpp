@@ -20,10 +20,17 @@ namespace changing_icons {
         SimplePlayer* m_iconDisplay;
         ColorChannelSprite* m_color1Display;
         ColorChannelSprite* m_color2Display;
+        ColorChannelSprite* m_glowColorDisplay;
         cocos2d::CCLabelBMFont* m_color1Label;
+        cocos2d::CCSprite* m_color1DisabledSpr;
         cocos2d::CCLabelBMFont* m_color2Label;
+        cocos2d::CCSprite* m_color2DisabledSpr;
+        cocos2d::CCLabelBMFont* m_glowColorLabel;
+        cocos2d::CCSprite* m_glowColorDisabledSpr;
         CCMenuItemSpriteExtra* m_color1Btn;
         CCMenuItemSpriteExtra* m_color2Btn;
+        CCMenuItemSpriteExtra* m_glowColorBtn;
+        CCMenuItemToggler* m_overrideGlowBtn;
         int m_selectedColorType;
         cocos2d::CCSprite* m_selectedColorSpr;
 
@@ -48,5 +55,6 @@ namespace changing_icons {
         void onColorType(CCObject* sender);
         void onSelectColor(CCObject* sender);
         void onClearColor(CCObject* sender);
+        void onToggleGlow(CCObject* sender);
     };
 }

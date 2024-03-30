@@ -7,17 +7,25 @@ using namespace changing_icons;
 namespace changing_icons::utils {
     CCMenuItemToggler* createToggleButton(
         CCMenu* menu, CCLayer* layer, Anchor anchor, CCPoint offset, char const* label,
-        CCObject* target, cocos2d::SEL_MenuHandler callback, float scale
+        CCObject* target, cocos2d::SEL_MenuHandler callback, float scale, CCLabelBMFont*& labelOut
     ) {
         auto btn = CCMenuItemToggler::createWithStandardSprites(target, callback, scale);
         menu->addChildAtPosition(btn, anchor, offset);
 
-        auto labelText = CCLabelBMFont::create(label, "bigFont.fnt");
-        labelText->setAnchorPoint(ccp(0.f, 0.5f));
-        labelText->limitLabelWidth(150.f, 0.85f * scale, 0.1f);
-        layer->addChildAtPosition(labelText, anchor, offset + ccp(24.f, 0.f) * scale);
+        labelOut = CCLabelBMFont::create(label, "bigFont.fnt");
+        labelOut->setAnchorPoint(ccp(0.f, 0.5f));
+        labelOut->limitLabelWidth(150.f, 0.85f * scale, 0.1f);
+        layer->addChildAtPosition(labelOut, anchor, offset + ccp(24.f, 0.f) * scale);
 
         return btn;
+    }
+
+    CCMenuItemToggler* createToggleButton(
+        CCMenu* menu, CCLayer* layer, Anchor anchor, CCPoint offset, char const* label,
+        CCObject* target, cocos2d::SEL_MenuHandler callback, float scale
+    ) {
+        CCLabelBMFont* labelOut;
+        return createToggleButton(menu, layer, anchor, offset, label, target, callback, scale, labelOut);
     }
 
     CCMenuItemToggler* createToggleButton(

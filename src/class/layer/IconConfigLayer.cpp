@@ -178,12 +178,12 @@ bool IconConfigLayer::setup() {
     auto constexpr iconOrderYPos = 25.f;
     auto iconOrderLabel = CCLabelBMFont::create("Icon Order", "goldFont.fnt");
     iconOrderLabel->setScale(0.65f);
-    m_mainLayer->addChildAtPosition(iconOrderLabel, Anchor::Left, ccp(110.f, iconOrderYPos));
+    m_mainLayer->addChildAtPosition(iconOrderLabel, Anchor::Left, ccp(105.f, iconOrderYPos));
 
     m_iconOrderMenu = CCMenu::create();
     m_iconOrderMenu->ignoreAnchorPointForPosition(false);
     m_iconOrderMenu->setContentSize(ccp(20.f, 20.f));
-    m_mainLayer->addChildAtPosition(m_iconOrderMenu, Anchor::Left, ccp(110.f, iconOrderYPos - 22.f));
+    m_mainLayer->addChildAtPosition(m_iconOrderMenu, Anchor::Left, ccp(105.f, iconOrderYPos - 22.f));
 
     auto randomOrderSpr = ButtonSprite::create("Random", "bigFont.fnt", "GJ_button_04.png");
     randomOrderSpr->setScale(0.5f);

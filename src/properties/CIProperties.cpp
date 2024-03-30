@@ -126,6 +126,16 @@ IconProperties matjson::Serialize<IconProperties>::from_json(matjson::Value cons
             value,
             "color2",
             IconProperties().color2
+        ),
+        .overrideGlow = utils::tryGetJsonValue<bool>(
+            value,
+            "override-glow",
+            IconProperties().overrideGlow
+        ),
+        .glowColor = utils::tryGetJsonValue<std::optional<int>>(
+            value,
+            "glow-color",
+            IconProperties().color2
         )
     };
 }
@@ -135,6 +145,8 @@ matjson::Value matjson::Serialize<IconProperties>::to_json(IconProperties const&
     obj["ID"] = value.iconID;
     obj["color1"] = value.color1;
     obj["color2"] = value.color2;
+    obj["override-glow"] = value.overrideGlow;
+    obj["glow-color"] = value.glowColor;
     return obj;
 }
 

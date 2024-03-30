@@ -41,6 +41,7 @@ bool IconCell::init(
     ) {
     if (!CCLayerColor::init()) return false;
     m_configLayer = configLayer;
+    auto gm = GameManager::get();
 
     this->setContentSize(ccp(constants::ICONCELL_WIDTH, constants::ICONCELL_HEIGHT));
     this->setAnchorPoint(ccp(0.f, 0.f));
@@ -50,31 +51,69 @@ bool IconCell::init(
         this->setOpacity(50);
     m_index = index;
 
-    auto playerColor1 = GameManager::get()->getPlayerColor();
-    auto playerColor2 = GameManager::get()->getPlayerColor2();
+    auto playerColor1 = gm->getPlayerColor();
+    auto playerColor2 = gm->getPlayerColor2();
 
     if (icon.color1) {
         auto color1Display = ColorChannelSprite::create();
         color1Display->setScale(0.5f);
-        color1Display->setColor(GameManager::get()->colorForIdx(icon.color1.value()));
-        this->addChildAtPosition(color1Display, Anchor::Left, ccp(55.f, 0.f));
+        color1Display->setColor(gm->colorForIdx(icon.color1.value()));
+        this->addChildAtPosition(color1Display, Anchor::Left, ccp(50.f, 0.f));
         playerColor1 = icon.color1.value();
+
+        auto colorLabel = CCLabelBMFont::create("1", "bigFont.fnt");
+        // colorLabel->setColor(cc3x(0x7f));
+        // colorLabel->setOpacity(127);
+        colorLabel->setScale(0.8f);
+        colorLabel->setPosition(color1Display->getContentSize() / 2);
+        color1Display->addChild(colorLabel);
     }
 
     if (icon.color2) {
         auto color2Display = ColorChannelSprite::create();
         color2Display->setScale(0.5f);
-        color2Display->setColor(GameManager::get()->colorForIdx(icon.color2.value()));
-        this->addChildAtPosition(color2Display, Anchor::Left, ccp(75.f, 0.f));
+        color2Display->setColor(gm->colorForIdx(icon.color2.value()));
+        this->addChildAtPosition(color2Display, Anchor::Left, ccp(70.f, 0.f));
         playerColor2 = icon.color2.value();
+
+        auto colorLabel = CCLabelBMFont::create("2", "bigFont.fnt");
+        // colorLabel->setColor(cc3x(0x7f));
+        // colorLabel->setOpacity(127);
+        colorLabel->setScale(0.8f);
+        colorLabel->setPosition(color2Display->getContentSize() / 2);
+        color2Display->addChild(colorLabel);
     }
 
     auto iconDisplay = SimplePlayer::create(0);
     iconDisplay->setScale(0.7f);
     iconDisplay->updatePlayerFrame(icon.iconID, iconType);
-    iconDisplay->setColor(GameManager::get()->colorForIdx(playerColor1));
-    iconDisplay->setSecondColor(GameManager::get()->colorForIdx(playerColor2));
-    this->addChildAtPosition(iconDisplay, Anchor::Left, ccp(24.f, 0.f));
+    iconDisplay->setColor(gm->colorForIdx(playerColor1));
+    iconDisplay->setSecondColor(gm->colorForIdx(playerColor2));
+    if (icon.overrideGlow) {
+        auto glowDisplay = ColorChannelSprite::create();
+        glowDisplay->setScale(0.5f);
+        glowDisplay->setColor(gm->colorForIdx(icon.glowColor.value_or(17)));
+        this->addChildAtPosition(glowDisplay, Anchor::Left, ccp(90.f, 0.f));
+
+        if (icon.glowColor) {
+            iconDisplay->setGlowOutline(gm->colorForIdx(icon.glowColor.value()));
+        } else {
+            auto glowDisabledSpr = CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png");
+            glowDisabledSpr->setPosition(glowDisplay->getContentSize() / 2);
+            glowDisplay->addChild(glowDisabledSpr);
+            iconDisplay->disableGlowOutline();
+        }
+
+        auto glowLabel = CCLabelBMFont::create("G", "bigFont.fnt");
+        glowLabel->setScale(0.8f);
+        glowLabel->setPosition(glowDisplay->getContentSize() / 2);
+        glowDisplay->addChild(glowLabel);
+    } else {
+        if (gm->getPlayerGlow()) {
+            iconDisplay->setGlowOutline(gm->colorForIdx(gm->getPlayerGlowColor()));
+        }
+    }
+    this->addChildAtPosition(iconDisplay, Anchor::Left, ccp(20.f, 0.f));
 
     if (readOnly) return true;
 
