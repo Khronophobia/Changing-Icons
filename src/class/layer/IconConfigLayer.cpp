@@ -215,35 +215,6 @@ bool IconConfigLayer::setup() {
     backwardOrderBtn->setTag(2);
     m_iconOrderMenu->addChildAtPosition(backwardOrderBtn, Anchor::Center, ccp(45.f, -20.f));
 
-    /* auto const mirrorEndOffset = ccp(30.f, -30.f);
-    m_mirrorEndBtn = CCMenuItemToggler::createWithStandardSprites(
-        this,
-        menu_selector(IconConfigLayer::onVarToggle),
-        0.6f
-    );
-    m_buttonMenu->addChildAtPosition(m_mirrorEndBtn, Anchor::Left, mirrorEndOffset);
-    
-    auto mirrorEndText = CCLabelBMFont::create("Mirror After End", "bigFont.fnt");
-    mirrorEndText->setAnchorPoint(ccp(0.f, 0.5f));
-    mirrorEndText->setScale(0.5f);
-    m_mainLayer->addChildAtPosition(
-        mirrorEndText, Anchor::Left, mirrorEndOffset + toggleTextOffset
-    );
-
-    auto mirrorEndInfoSpr = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
-    mirrorEndInfoSpr->setScale(0.4f);
-    auto mirrorEndInfoBtn = CCMenuItemSpriteExtra::create(
-        mirrorEndInfoSpr,
-        this,
-        menu_selector(IconConfigLayer::onVarInfo)
-    );
-    mirrorEndInfoBtn->setUserObject(CCString::create(
-        "Only applicable when <cy>Icon Order</c> is set to <cj>Up</c> or <cj>Down</c>. Mirror the list when reaching the end instead of wrapping around."
-    ));
-    m_buttonMenu->addChildAtPosition(
-        mirrorEndInfoBtn, Anchor::Left, mirrorEndOffset + toggleInfoOffset
-    ); */
-
     m_mirrorEndBtn = utils::createToggleButton(
         m_buttonMenu, m_mainLayer,
         Anchor::Left, ccp(30.f, -50.f),
@@ -263,7 +234,7 @@ bool IconConfigLayer::setup() {
     iconListMenu->setLayout(
         RowLayout::create()
     );
-    m_mainLayer->addChildAtPosition(iconListMenu, Anchor::Left, ccp(110.f, -85.f));
+    m_mainLayer->addChildAtPosition(iconListMenu, Anchor::BottomLeft, ccp(110.f, 65.f));
 
     auto iconListAddSpr = CCSprite::createWithSpriteFrameName("GJ_plusBtn_001.png");
     iconListAddSpr->setScale(0.83f);
