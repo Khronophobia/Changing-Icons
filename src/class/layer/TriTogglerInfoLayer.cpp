@@ -52,7 +52,7 @@ bool TriTogglerInfoLayer::init() {
     topText->setAnchorPoint(ccp(0.5f, 0.f));
     m_mainLayer->addChildAtPosition(topText, Anchor::Center, ccp(0.f, 15.f));
 
-    auto constexpr checkXPos = 115.f;
+    auto constexpr checkXPos = 95.f;
     auto constexpr checkYPos = 0.f;
     auto constexpr checkYOffset = 24.f;
     auto constexpr textXPos = checkXPos + 15.f;
@@ -70,9 +70,9 @@ bool TriTogglerInfoLayer::init() {
     m_mainLayer->addChildAtPosition(onCheckSpr, Anchor::Left, ccp(checkXPos, checkYPos - checkYOffset * 2));
 
     auto checkExplanation = TextArea::create(
-        "Override is disabled\n"
-        "Override is set to <cy>off</c>\n"
-        "Override is set to <cy>on</c>",
+        "Won't override setting\n"
+        "Will override setting to <cy>off</c>\n"
+        "Will override setting to <cy>on</c>",
         "chatFont.fnt", 1.f, 150.f, ccp(0.f, 0.5f), checkYOffset, false
     );
     checkExplanation->setAnchorPoint(ccp(0.f, 1.f));

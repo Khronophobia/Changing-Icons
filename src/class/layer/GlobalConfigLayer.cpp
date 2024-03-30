@@ -9,7 +9,7 @@ using namespace changing_icons;
 
 GlobalConfigLayer* GlobalConfigLayer::create() {
     auto ret = new GlobalConfigLayer();
-    if (ret && ret->initAnchored(400.f, 280.f, "GJ_square05.png")) {
+    if (ret && ret->initAnchored(400.f, 300.f, "GJ_square05.png")) {
         ret->autorelease();
         return ret;
     }
@@ -22,6 +22,10 @@ bool GlobalConfigLayer::setup() {
     m_noElasticity = true;
     this->setTitle("Global Overrides");
     auto& globalConfig = m_configManager->getGlobalConfig();
+
+    static_cast<AnchorLayoutOptions*>(m_closeBtn->getLayoutOptions())
+        ->setOffset(ccp(10.f, -10.f));
+    m_buttonMenu->updateLayout();
 
     auto globalOverrideBg = CCScale9Sprite::create("square02_001.png");
     globalOverrideBg->setAnchorPoint(ccp(0.5f, 0.5f));

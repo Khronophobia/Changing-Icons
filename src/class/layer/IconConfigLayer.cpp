@@ -128,16 +128,18 @@ bool IconConfigLayer::setup() {
     m_gamemodeBar->addChild(jetpackBtn);
     m_gamemodeBar->updateLayout();
 
+    auto constexpr checkboxYPos = -45.f;
+    auto constexpr checkboxYOffset = 30.f;
     m_disableBtn = utils::createToggleButton(
         m_buttonMenu, m_mainLayer,
-        Anchor::TopLeft, ccp(30.f, -45.f),
+        Anchor::TopLeft, ccp(30.f, checkboxYPos),
         "Disable",
         this, menu_selector(IconConfigLayer::onVarToggle), 0.6f
     );
 
     m_useAllBtn = utils::createToggleButton(
         m_buttonMenu, m_mainLayer,
-        Anchor::TopLeft, ccp(30.f, -75.f),
+        Anchor::TopLeft, ccp(30.f, checkboxYPos - checkboxYOffset),
         "Use All Icons",
         this, menu_selector(IconConfigLayer::onVarToggle), 0.6f
     );
@@ -149,7 +151,7 @@ bool IconConfigLayer::setup() {
 
     m_includePlayerBtn = utils::createToggleButton(
         m_buttonMenu, m_mainLayer,
-        Anchor::TopLeft, ccp(30.f, -105.f),
+        Anchor::TopLeft, ccp(30.f, checkboxYPos - checkboxYOffset * 2),
         "Include Player Icon",
         this, menu_selector(IconConfigLayer::onVarToggle), 0.6f
     );

@@ -4,68 +4,70 @@
 using namespace geode::prelude;
 using namespace changing_icons;
 
-CCMenuItemToggler* changing_icons::utils::createToggleButton(
-    CCMenu* menu, CCLayer* layer, Anchor anchor, CCPoint offset, char const* label,
-    CCObject* target, cocos2d::SEL_MenuHandler callback, float scale
-) {
-    auto btn = CCMenuItemToggler::createWithStandardSprites(target, callback, scale);
-    menu->addChildAtPosition(btn, anchor, offset);
+namespace changing_icons::utils {
+    CCMenuItemToggler* createToggleButton(
+        CCMenu* menu, CCLayer* layer, Anchor anchor, CCPoint offset, char const* label,
+        CCObject* target, cocos2d::SEL_MenuHandler callback, float scale
+    ) {
+        auto btn = CCMenuItemToggler::createWithStandardSprites(target, callback, scale);
+        menu->addChildAtPosition(btn, anchor, offset);
 
-    auto labelText = CCLabelBMFont::create(label, "bigFont.fnt");
-    labelText->setAnchorPoint(ccp(0.f, 0.5f));
-    labelText->limitLabelWidth(150.f, 0.85f * scale, 0.1f);
-    layer->addChildAtPosition(labelText, anchor, offset + ccp(24.f, 0.f) * scale);
+        auto labelText = CCLabelBMFont::create(label, "bigFont.fnt");
+        labelText->setAnchorPoint(ccp(0.f, 0.5f));
+        labelText->limitLabelWidth(150.f, 0.85f * scale, 0.1f);
+        layer->addChildAtPosition(labelText, anchor, offset + ccp(24.f, 0.f) * scale);
 
-    return btn;
-}
-
-CCMenuItemToggler* changing_icons::utils::createToggleButton(
-    CCMenu* menu, CCLayer* layer, CCPoint position, char const* label,
-    CCObject* target, cocos2d::SEL_MenuHandler callback, float scale
-) {
-    auto btn = CCMenuItemToggler::createWithStandardSprites(target, callback, scale);
-    btn->setPosition(position);
-    menu->addChild(btn);
-
-    auto labelText = CCLabelBMFont::create(label, "bigFont.fnt");
-    labelText->setAnchorPoint(ccp(0.f, 0.5f));
-    labelText->limitLabelWidth(150.f, 0.85f * scale, 0.1f);
-    labelText->setPosition(position + ccp(24.f, 0.f) * scale);
-    layer->addChild(labelText);
-
-    return btn;
-}
-
-CCMenuItemSpriteExtra* changing_icons::utils::createToggleInfo(
-    CCMenu* menu, CCMenuItemToggler* btn, CCObject* target, SEL_MenuHandler callback, gd::string const& infoDesc
-) {
-    bool isAnchorLayout = false;
-    Anchor anchor;
-    CCPoint offset;
-    if (auto layoutOpts = static_cast<AnchorLayoutOptions*>(btn->getLayoutOptions())) {
-        isAnchorLayout = true;
-        anchor = layoutOpts->getAnchor();
-        offset = layoutOpts->getOffset();
-    }
-    auto scale = btn->m_offButton->getNormalImage()->getScale();
-    auto constexpr posOffset = 20.f;
-
-    auto infoSpr = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
-    infoSpr->setScale(0.7f * scale);
-    auto infoBtn = CCMenuItemSpriteExtra::create(
-        infoSpr, target, callback
-    );
-    if (!infoDesc.empty())
-        infoBtn->setUserObject(CCString::create(infoDesc));
-
-    if (isAnchorLayout) {
-        menu->addChildAtPosition(infoBtn, anchor, offset + ccp(-posOffset, posOffset) * scale);
-    } else {
-        infoBtn->setPosition(btn->getPosition() + ccp(-posOffset, posOffset) * scale);
-        menu->addChild(infoBtn);
+        return btn;
     }
 
-    return infoBtn;
+    CCMenuItemToggler* createToggleButton(
+        CCMenu* menu, CCLayer* layer, CCPoint position, char const* label,
+        CCObject* target, cocos2d::SEL_MenuHandler callback, float scale
+    ) {
+        auto btn = CCMenuItemToggler::createWithStandardSprites(target, callback, scale);
+        btn->setPosition(position);
+        menu->addChild(btn);
+
+        auto labelText = CCLabelBMFont::create(label, "bigFont.fnt");
+        labelText->setAnchorPoint(ccp(0.f, 0.5f));
+        labelText->limitLabelWidth(150.f, 0.85f * scale, 0.1f);
+        labelText->setPosition(position + ccp(24.f, 0.f) * scale);
+        layer->addChild(labelText);
+
+        return btn;
+    }
+
+    CCMenuItemSpriteExtra* createToggleInfo(
+        CCMenu* menu, CCMenuItemToggler* btn, CCObject* target, SEL_MenuHandler callback, gd::string const& infoDesc
+    ) {
+        bool isAnchorLayout = false;
+        Anchor anchor;
+        CCPoint offset;
+        if (auto layoutOpts = static_cast<AnchorLayoutOptions*>(btn->getLayoutOptions())) {
+            isAnchorLayout = true;
+            anchor = layoutOpts->getAnchor();
+            offset = layoutOpts->getOffset();
+        }
+        auto scale = btn->m_offButton->getNormalImage()->getScale();
+        auto constexpr posOffset = 20.f;
+
+        auto infoSpr = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
+        infoSpr->setScale(0.7f * scale);
+        auto infoBtn = CCMenuItemSpriteExtra::create(
+            infoSpr, target, callback
+        );
+        if (!infoDesc.empty())
+            infoBtn->setUserObject(CCString::create(infoDesc));
+
+        if (isAnchorLayout) {
+            menu->addChildAtPosition(infoBtn, anchor, offset + ccp(-posOffset, posOffset) * scale);
+        } else {
+            infoBtn->setPosition(btn->getPosition() + ccp(-posOffset, posOffset) * scale);
+            menu->addChild(infoBtn);
+        }
+
+        return infoBtn;
+    }
 }
 
 fmt::appender fmt::formatter<IconType>::format(IconType type, format_context& ctx) const {
