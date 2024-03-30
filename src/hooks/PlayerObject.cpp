@@ -201,6 +201,7 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
 
 void CIPlayerObject::refreshColorsCI() {
     auto const& config = getActiveProperties(getGamemode());
+    if (config.disabled) return;
     if (config.useAll) {
         setColorsCI(getGamemode(), m_fields->m_ogColor1, m_fields->m_ogColor2);
         return;
