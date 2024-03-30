@@ -257,13 +257,14 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
 
 void AddIconLayer::setupIcons(int page) {
     m_iconList->removeAllChildren();
+    auto const iconAmount = GameManager::get()->countForType(m_iconType);
     for (
             int i = 1;
             i <= constants::ICONS_PER_PAGE;
             i++
     ) {
         auto iconID = i + page * constants::ICONS_PER_PAGE;
-        if (iconID > GameManager::get()->countForType(m_iconType)) break;
+        if (iconID > iconAmount) break;
         auto iconSpr = GJItemIcon::createBrowserItem(convertIconType(m_iconType), iconID);
         auto iconBtn = CCMenuItemSpriteExtra::create(
             iconSpr,
