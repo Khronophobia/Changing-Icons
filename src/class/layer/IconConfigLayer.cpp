@@ -156,7 +156,7 @@ bool IconConfigLayer::setup() {
     auto includePlayerInfoBtn = utils::createToggleInfo(
         m_buttonMenu, m_includePlayerBtn,\
         this, menu_selector(IconConfigLayer::onVarInfo),
-        "Include the player's icon on the <cy>list</c>"
+        "Include the player's icon on the <cy>list</c>."
     );
 
     auto iconListBG = CCLayerColor::create({0, 0, 0, 95});
