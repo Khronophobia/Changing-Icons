@@ -7,6 +7,31 @@
 using namespace geode::prelude;
 using namespace changing_icons;
 
+bool CIPlayerObject::init(int p0, int p1, GJBaseGameLayer* p2, cocos2d::CCLayer* p3, bool p4) {
+    if (!PlayerObject::init(p0, p1, p2, p3, p4)) return false;
+
+    m_fields->m_ogHasGlow = m_hasGlow;
+    // Not sure if these are needed but just in case
+    m_fields->m_currentColor = GameManager::get()->colorForIdx(GameManager::get()->getPlayerColor());
+    m_fields->m_currentVehicleColor = GameManager::get()->colorForIdx(GameManager::get()->getPlayerColor());
+    m_fields->m_vehicleGlowColor = GameManager::get()->colorForIdx(GameManager::get()->getPlayerGlowColor());
+    m_fields->m_hasVehicleGlow = m_hasGlow;
+    m_fields->m_hasCustomVehicleGlowColor = m_hasCustomGlowColor;
+
+    return true;
+}
+
+void CIPlayerObject::updateGlowColor() {
+    PlayerObject::updateGlowColor();
+    m_vehicleGlow->setColor(m_fields->m_vehicleGlowColor);
+}
+
+void CIPlayerObject::updatePlayerGlow() {
+    PlayerObject::updatePlayerGlow();
+    if (m_isShip || m_isBird)
+        m_vehicleGlow->setVisible(m_fields->m_hasVehicleGlow);
+}
+
 void CIPlayerObject::flashPlayer(float p0, float p1, ccColor3B mainColor, ccColor3B secondColor) {
     // Make this do nothing because it resets the colors
 }
@@ -19,18 +44,41 @@ void CIPlayerObject::setVehicleSecondColor(ccColor3B const& color) {
     m_vehicleSpriteSecondary->setColor(color);
 }
 
+void CIPlayerObject::enableCustomVehicleGlowColor(ccColor3B const& color) {
+    m_fields->m_hasCustomVehicleGlowColor = true;
+    m_fields->m_vehicleGlowColor = color;
+}
+
 void CIPlayerObject::setColorsCI(IconType type, ccColor3B const& color1, ccColor3B const& color2) {
     if (type == IconType::Ship || type == IconType::Ufo || type == IconType::Jetpack) {
         setVehicleColor(color1);
         setVehicleSecondColor(color2);
+        m_fields->m_currentVehicleColor = color1;
     } else {
         PlayerObject::setColor(color1);
         PlayerObject::setSecondColor(color2);
+        m_fields->m_currentColor = color1;
     }
 }
 
 void CIPlayerObject::setColorsCI(IconType type, int color1, int color2) {
     setColorsCI(type, GameManager::get()->colorForIdx(color1), GameManager::get()->colorForIdx(color2));
+}
+
+void CIPlayerObject::setGlowColorCI(IconType type, bool enable, ccColor3B const& color) {
+    if (type == IconType::Ship || type == IconType::Ufo || type == IconType::Jetpack) {
+        m_fields->m_hasVehicleGlow = enable || (m_fields->m_currentVehicleColor == cc3x(0x0));
+        enableCustomVehicleGlowColor(color);
+    } else {
+        m_hasGlow = enable || (m_fields->m_currentColor == cc3x(0x0));
+        PlayerObject::enableCustomGlowColor(color);
+    }
+    PlayerObject::updateGlowColor();
+    PlayerObject::updatePlayerGlow();
+}
+
+void CIPlayerObject::setGlowColorCI(IconType type, bool enable, int color) {
+    setGlowColorCI(type, enable, GameManager::get()->colorForIdx(color));
 }
 
 void CIPlayerObject::switchedToMode(GameObjectType p0) { // Need to do this because updatePlayerRobotFrame
@@ -131,9 +179,12 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
 
     int color1 = m_fields->m_ogColor1;
     int color2 = m_fields->m_ogColor2;
+    int glowColor = m_fields->m_ogGlowColor;
+    bool enableGlow = m_fields->m_ogHasGlow;
 
     if (config.disabled || (!config.useAll && config.iconSet.empty())) {
         setColorsCI(type, color1, color2);
+        setGlowColorCI(type, enableGlow, glowColor);
         return originalFrame;
     }
 
@@ -141,7 +192,12 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
         auto const& iconProps = config.iconSet.at(0);
         if (iconProps.color1) color1 = iconProps.color1.value();
         if (iconProps.color2) color2 = iconProps.color2.value();
+        if (iconProps.overrideGlow) {
+            enableGlow = iconProps.glowColor.has_value();
+            if (iconProps.glowColor) glowColor = iconProps.glowColor.value();
+        }
         setColorsCI(type, color1, color2);
+        setGlowColorCI(type, enableGlow, glowColor);
         return iconProps.iconID;
     }
 
@@ -189,8 +245,13 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
         newIcon = iconProps.iconID;
         if (iconProps.color1) color1 = iconProps.color1.value();
         if (iconProps.color2) color2 = iconProps.color2.value();
+        if (iconProps.overrideGlow) {
+            enableGlow = iconProps.glowColor.has_value();
+            if (iconProps.glowColor) glowColor = iconProps.glowColor.value();
+        }
     }
     setColorsCI(type, color1, color2);
+    setGlowColorCI(type, enableGlow, glowColor);
 
     std::string_view playerName = "P1";
     if (this == PlayLayer::get()->m_player2) playerName = "P2";
@@ -202,15 +263,23 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
 void CIPlayerObject::refreshColorsCI() {
     auto const& config = getActiveProperties(getGamemode());
     if (config.disabled) return;
+    bool enableGlow = m_fields->m_ogHasGlow;
     if (config.useAll) {
         setColorsCI(getGamemode(), m_fields->m_ogColor1, m_fields->m_ogColor2);
+        setGlowColorCI(getGamemode(), enableGlow, m_fields->m_ogGlowColor);
         return;
     }
     auto const& icon = config.iconSet.at(config.current);
+    if (icon.overrideGlow) enableGlow = icon.glowColor.has_value();
     setColorsCI(
         getGamemode(),
         icon.color1.value_or(m_fields->m_ogColor1),
         icon.color2.value_or(m_fields->m_ogColor2)
+    );
+    setGlowColorCI(
+        getGamemode(),
+        enableGlow,
+        icon.glowColor.value_or(m_fields->m_ogGlowColor)
     );
 }
 
