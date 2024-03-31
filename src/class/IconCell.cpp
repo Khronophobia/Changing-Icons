@@ -64,7 +64,7 @@ bool IconCell::init(
         auto colorLabel = CCLabelBMFont::create("1", "bigFont.fnt");
         // colorLabel->setColor(cc3x(0x7f));
         // colorLabel->setOpacity(127);
-        colorLabel->setScale(0.8f);
+        colorLabel->setScale(0.7f);
         colorLabel->setPosition(color1Display->getContentSize() / 2);
         color1Display->addChild(colorLabel);
     }
@@ -79,7 +79,7 @@ bool IconCell::init(
         auto colorLabel = CCLabelBMFont::create("2", "bigFont.fnt");
         // colorLabel->setColor(cc3x(0x7f));
         // colorLabel->setOpacity(127);
-        colorLabel->setScale(0.8f);
+        colorLabel->setScale(0.7f);
         colorLabel->setPosition(color2Display->getContentSize() / 2);
         color2Display->addChild(colorLabel);
     }
@@ -105,7 +105,7 @@ bool IconCell::init(
         }
 
         auto glowLabel = CCLabelBMFont::create("G", "bigFont.fnt");
-        glowLabel->setScale(0.8f);
+        glowLabel->setScale(0.7f);
         glowLabel->setPosition(glowDisplay->getContentSize() / 2);
         glowDisplay->addChild(glowLabel);
     } else {
