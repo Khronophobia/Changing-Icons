@@ -238,20 +238,7 @@ std::pair<IconType, CITempProperties> CIPlayerObject::setupCIValues(IconType typ
         if (globalConfig.override.useAll) useAll = globalConfig.override.useAll.value();
         if (globalConfig.override.includePlayerIcon) includePlayerIcon = globalConfig.override.includePlayerIcon.value();
     }
-    int index;
-    if (useAll) {
-        switch (order) {
-            case IconOrder::Random: [[fallthrough]];
-            case IconOrder::Forward: index = 1; break;
-            case IconOrder::Backward: index = gm->countForType(type); break;
-        }
-    } else {
-        switch (order) {
-            case IconOrder::Random: [[fallthrough]];
-            case IconOrder::Forward: index = 0; break;
-            case IconOrder::Backward: index = config.iconSet.size() - 1; break;
-        }
-    }
+
     auto iconSet = config.iconSet;
     if (includePlayerIcon && !iconSet.empty()) {
         int playerIconID;
@@ -268,6 +255,21 @@ std::pair<IconType, CITempProperties> CIPlayerObject::setupCIValues(IconType typ
             case IconType::Jetpack: playerIconID = gm->getPlayerJetpack(); break;
         }
         iconSet.push_back(IconProperties{ .iconID = playerIconID });
+    }
+    
+    int index;
+    if (useAll) {
+        switch (order) {
+            case IconOrder::Random: [[fallthrough]];
+            case IconOrder::Forward: index = 1; break;
+            case IconOrder::Backward: index = gm->countForType(type); break;
+        }
+    } else {
+        switch (order) {
+            case IconOrder::Random: [[fallthrough]];
+            case IconOrder::Forward: index = 0; break;
+            case IconOrder::Backward: index = iconSet.size() - 1; break;
+        }
     }
 
     auto properties = CITempProperties{
