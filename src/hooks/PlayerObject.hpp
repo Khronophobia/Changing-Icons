@@ -2,10 +2,6 @@
 #include <Geode/modify/PlayerObject.hpp>
 #include <properties/TempProperties.hpp>
 
-namespace changing_icons {
-    struct CITempProperties;
-}
-
 class $modify(CIPlayerObject, PlayerObject) {
     bool m_levelStarted;
     bool m_ciHasInit;
