@@ -33,4 +33,8 @@ $on_mod(Loaded) {
     if (auto res = file::createDirectoryAll(CIManager::getPresetDir(IconType::Jetpack)); res.isErr()) {
         log::error("Creating jetpack preset directory failed: {}", res.error());
     }
+
+    for (auto const& pair : CIManager::get()->getConfigMap()) {
+        CIManager::get()->refreshUnlockedIcons(pair.first);
+    }
 }

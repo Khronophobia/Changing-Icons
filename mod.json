@@ -23,6 +23,13 @@
 			"version": ">=v1.2.0"
 		}
 	],
+	"settings": {
+		"disable-locked-icons": {
+			"name": "Disable Locked Icons",
+			"type": "bool",
+			"default": true
+		}
+	},
 	"incompatibilities": [
 		{
 			"id": "rooot.custom-gamemode-colors",

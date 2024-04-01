@@ -316,6 +316,13 @@ void AddIconLayer::setupIcons(int page) {
         );
         iconBtn->setTag(iconID);
         m_iconList->addChild(iconBtn);
+        if (
+            !GameManager::get()->isIconUnlocked(iconID, m_iconType) &&
+            Mod::get()->getSettingValue<bool>("disable-locked-icons")
+        ) {
+            iconSpr->changeToLockedState(1.25f);
+            iconBtn->setEnabled(false);
+        }
     }
     m_iconList->updateLayout();
 }

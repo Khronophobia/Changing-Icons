@@ -291,6 +291,9 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
     auto gm = GameManager::get();
     auto& config = getActiveProperties(type);
 
+    auto disableLockedIcons = Mod::get()->getSettingValue<bool>("disable-locked-icons");
+    auto const& unlockedIcons = CIManager::get()->getUnlockedIcons(type);
+
     int color1 = m_fields->m_ogColor1;
     int color2 = m_fields->m_ogColor2;
     int glowColor = m_fields->m_ogGlowColor;
@@ -315,12 +318,22 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
         return iconProps.iconID;
     }
 
+    if (config.useAll && disableLockedIcons && unlockedIcons.size() == 1) {
+        setColorsCI(type, color1, color2);
+        setGlowColorCI(type, enableGlow, glowColor);
+        return unlockedIcons.at(0);
+    }
+
     int start = 0;
     int end = config.iconSet.size() - 1;
     int result;
     if (config.useAll) {
-        start = 1;
-        end = gm->countForType(type);
+        if (disableLockedIcons) {
+            end = unlockedIcons.size() - 1;
+        } else {
+            start = 1;
+            end = gm->countForType(type);
+        }
     }
     switch (config.order) {
     case IconOrder::Random:
@@ -353,7 +366,10 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
     }
 
     int newIcon;
-    if (config.useAll) newIcon = result;
+    if (config.useAll) {
+        if (disableLockedIcons) newIcon = unlockedIcons.at(result);
+        else newIcon = result;
+    }
     else {
         auto const& iconProps = config.iconSet.at(result);
         newIcon = iconProps.iconID;

@@ -21,6 +21,7 @@ namespace changing_icons {
         void onVarTriToggle(CCObject* sender);
         void onOrderButton(CCObject* sender);
         void onAddToOverride(CCObject* sender);
+        void onModSettings(CCObject* sender);
         ~GlobalConfigLayer();
     };
 }

@@ -3,6 +3,7 @@
 #include <class/CCMenuItemTriToggler.hpp>
 #include <class/CCVariableRef.hpp>
 #include "TriTogglerInfoLayer.hpp"
+#include <Geode/ui/GeodeUI.hpp>
 
 using namespace geode::prelude;
 using namespace changing_icons;
@@ -26,6 +27,13 @@ bool GlobalConfigLayer::setup() {
     static_cast<AnchorLayoutOptions*>(m_closeBtn->getLayoutOptions())
         ->setOffset(ccp(10.f, -10.f));
     m_buttonMenu->updateLayout();
+
+    auto modSettingsBtn = CCMenuItemSpriteExtra::create(
+        CCSprite::createWithSpriteFrameName("GJ_optionsBtn_001.png"),
+        this,
+        menu_selector(GlobalConfigLayer::onModSettings)
+    );
+    m_buttonMenu->addChildAtPosition(modSettingsBtn, Anchor::TopRight, ccp(-10.f, -10.f));
 
     auto globalOverrideBg = CCScale9Sprite::create("square02_001.png");
     globalOverrideBg->setAnchorPoint(ccp(0.5f, 0.5f));
@@ -295,6 +303,10 @@ void GlobalConfigLayer::onAddToOverride(CCObject* sender) {
     } else {
         overrideList.insert(type);
     }
+}
+
+void GlobalConfigLayer::onModSettings(CCObject* sender) {
+    openSettingsPopup(Mod::get());
 }
 
 GlobalConfigLayer::~GlobalConfigLayer() {

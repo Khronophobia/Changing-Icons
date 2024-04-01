@@ -1,7 +1,9 @@
 #include "PlayLayer.hpp"
 #include "PlayerObject.hpp"
+#include <class/CIConfigManager.hpp>
 
 using namespace geode::prelude;
+using namespace changing_icons;
 
 void CIPlayLayer::setupHasCompleted() {
     PlayLayer::setupHasCompleted();
