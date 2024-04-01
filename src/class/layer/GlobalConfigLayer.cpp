@@ -29,7 +29,7 @@ bool GlobalConfigLayer::setup() {
     m_buttonMenu->updateLayout();
 
     auto modSettingsBtn = CCMenuItemSpriteExtra::create(
-        CCSprite::createWithSpriteFrameName("GJ_optionsBtn_001.png"),
+        CCSprite::createWithSpriteFrameName("GJ_optionsBtn02_001.png"),
         this,
         menu_selector(GlobalConfigLayer::onModSettings)
     );
