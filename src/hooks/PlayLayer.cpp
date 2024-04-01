@@ -11,7 +11,7 @@ void CIPlayLayer::setupHasCompleted() {
 
     auto startMode = m_levelSettings->m_startMode;
     auto ciPlayer1 = static_cast<CIPlayerObject*>(m_player1);
-    auto ciPlayer2 = static_cast<CIPlayerObject*>(m_player1);
+    auto ciPlayer2 = static_cast<CIPlayerObject*>(m_player2);
     switch (startMode) {
     default: break;
     case 0:
