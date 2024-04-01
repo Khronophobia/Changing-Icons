@@ -1,5 +1,6 @@
 #pragma once
 #include <Geode/modify/PlayerObject.hpp>
+#include <properties/TempProperties.hpp>
 
 namespace changing_icons {
     struct CITempProperties;
@@ -7,6 +8,9 @@ namespace changing_icons {
 
 class $modify(CIPlayerObject, PlayerObject) {
     bool m_levelStarted;
+    bool m_ciHasInit;
+    std::unordered_map<IconType, changing_icons::CITempProperties> m_ciProperties;
+    inline static changing_icons::CITempProperties m_emptyCIProperty = changing_icons::CITempProperties();
     int m_ogColor1 = GameManager::get()->getPlayerColor();
     int m_ogColor2 = GameManager::get()->getPlayerColor2();
     int m_ogGlowColor = GameManager::get()->getPlayerGlowColor();
@@ -42,4 +46,5 @@ class $modify(CIPlayerObject, PlayerObject) {
     int getNextIconCI(IconType type, int originalFrame);
     void refreshColorsCI();
     changing_icons::CITempProperties& getActiveProperties(IconType type);
+    std::pair<IconType, changing_icons::CITempProperties> setupCIValues(IconType type);
 };

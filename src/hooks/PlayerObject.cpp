@@ -1,5 +1,4 @@
 #include "PlayerObject.hpp"
-#include "GJBaseGameLayer.hpp"
 #include <class/CIConfigManager.hpp>
 #include <CIUtilities.hpp>
 #include <Random.hpp>
@@ -84,6 +83,9 @@ void CIPlayerObject::setGlowColorCI(IconType type, bool enable, int color) {
 void CIPlayerObject::switchedToMode(GameObjectType p0) { // Need to do this because updatePlayerRobotFrame
     PlayerObject::switchedToMode(p0);                    // and updatePlayerSpiderFrame are inlined
     if (!PlayLayer::get()) return;
+    if (PlayLayer::get()->m_player1 != this && PlayLayer::get()->m_player2 != this)
+        return;
+
     switch (p0) {
     default: return;
     case GameObjectType::RobotPortal:
@@ -96,63 +98,91 @@ void CIPlayerObject::switchedToMode(GameObjectType p0) { // Need to do this beca
 }
 
 void CIPlayerObject::updatePlayerFrame(int frame) {
-    if (!PlayLayer::get()) {
-        PlayerObject::updatePlayerFrame(frame);
+    PlayerObject::updatePlayerFrame(frame);
+    if (!PlayLayer::get()) return;
+    if (PlayLayer::get()->m_player1 != this && PlayLayer::get()->m_player2 != this)
         return;
-    }
+
     PlayerObject::updatePlayerFrame(getNextIconCI(IconType::Cube, frame));
 }
 
 void CIPlayerObject::updatePlayerShipFrame(int frame) {
-    if (!PlayLayer::get()) {
-        PlayerObject::updatePlayerShipFrame(frame);
+    PlayerObject::updatePlayerShipFrame(frame);
+    if (!PlayLayer::get()) return;
+    if (PlayLayer::get()->m_player1 != this && PlayLayer::get()->m_player2 != this)
         return;
-    }
+
     PlayerObject::updatePlayerShipFrame(getNextIconCI(IconType::Ship, frame));
 }
 
 void CIPlayerObject::updatePlayerJetpackFrame(int frame) {
-    if (!PlayLayer::get()) {
-        PlayerObject::updatePlayerJetpackFrame(frame);
+    PlayerObject::updatePlayerJetpackFrame(frame);
+    if (!PlayLayer::get()) return;
+    if (PlayLayer::get()->m_player1 != this && PlayLayer::get()->m_player2 != this)
         return;
-    }
+
     PlayerObject::updatePlayerJetpackFrame(getNextIconCI(IconType::Jetpack, frame));
 }
 
 void CIPlayerObject::updatePlayerRollFrame(int frame) {
-    if (!PlayLayer::get()) {
-        PlayerObject::updatePlayerRollFrame(frame);
+    PlayerObject::updatePlayerRollFrame(frame);
+    if (!PlayLayer::get()) return;
+    if (PlayLayer::get()->m_player1 != this && PlayLayer::get()->m_player2 != this)
         return;
-    }
+
     PlayerObject::updatePlayerRollFrame(getNextIconCI(IconType::Ball, frame));
 }
 
 void CIPlayerObject::updatePlayerBirdFrame(int frame) {
-    if (!PlayLayer::get()) {
-        PlayerObject::updatePlayerBirdFrame(frame);
+    PlayerObject::updatePlayerBirdFrame(frame);
+    if (!PlayLayer::get()) return;
+    if (PlayLayer::get()->m_player1 != this && PlayLayer::get()->m_player2 != this)
         return;
-    }
+
     PlayerObject::updatePlayerBirdFrame(getNextIconCI(IconType::Ufo, frame));
 }
 
 void CIPlayerObject::updatePlayerDartFrame(int frame) {
-    if (!PlayLayer::get()) {
-        PlayerObject::updatePlayerDartFrame(frame);
+    PlayerObject::updatePlayerDartFrame(frame);
+    if (!PlayLayer::get()) return;
+    if (PlayLayer::get()->m_player1 != this && PlayLayer::get()->m_player2 != this)
         return;
-    }
+
     PlayerObject::updatePlayerDartFrame(getNextIconCI(IconType::Wave, frame));
 }
 
 void CIPlayerObject::updatePlayerSwingFrame(int frame) {
-    if (!PlayLayer::get()) {
-        PlayerObject::updatePlayerSwingFrame(frame);
+    PlayerObject::updatePlayerSwingFrame(frame);
+    if (!PlayLayer::get()) return;
+    if (PlayLayer::get()->m_player1 != this && PlayLayer::get()->m_player2 != this)
         return;
-    }
+
     PlayerObject::updatePlayerSwingFrame(getNextIconCI(IconType::Swing, frame));
 }
 
 void CIPlayerObject::resetObject() { // I need something that gets called after init,
     PlayerObject::resetObject();     // And this seems the closest to what I want
+    if (!PlayLayer::get()) return;
+    if (PlayLayer::get()->m_player1 != this && PlayLayer::get()->m_player2 != this)
+        return;
+
+    if (!m_fields->m_ciHasInit) {
+        m_fields->m_ciProperties = {
+            setupCIValues(IconType::Cube),
+            setupCIValues(IconType::Ship),
+            setupCIValues(IconType::Ball),
+            setupCIValues(IconType::Ufo),
+            setupCIValues(IconType::Wave),
+            setupCIValues(IconType::Robot),
+            setupCIValues(IconType::Spider),
+            setupCIValues(IconType::Swing),
+            setupCIValues(IconType::Jetpack)
+        };
+
+        log::info("CI values initialized");
+        m_fields->m_ciHasInit = true;
+    }
+
     if (m_fields->m_levelStarted) refreshColorsCI();
 }
 
@@ -284,9 +314,70 @@ void CIPlayerObject::refreshColorsCI() {
 }
 
 CITempProperties& CIPlayerObject::getActiveProperties(IconType type) {
-    auto ciGameLayer = static_cast<CIBaseGameLayer*>(m_gameLayer);
-    if (this == PlayLayer::get()->m_player1)
-        return ciGameLayer->m_fields->m_player1CIProperties.at(type);
-    else
-        return ciGameLayer->m_fields->m_player2CIProperties.at(type);
+    if (m_fields->m_ciProperties.contains(type))
+        return m_fields->m_ciProperties.at(type);
+
+    return m_fields->m_emptyCIProperty;
+}
+
+std::pair<IconType, CITempProperties> CIPlayerObject::setupCIValues(IconType type) {
+    auto gm = GameManager::get();
+    auto const& config = CIConfigManager::get()->getConfig(type);
+    auto const& globalConfig = CIConfigManager::get()->getGlobalConfig();
+
+    auto order = config.order;
+    auto disabled = config.disabled;
+    auto useAll = config.useAll;
+    auto includePlayerIcon = config.includePlayerIcon;
+    auto mirrorEnd = config.mirrorEnd;
+    if (globalConfig.globalOverrides.find(type) != globalConfig.globalOverrides.end()) {
+        log::info("Gamemode {} listed in global overrides", static_cast<int>(type));
+        if (globalConfig.override.order) order = globalConfig.override.order.value();
+        if (globalConfig.override.disabled) disabled = globalConfig.override.disabled.value();
+        if (globalConfig.override.useAll) useAll = globalConfig.override.useAll.value();
+        if (globalConfig.override.includePlayerIcon) includePlayerIcon = globalConfig.override.includePlayerIcon.value();
+    }
+    int index;
+    if (useAll) {
+        switch (order) {
+            case IconOrder::Random: [[fallthrough]];
+            case IconOrder::Forward: index = 1; break;
+            case IconOrder::Backward: index = gm->countForType(type); break;
+        }
+    } else {
+        switch (order) {
+            case IconOrder::Random: [[fallthrough]];
+            case IconOrder::Forward: index = 0; break;
+            case IconOrder::Backward: index = config.iconSet.size() - 1; break;
+        }
+    }
+    auto iconSet = config.iconSet;
+    if (includePlayerIcon && !iconSet.empty()) {
+        int playerIconID;
+        switch (type) {
+            default:
+            case IconType::Cube: playerIconID = gm->getPlayerFrame(); break;
+            case IconType::Ship: playerIconID = gm->getPlayerShip(); break;
+            case IconType::Ball: playerIconID = gm->getPlayerBall(); break;
+            case IconType::Ufo: playerIconID = gm->getPlayerBird(); break;
+            case IconType::Wave: playerIconID = gm->getPlayerDart(); break;
+            case IconType::Robot: playerIconID = gm->getPlayerRobot(); break;
+            case IconType::Spider: playerIconID = gm->getPlayerSpider(); break;
+            case IconType::Swing: playerIconID = gm->getPlayerSwing(); break;
+            case IconType::Jetpack: playerIconID = gm->getPlayerJetpack(); break;
+        }
+        iconSet.push_back(IconProperties{ .iconID = playerIconID });
+    }
+
+    auto properties = CITempProperties{
+        .current = index,
+        .index = index,
+        .iconSet = iconSet,
+        .order = order,
+        .useAll = useAll,
+        .mirrorEnd = mirrorEnd,
+        .disabled = disabled
+    };
+
+    return {type, properties};
 }
