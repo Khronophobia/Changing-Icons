@@ -69,7 +69,7 @@ bool LoadPresetLayer::setup(IconConfigLayer* configLayer, IconType type) {
 }
 
 void LoadPresetLayer::refreshSets(bool toTop) {
-    auto res = file::readDirectory(CIConfigManager::getPresetDir(m_iconType));
+    auto res = file::readDirectory(CIManager::getPresetDir(m_iconType));
     if (res.isErr()) {
         log::error("{}", res.error());
         return;
@@ -149,7 +149,7 @@ void LoadPresetLayer::loadPreset(CIPreset const& preset) {
 }
 
 void LoadPresetLayer::deletePreset(ghc::filesystem::path const& filename) {
-    auto presetDir = CIConfigManager::getPresetDir(m_iconType) / filename.filename();
+    auto presetDir = CIManager::getPresetDir(m_iconType) / filename.filename();
     std::error_code error;
     if (!ghc::filesystem::remove(presetDir, error)) {
         log::error("Error deleting {}: {}", filename.filename(), error);

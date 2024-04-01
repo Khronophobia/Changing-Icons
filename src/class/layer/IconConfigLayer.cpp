@@ -24,7 +24,7 @@ IconConfigLayer* IconConfigLayer::create() {
 }
 
 bool IconConfigLayer::setup() {
-    m_configManager = CIConfigManager::get();
+    m_configManager = CIManager::get();
 
     m_noElasticity = true;
     m_currentTab = m_configManager->getGlobalConfig().currentTab;

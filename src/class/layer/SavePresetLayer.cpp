@@ -78,7 +78,7 @@ void SavePresetLayer::onSave(CCObject*) {
         return;
     }
 
-    auto presetDir = CIConfigManager::getPresetDir(m_iconType);
+    auto presetDir = CIManager::getPresetDir(m_iconType);
     presetDir /= name + ".json";
     if (ghc::filesystem::exists(presetDir)) {
         createQuickPopup(

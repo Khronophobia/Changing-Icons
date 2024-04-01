@@ -3,16 +3,16 @@
 using namespace geode::prelude;
 using namespace changing_icons;
 
-CIConfigManager* CIConfigManager::get() {
+CIManager* CIManager::get() {
     if (!m_sharedInstance) {
-        m_sharedInstance = new CIConfigManager();
+        m_sharedInstance = new CIManager();
         m_sharedInstance->init();
     }
 
     return m_sharedInstance;
 }
 
-bool CIConfigManager::init() {
+bool CIManager::init() {
     m_globalConfig = Mod::get()->getSavedValue<CIGlobalProperties>("global");
     m_cubeConfig = Mod::get()->getSavedValue<CITabProperties>("cube");
     m_shipConfig = Mod::get()->getSavedValue<CITabProperties>("ship");
@@ -27,11 +27,11 @@ bool CIConfigManager::init() {
     return true;
 }
 
-CIGlobalProperties& CIConfigManager::getGlobalConfig() {
+CIGlobalProperties& CIManager::getGlobalConfig() {
     return m_globalConfig;
 }
 
-CITabProperties& CIConfigManager::getConfig(IconType type) {
+CITabProperties& CIManager::getConfig(IconType type) {
     switch (type) {
         default:
         case IconType::Cube: return m_cubeConfig;
@@ -46,7 +46,7 @@ CITabProperties& CIConfigManager::getConfig(IconType type) {
     }
 }
 
-ghc::filesystem::path CIConfigManager::getPresetDir(IconType type) {
+ghc::filesystem::path CIManager::getPresetDir(IconType type) {
     auto presetDir = Mod::get()->getConfigDir() / "icon-sets";
     switch (type) {
         default:

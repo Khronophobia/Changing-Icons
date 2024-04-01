@@ -5,7 +5,7 @@ namespace changing_icons {
     enum class IconOrder;
     struct CITabProperties;
     struct IconProperties;
-    class CIConfigManager;
+    class CIManager;
 
     class IconConfigLayer : public geode::Popup<> {
     protected:
@@ -17,7 +17,7 @@ namespace changing_icons {
         CCMenuItemToggler* m_useAllBtn;
         CCMenuItemToggler* m_includePlayerBtn;
         CCMenuItemToggler* m_mirrorEndBtn;
-        CIConfigManager* m_configManager;
+        CIManager* m_configManager;
         cocos2d::CCMenu* m_iconOrderMenu;
         
         bool setup() override;

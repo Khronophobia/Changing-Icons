@@ -18,7 +18,7 @@ GlobalConfigLayer* GlobalConfigLayer::create() {
 }
 
 bool GlobalConfigLayer::setup() {
-    m_configManager = CIConfigManager::get();
+    m_configManager = CIManager::get();
     m_noElasticity = true;
     this->setTitle("Global Overrides");
     auto& globalConfig = m_configManager->getGlobalConfig();

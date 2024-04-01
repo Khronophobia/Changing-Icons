@@ -2,9 +2,9 @@
 #include <properties/ConfigProperties.hpp>
 
 namespace changing_icons {
-    class CIConfigManager : public cocos2d::CCObject {
+    class CIManager : public cocos2d::CCObject {
     protected:
-        inline static CIConfigManager* m_sharedInstance = nullptr;
+        inline static CIManager* m_sharedInstance = nullptr;
         CIGlobalProperties m_globalConfig;
         CITabProperties m_cubeConfig;
         CITabProperties m_shipConfig;
@@ -18,7 +18,7 @@ namespace changing_icons {
         bool init();
     public:
         // Get the shared instance of CIConfigManager
-        static CIConfigManager* get();
+        static CIManager* get();
         CIGlobalProperties& getGlobalConfig();
         CITabProperties& getConfig(IconType type);
         static ghc::filesystem::path getPresetDir(IconType type);

@@ -3,11 +3,11 @@
 
 namespace changing_icons {
     enum class IconOrder;
-    class CIConfigManager;
+    class CIManager;
 
     class GlobalConfigLayer : public geode::Popup<> {
     protected:
-        CIConfigManager* m_configManager;
+        CIManager* m_configManager;
         cocos2d::CCLabelBMFont* m_iconOrderLabel;
         cocos2d::CCMenu* m_iconOrderMenu;
         cocos2d::CCMenu* m_gamemodeBar;

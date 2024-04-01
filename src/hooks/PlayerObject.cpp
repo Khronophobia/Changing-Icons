@@ -223,8 +223,8 @@ CITempProperties& CIPlayerObject::getActiveProperties(IconType type) {
 
 std::pair<IconType, CITempProperties> CIPlayerObject::setupCIValues(IconType type) {
     auto gm = GameManager::get();
-    auto const& config = CIConfigManager::get()->getConfig(type);
-    auto const& globalConfig = CIConfigManager::get()->getGlobalConfig();
+    auto const& config = CIManager::get()->getConfig(type);
+    auto const& globalConfig = CIManager::get()->getGlobalConfig();
 
     auto order = config.order;
     auto disabled = config.disabled;
