@@ -125,6 +125,7 @@ void CIPlayerObject::switchedToMode(GameObjectType p0) { // Need to do this beca
         PlayerObject::updatePlayerSpiderFrame(getNextIconCI(IconType::Spider, GameManager::get()->getPlayerSpider()));
         break;
     }
+    PlayerObject::updateGlowColor();
 }
 
 $override
