@@ -4,7 +4,7 @@
 namespace changing_icons {
     class CIManager : public cocos2d::CCObject {
     protected:
-        inline static CIManager* m_sharedInstance = nullptr;
+        inline static CIManager* s_sharedInstance = nullptr;
         CIGlobalProperties m_globalConfig;
         std::unordered_map<IconType, CITabProperties> m_iconConfigs;
         /* CITabProperties m_cubeConfig;

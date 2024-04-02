@@ -4,12 +4,12 @@ using namespace geode::prelude;
 using namespace changing_icons;
 
 CIManager* CIManager::get() {
-    if (!m_sharedInstance) {
-        m_sharedInstance = new CIManager();
-        m_sharedInstance->init();
+    if (!s_sharedInstance) {
+        s_sharedInstance = new CIManager();
+        s_sharedInstance->init();
     }
 
-    return m_sharedInstance;
+    return s_sharedInstance;
 }
 
 bool CIManager::init() {

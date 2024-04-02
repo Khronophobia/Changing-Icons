@@ -218,7 +218,7 @@ CITempProperties& CIPlayerObject::getActiveProperties(IconType type) {
     if (m_fields->m_ciProperties.contains(type))
         return m_fields->m_ciProperties.at(type);
 
-    return m_fields->m_emptyCIProperty;
+    return m_fields->s_emptyCIProperty;
 }
 
 std::pair<IconType, CITempProperties> CIPlayerObject::setupCIValues(IconType type) {
