@@ -33,10 +33,10 @@ namespace changing_icons {
         CCMenuItemToggler* m_overrideGlowBtn;
         int m_selectedColorType;
         cocos2d::CCSprite* m_selectedColorSpr;
+        cocos2d::CCMenu* m_colorMenu;
 
         bool setup(IconType iconType, IconConfigLayer* configLayer, IconProperties iconProps, std::optional<int> index) override;
         void setupIcons(int page);
-        UnlockType convertIconType(IconType type) const;
         void setIconColor(std::optional<int> color, int colorType);
         void updateIconColors();
     public:

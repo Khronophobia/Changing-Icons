@@ -234,16 +234,16 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
     m_selectedColorSpr->setPosition(m_color1Btn->getPosition());
     m_mainLayer->addChild(m_selectedColorSpr);
 
-    auto colorMenu = CCMenu::create();
-    colorMenu->ignoreAnchorPointForPosition(false);
-    colorMenu->setContentSize(ccp(450.f, 160.f));
-    colorMenu->setLayout(
+    m_colorMenu = CCMenu::create();
+    m_colorMenu->ignoreAnchorPointForPosition(false);
+    m_colorMenu->setContentSize(ccp(450.f, 160.f));
+    m_colorMenu->setLayout(
         RowLayout::create()
             ->setGap(2.f)
             ->setGrowCrossAxis(true)
             ->setCrossAxisOverflow(false)
     );
-    m_mainLayer->addChildAtPosition(colorMenu, Anchor::Center, ccp(0.f, -30.f));
+    m_mainLayer->addChildAtPosition(m_colorMenu, Anchor::Center, ccp(0.f, -30.f));
 
     std::array<int, constants::COLOR_COUNT + 1> constexpr colorOrder{
         51, 19, 48, 9, 37, 53, 54, 55, 25, 56, 57, 58,
@@ -260,15 +260,29 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
         auto spr = ColorChannelSprite::create();
         spr->setScale(0.8f);
         spr->setColor(GameManager::get()->colorForIdx(ID));
+        auto lockSpr = CCSprite::createWithSpriteFrameName("GJ_lockGray_001.png");
+        lockSpr->setScale(0.8f);
+        lockSpr->setPosition(spr->getContentSize() / 2);
+        spr->addChild(lockSpr);
+
         auto btn = CCMenuItemSpriteExtra::create(
             spr,
             this,
             menu_selector(AddIconLayer::onSelectColor)
         );
         btn->setTag(ID);
-        colorMenu->addChild(btn);
+        m_colorMenu->addChild(btn);
+
+        if (
+            !GameManager::get()->isColorUnlocked(ID, UnlockType::Col1) &&
+            Mod::get()->getSettingValue<bool>("disable-locked-icons")
+        ) {
+            btn->setEnabled(false);
+        } else {
+            lockSpr->setVisible(false);
+        }
     }
-    colorMenu->updateLayout();
+    m_colorMenu->updateLayout();
 
     auto clearColorSpr = CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png");
     clearColorSpr->setScale(0.8f);
@@ -286,7 +300,7 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
     m_colorPageNodes->addObject(m_overrideGlowBtn);
     m_colorPageNodes->addObject(overrideGlowLabel);
     m_colorPageNodes->addObject(m_selectedColorSpr);
-    m_colorPageNodes->addObject(colorMenu);
+    m_colorPageNodes->addObject(m_colorMenu);
     m_colorPageNodes->addObject(clearColorBtn);
 
     for (auto& node : CCArrayExt<CCNode*>(m_colorPageNodes)) node->setVisible(false);
@@ -305,7 +319,9 @@ void AddIconLayer::setupIcons(int page) {
     ) {
         auto iconID = i + page * constants::ICONS_PER_PAGE;
         if (iconID > iconAmount) break;
-        auto iconSpr = GJItemIcon::createBrowserItem(convertIconType(m_iconType), iconID);
+        auto iconSpr = GJItemIcon::createBrowserItem(
+            GameManager::get()->iconTypeToUnlockType(m_iconType), iconID
+        );
         auto iconBtn = CCMenuItemSpriteExtra::create(
             iconSpr,
             this,
@@ -325,21 +341,6 @@ void AddIconLayer::setupIcons(int page) {
         }
     }
     m_iconList->updateLayout();
-}
-
-UnlockType AddIconLayer::convertIconType(IconType type) const {
-    switch (type) {
-        default:
-        case IconType::Cube: return UnlockType::Cube;
-        case IconType::Ship: return UnlockType::Ship;
-        case IconType::Ball: return UnlockType::Ball;
-        case IconType::Ufo: return UnlockType::Bird;
-        case IconType::Wave: return UnlockType::Dart;
-        case IconType::Robot: return UnlockType::Robot;
-        case IconType::Spider: return UnlockType::Spider;
-        case IconType::Swing: return UnlockType::Swing;
-        case IconType::Jetpack: return UnlockType::Jetpack;
-    }
 }
 
 void AddIconLayer::setIconColor(std::optional<int> color, int colorType) {
@@ -440,10 +441,32 @@ void AddIconLayer::onAddIcon(CCObject* sender) {
 
 void AddIconLayer::onColorType(CCObject* sender) {
     m_selectedColorType = sender->getTag();
+    UnlockType colorUnlockType;
     switch (m_selectedColorType) {
-        case 0: m_selectedColorSpr->setPosition(m_color1Btn->getPosition()); break;
-        case 1: m_selectedColorSpr->setPosition(m_color2Btn->getPosition()); break;
-        case 2: m_selectedColorSpr->setPosition(m_glowColorBtn->getPosition()); break;
+    case 0:
+        m_selectedColorSpr->setPosition(m_color1Btn->getPosition());
+        colorUnlockType = UnlockType::Col1;
+        break;
+    case 1:
+        m_selectedColorSpr->setPosition(m_color2Btn->getPosition());
+        colorUnlockType = UnlockType::Col2;
+        break;
+    case 2:
+        m_selectedColorSpr->setPosition(m_glowColorBtn->getPosition());
+        colorUnlockType = UnlockType::Col2;
+        break;
+    }
+    if (Mod::get()->getSettingValue<bool>("disable-locked-icons")) {
+        for (auto& btn : CCArrayExt<CCMenuItemSpriteExtra*>(m_colorMenu->getChildren())) {
+            auto lockSpr = getChildOfType<CCSprite>(btn->getNormalImage(), 0);
+            if (!GameManager::get()->isColorUnlocked(btn->getTag(), colorUnlockType)) {
+                lockSpr->setVisible(true);
+                btn->setEnabled(false);
+            } else {
+                lockSpr->setVisible(false);
+                btn->setEnabled(true);
+            }
+        }
     }
 }
 
