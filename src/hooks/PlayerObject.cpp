@@ -392,13 +392,8 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
 
 void CIPlayerObject::refreshColorsCI() {
     auto const& config = getActiveProperties(getGamemode());
-    if (config.disabled) return;
+    if (config.disabled || config.useAll || config.iconSet.empty()) return;
     bool enableGlow = m_fields->m_ogHasGlow;
-    if (config.useAll) {
-        setColorsCI(getGamemode(), m_fields->m_ogColor1, m_fields->m_ogColor2);
-        setGlowColorCI(getGamemode(), enableGlow, m_fields->m_ogGlowColor);
-        return;
-    }
     auto const& icon = config.iconSet.at(config.current);
     if (icon.overrideGlow) enableGlow = icon.glowColor.has_value();
     setColorsCI(
