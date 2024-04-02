@@ -6,6 +6,13 @@ using namespace geode::prelude;
 using namespace changing_icons;
 
 void CIPlayLayer::setupHasCompleted() {
+    if (Mod::get()->getSettingValue<bool>("disable-locked-icons")) {
+        for (auto const& pair : CIManager::get()->getConfigMap()) {
+            CIManager::get()->refreshUnlockedIcons(pair.first);
+        }
+        log::info("Unlocked icons refreshed");
+    }
+
     PlayLayer::setupHasCompleted();
 
     static_cast<CIPlayerObject*>(m_player1)->m_fields->m_levelStarted = true;
