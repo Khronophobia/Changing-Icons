@@ -6,6 +6,7 @@ namespace changing_icons {
     struct CITabProperties;
     struct IconProperties;
     class CIManager;
+    class DropdownMenu;
 
     class IconConfigLayer : public geode::Popup<> {
     protected:
@@ -18,12 +19,10 @@ namespace changing_icons {
         CCMenuItemToggler* m_includePlayerBtn;
         CCMenuItemToggler* m_mirrorEndBtn;
         CIManager* m_configManager;
-        cocos2d::CCMenu* m_iconOrderMenu;
+        DropdownMenu* m_iconOrderDropdown;
         
         bool setup() override;
         void refreshTab();
-        void setOrderChoice(IconOrder choice);
-        void setOrderChoice(int choice);
         void refreshIconList(IconType currentTab, bool toTop = false);
         ~IconConfigLayer();
     public:
@@ -34,7 +33,7 @@ namespace changing_icons {
         void onSwitchTab(CCObject*);
         void onVarInfo(CCObject*);
         void onVarToggle(CCObject*);
-        void onOrderButton(CCObject*);
+        void onOrderDropdown(CCObject*);
         void onAddIcon(CCObject*);
         void onClearList(CCObject*);
         void onSaveList(CCObject*);

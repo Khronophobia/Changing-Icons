@@ -10,6 +10,7 @@ file(GLOB SOURCES
     src/*.cpp
     src/class/*.cpp
     src/class/layer/*.cpp
+    src/class/dropdown/*.cpp
     src/hooks/*.cpp
     src/properties/*.cpp
 )
