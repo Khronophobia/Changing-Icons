@@ -3,6 +3,7 @@
 namespace changing_icons {
     class DropdownChoice : public cocos2d::CCMenuItem {
     protected:
+        float m_width;
         bool m_isSelecting;
         bool m_selected;
 

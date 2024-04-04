@@ -18,6 +18,7 @@ bool DropdownChoice::init(char const* str, float width, CCObject* target, SEL_Me
     if (!CCMenuItem::initWithTarget(target, callback)) return false;
     this->setContentSize(ccp(width, 24.f));
     m_selected = selected;
+    m_width = width;
 
     m_background = CCLayerColor::create({0, 0, 0, 127});
     m_background->setContentSize(m_obContentSize);
@@ -51,6 +52,7 @@ void DropdownChoice::setSelected(bool selected) {
 
 void DropdownChoice::setLabelText(char const* str) {
     m_label->setString(str);
+    m_label->limitLabelWidth(m_width - 30.f, 0.6f, 0.1f);
 }
 
 void DropdownChoice::selected() {

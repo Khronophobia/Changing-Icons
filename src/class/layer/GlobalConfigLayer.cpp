@@ -2,6 +2,7 @@
 #include <class/CIConfigManager.hpp>
 #include <class/CCMenuItemTriToggler.hpp>
 #include <class/CCVariableRef.hpp>
+#include <class/dropdown/DropdownMenu.hpp>
 #include "TriTogglerInfoLayer.hpp"
 #include <Geode/ui/GeodeUI.hpp>
 
@@ -85,6 +86,22 @@ bool GlobalConfigLayer::setup() {
     useAllBtn->setUserObject(CCVariableRef<std::optional<bool>>::create(globalConfig.override.useAll));
     globalOverrideMenu->addChildAtPosition(useAllBtn, Anchor::Left, ccp(20.f, toggleYPos - toggleOffset));
 
+    auto iconOrderLabel = CCLabelBMFont::create("Order", "bigFont.fnt");
+    iconOrderLabel->setAnchorPoint(ccp(0.f, 0.5f));
+    iconOrderLabel->setScale(0.6f);
+    globalOverrideBg->addChildAtPosition(iconOrderLabel, Anchor::Left, ccp(12.f, 8.f));
+
+    m_iconOrderDropdown = DropdownMenu::create(
+        {"Random", "Forward", "Backward", "Don't Override"},
+        120.f,
+        this, menu_selector(GlobalConfigLayer::onOrderDropdown)
+    );
+    m_iconOrderDropdown->setAnchorPoint(ccp(1.f, 0.5f));
+    m_iconOrderDropdown->setScale(0.9f);
+    globalOverrideBg->addChildAtPosition(m_iconOrderDropdown, Anchor::Right, ccp(-12.f, 8.f));
+
+    auto constexpr listCheckboxYPos = -20.f;
+
     auto includePlayerBtn = CCMenuItemTriToggler::createWithLabel(
         CCSprite::create("CI_checkDisabled.png"_spr),
         CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png"),
@@ -95,47 +112,7 @@ bool GlobalConfigLayer::setup() {
         0.6f
     );
     includePlayerBtn->setUserObject(CCVariableRef<std::optional<bool>>::create(globalConfig.override.includePlayerIcon));
-    globalOverrideMenu->addChildAtPosition(includePlayerBtn, Anchor::Left, ccp(20.f, toggleYPos - toggleOffset * 2));
-
-    auto constexpr iconOrderYPos = -3.f;
-    auto iconOrderLabel = CCLabelBMFont::create("Icon Order", "goldFont.fnt");
-    iconOrderLabel->setScale(0.65f);
-    globalOverrideBg->addChildAtPosition(iconOrderLabel, Anchor::Center, ccp(0.f, iconOrderYPos));
-
-    m_iconOrderMenu = CCMenu::create();
-    m_iconOrderMenu->ignoreAnchorPointForPosition(false);
-    m_iconOrderMenu->setContentSize(ccp(20.f, 20.f));
-    globalOverrideBg->addChildAtPosition(m_iconOrderMenu, Anchor::Center, ccp(0.f, iconOrderYPos - 22.f));
-
-    auto randomOrderSpr = ButtonSprite::create("Random", "bigFont.fnt", "GJ_button_04.png");
-    randomOrderSpr->setScale(0.5f);
-    auto randomOrderBtn = CCMenuItemSpriteExtra::create(
-        randomOrderSpr,
-        this,
-        menu_selector(GlobalConfigLayer::onOrderButton)
-    );
-    randomOrderBtn->setTag(0);
-    m_iconOrderMenu->addChildAtPosition(randomOrderBtn, Anchor::Center);
-
-    auto forwardOrderSpr = ButtonSprite::create("Forward", "bigFont.fnt", "GJ_button_04.png");
-    forwardOrderSpr->setScale(0.5f);
-    auto forwardOrderBtn = CCMenuItemSpriteExtra::create(
-        forwardOrderSpr,
-        this,
-        menu_selector(GlobalConfigLayer::onOrderButton)
-    );
-    forwardOrderBtn->setTag(1);
-    m_iconOrderMenu->addChildAtPosition(forwardOrderBtn, Anchor::Center, ccp(-45.f, -20.f));
-
-    auto backwardOrderSpr = ButtonSprite::create("Backward", "bigFont.fnt", "GJ_button_04.png");
-    backwardOrderSpr->setScale(0.5f);
-    auto backwardOrderBtn = CCMenuItemSpriteExtra::create(
-        backwardOrderSpr,
-        this,
-        menu_selector(GlobalConfigLayer::onOrderButton)
-    );
-    backwardOrderBtn->setTag(2);
-    m_iconOrderMenu->addChildAtPosition(backwardOrderBtn, Anchor::Center, ccp(45.f, -20.f));
+    globalOverrideMenu->addChildAtPosition(includePlayerBtn, Anchor::Left, ccp(20.f, listCheckboxYPos));
 
     auto mirrorEndBtn = CCMenuItemTriToggler::createWithLabel(
         CCSprite::create("CI_checkDisabled.png"_spr),
@@ -147,7 +124,7 @@ bool GlobalConfigLayer::setup() {
         0.6f
     );
     mirrorEndBtn->setUserObject(CCVariableRef<std::optional<bool>>::create(globalConfig.override.mirrorEnd));
-    globalOverrideMenu->addChildAtPosition(mirrorEndBtn, Anchor::Left, ccp(20.f, -70.f));
+    globalOverrideMenu->addChildAtPosition(mirrorEndBtn, Anchor::Left, ccp(20.f, listCheckboxYPos - toggleOffset));
 
     m_gamemodeBar = CCMenu::create();
     m_gamemodeBar->setTouchPriority(CCTouchDispatcher::get()->getForcePrio() - 1);
@@ -240,9 +217,12 @@ bool GlobalConfigLayer::setup() {
     // Initialize values
     disableBtn->setState(globalConfig.override.disabled);
     useAllBtn->setState(globalConfig.override.useAll);
+    if (globalConfig.override.order) {
+        m_iconOrderDropdown->setChoice(static_cast<int>(globalConfig.override.order.value()));
+    } else {
+        m_iconOrderDropdown->setChoice(3);
+    }
     includePlayerBtn->setState(globalConfig.override.includePlayerIcon);
-    if (globalConfig.override.order)
-        setOrderChoice(globalConfig.override.order.value());
     mirrorEndBtn->setState(globalConfig.override.mirrorEnd);
     for (auto btn : CCArrayExt<CCMenuItemToggler*>(m_gamemodeBar->getChildren())) {
         auto btnType = static_cast<IconType>(btn->getTag());
@@ -268,35 +248,12 @@ void GlobalConfigLayer::onVarTriToggle(CCObject* sender) {
     }
 }
 
-void GlobalConfigLayer::onOrderButton(CCObject* sender) {
-    auto& overrideVars = m_configManager->getGlobalConfig().override;
-    auto btn = static_cast<CCMenuItemSpriteExtra*>(sender);
-    auto spr = static_cast<ButtonSprite*>(btn->getNormalImage());
-    if (static_cast<IconOrder>(btn->getTag()) == overrideVars.order) {
-        overrideVars.order = std::nullopt;
-        spr->updateBGImage("GJ_button_04.png");
-        btn->setContentSize(spr->getScaledContentSize());
-        spr->setPosition(btn->getContentSize() / 2);
-        return;
-    }
-    overrideVars.order = static_cast<IconOrder>(btn->getTag());
-    setOrderChoice(btn->getTag());
-}
-
-void GlobalConfigLayer::setOrderChoice(IconOrder choice) {
-    GlobalConfigLayer::setOrderChoice(static_cast<int>(choice));
-}
-
-void GlobalConfigLayer::setOrderChoice(int choice) {
-    for (auto btn : CCArrayExt<CCMenuItemSpriteExtra*>(m_iconOrderMenu->getChildren())) {
-        auto spr = static_cast<ButtonSprite*>(btn->getNormalImage());
-        if (btn->getTag() == choice)
-            spr->updateBGImage("GJ_button_01.png");
-        else
-            spr->updateBGImage("GJ_button_04.png");
-        // I need to do this for some reason??
-        btn->setContentSize(spr->getScaledContentSize());
-        spr->setPosition(btn->getContentSize() / 2);
+void GlobalConfigLayer::onOrderDropdown(CCObject* sender) {
+    auto& globalConfig = m_configManager->getGlobalConfig();
+    if (sender->getTag() == 3) {
+        globalConfig.override.order = std::nullopt;
+    } else {
+        globalConfig.override.order = static_cast<IconOrder>(sender->getTag());
     }
 }
 
