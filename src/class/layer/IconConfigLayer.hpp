@@ -17,6 +17,7 @@ namespace changing_icons {
         CCMenuItemToggler* m_disableBtn;
         CCMenuItemToggler* m_useAllBtn;
         CCMenuItemToggler* m_includePlayerBtn;
+        CCMenuItemToggler* m_shuffleListBtn;
         CCMenuItemToggler* m_mirrorEndBtn;
         CIManager* m_configManager;
         DropdownMenu* m_iconOrderDropdown;

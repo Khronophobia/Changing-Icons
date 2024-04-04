@@ -193,16 +193,30 @@ bool IconConfigLayer::setup() {
         "Include the player's icon on the <cy>list</c>."
     );
 
-    m_mirrorEndBtn = utils::createToggleButton(
+    m_shuffleListBtn = utils::createToggleButton(
         m_buttonMenu, m_mainLayer,
         Anchor::TopLeft, ccp(30.f, listCheckboxYPos - listCheckboxOffset),
+        "Shuffle List",
+        this, menu_selector(IconConfigLayer::onVarToggle), 0.6f
+    );
+    auto shuffleListInfoBtn = utils::createToggleInfo(
+        m_buttonMenu, m_shuffleListBtn,
+        this, menu_selector(IconConfigLayer::onVarInfo),
+        "An alternative to setting <cy>Order</c> to <cj>Random</c>. "
+        "Shuffle the list during level start.\n"
+        "(You can also enable this and set <cy>Order</c> to <cj>Random</c>, but why would you do that?)"
+    );
+
+    m_mirrorEndBtn = utils::createToggleButton(
+        m_buttonMenu, m_mainLayer,
+        Anchor::TopLeft, ccp(30.f, listCheckboxYPos - listCheckboxOffset * 2),
         "Mirror After End",
         this, menu_selector(IconConfigLayer::onVarToggle), 0.6f
     );
     auto mirrorEndInfoBtn = utils::createToggleInfo(
         m_buttonMenu, m_mirrorEndBtn,
         this, menu_selector(IconConfigLayer::onVarInfo),
-        "Only applicable when <cy>Order</c> is set to <cj>Up</c> or <cj>Down</c>. "
+        "Only applicable when <cy>Order</c> is set to <cj>Forward</c> or <cj>Backward</c>. "
         "Mirror the list when reaching the end instead of wrapping around."
     );
 
@@ -298,6 +312,8 @@ void IconConfigLayer::refreshTab() {
     m_iconOrderDropdown->setChoice(static_cast<int>(currentConfig.order));
     m_includePlayerBtn->toggle(currentConfig.includePlayerIcon);
     m_includePlayerBtn->setUserObject(CCVariableRef<bool>::create(currentConfig.includePlayerIcon));
+    m_shuffleListBtn->toggle(currentConfig.shuffleList);
+    m_shuffleListBtn->setUserObject(CCVariableRef<bool>::create(currentConfig.shuffleList));
     m_mirrorEndBtn->toggle(currentConfig.mirrorEnd);
     m_mirrorEndBtn->setUserObject(CCVariableRef<bool>::create(currentConfig.mirrorEnd));
 
