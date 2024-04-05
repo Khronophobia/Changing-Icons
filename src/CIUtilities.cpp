@@ -95,8 +95,10 @@ fmt::appender fmt::formatter<IconType>::format(IconType type, format_context& ct
 
 fmt::appender fmt::formatter<IconOrder>::format(IconOrder order, format_context& ctx) const {
     switch(order) {
+        default: return formatter<string_view>::format("Unknown", ctx);
         case IconOrder::Random: return formatter<string_view>::format("Random", ctx);
         case IconOrder::Forward: return formatter<string_view>::format("Forward", ctx);
         case IconOrder::Backward: return formatter<string_view>::format("Backward", ctx);
+        case IconOrder::Shuffle: return formatter<string_view>::format("Shuffle", ctx);
     }
 }
