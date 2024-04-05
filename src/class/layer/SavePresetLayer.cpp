@@ -22,7 +22,7 @@ SavePresetLayer* SavePresetLayer::create(IconType type, std::vector<IconProperti
 bool SavePresetLayer::setup(IconType type) {
     m_noElasticity = true;
     m_iconType = type;
-    this->setTitle("Save Icon Set");
+    this->setTitle("Save List");
     m_closeBtn->setLayoutOptions(
         AnchorLayoutOptions::create()
             ->setAnchor(Anchor::TopLeft)

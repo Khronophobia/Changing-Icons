@@ -19,7 +19,7 @@ LoadPresetLayer* LoadPresetLayer::create(IconConfigLayer* configLayer, IconType 
 }
 
 bool LoadPresetLayer::setup(IconConfigLayer* configLayer, IconType type) {
-    this->setTitle("Load Icon Set");
+    this->setTitle("Load List");
     m_noElasticity = true;
     m_configLayer = configLayer;
     m_iconType = type;
@@ -159,7 +159,7 @@ void LoadPresetLayer::deletePreset(ghc::filesystem::path const& filename) {
 }
 
 void LoadPresetLayer::onBack(CCObject*) {
-    this->setTitle("Load Icon Set");
+    this->setTitle("Load List");
     m_presetScrollbar->removeFromParent();
     m_presetBackBtn->setVisible(false);
     m_presetViewBg->setVisible(false);
