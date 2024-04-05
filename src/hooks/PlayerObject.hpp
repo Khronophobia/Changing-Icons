@@ -4,7 +4,6 @@
 
 class $modify(CIPlayerObject, PlayerObject) {
     bool m_levelStarted;
-    bool m_ciHasInit;
     std::unordered_map<IconType, changing_icons::CITempProperties> m_ciProperties;
     inline static changing_icons::CITempProperties s_emptyCIProperty = changing_icons::CITempProperties();
     int m_ogColor1 = GameManager::get()->getPlayerColor();
@@ -41,7 +40,6 @@ class $modify(CIPlayerObject, PlayerObject) {
     void setColorsCI(IconType type, int color1, int color2);
     IconType getGamemode();
     changing_icons::CITempProperties& getActiveProperties(IconType type);
-    std::pair<IconType, changing_icons::CITempProperties> setupCIValues(IconType type);
     int getNextIconCI(IconType type, int originalFrame);
     void refreshColorsCI();
 };

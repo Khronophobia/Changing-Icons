@@ -135,23 +135,6 @@ void CIPlayerObject::resetObject() { // I need something that gets called after 
     if (PlayLayer::get()->m_player1 != this && PlayLayer::get()->m_player2 != this)
         return;
 
-    if (!m_fields->m_ciHasInit) {
-        m_fields->m_ciProperties = {
-            setupCIValues(IconType::Cube),
-            setupCIValues(IconType::Ship),
-            setupCIValues(IconType::Ball),
-            setupCIValues(IconType::Ufo),
-            setupCIValues(IconType::Wave),
-            setupCIValues(IconType::Robot),
-            setupCIValues(IconType::Spider),
-            setupCIValues(IconType::Swing),
-            setupCIValues(IconType::Jetpack)
-        };
-
-        log::info("CI values initialized");
-        m_fields->m_ciHasInit = true;
-    }
-
     if (m_fields->m_levelStarted) refreshColorsCI();
 }
 
@@ -220,75 +203,6 @@ CITempProperties& CIPlayerObject::getActiveProperties(IconType type) {
         return m_fields->m_ciProperties.at(type);
 
     return m_fields->s_emptyCIProperty;
-}
-
-std::pair<IconType, CITempProperties> CIPlayerObject::setupCIValues(IconType type) {
-    auto gm = GameManager::get();
-    auto const& config = CIManager::get()->getConfig(type);
-    auto const& globalConfig = CIManager::get()->getGlobalConfig();
-
-    auto order = config.order;
-    auto disabled = config.disabled;
-    auto useAll = config.useAll;
-    auto includePlayerIcon = config.includePlayerIcon;
-    auto mirrorEnd = config.mirrorEnd;
-    if (globalConfig.globalOverrides.find(type) != globalConfig.globalOverrides.end()) {
-        log::info("Gamemode {} listed in global overrides", static_cast<int>(type));
-        if (globalConfig.override.order) order = globalConfig.override.order.value();
-        if (globalConfig.override.disabled) disabled = globalConfig.override.disabled.value();
-        if (globalConfig.override.useAll) useAll = globalConfig.override.useAll.value();
-        if (globalConfig.override.includePlayerIcon) includePlayerIcon = globalConfig.override.includePlayerIcon.value();
-    }
-
-    auto iconSet = config.iconSet;
-    if (includePlayerIcon && !iconSet.empty()) {
-        int playerIconID;
-        switch (type) {
-            default:
-            case IconType::Cube: playerIconID = gm->getPlayerFrame(); break;
-            case IconType::Ship: playerIconID = gm->getPlayerShip(); break;
-            case IconType::Ball: playerIconID = gm->getPlayerBall(); break;
-            case IconType::Ufo: playerIconID = gm->getPlayerBird(); break;
-            case IconType::Wave: playerIconID = gm->getPlayerDart(); break;
-            case IconType::Robot: playerIconID = gm->getPlayerRobot(); break;
-            case IconType::Spider: playerIconID = gm->getPlayerSpider(); break;
-            case IconType::Swing: playerIconID = gm->getPlayerSwing(); break;
-            case IconType::Jetpack: playerIconID = gm->getPlayerJetpack(); break;
-        }
-        iconSet.push_back(IconProperties{ .iconID = playerIconID });
-    }
-    
-    if (order == IconOrder::Shuffle && !iconSet.empty())
-        std::shuffle(iconSet.begin(), iconSet.end(), Random::mt);
-    
-    int index;
-    if (useAll) {
-        switch (order) {
-            case IconOrder::Random: [[fallthrough]];
-            case IconOrder::Shuffle: [[fallthrough]];
-            case IconOrder::Forward: index = 1; break;
-            case IconOrder::Backward: index = gm->countForType(type); break;
-        }
-    } else {
-        switch (order) {
-            case IconOrder::Random: [[fallthrough]];
-            case IconOrder::Shuffle: [[fallthrough]];
-            case IconOrder::Forward: index = 0; break;
-            case IconOrder::Backward: index = iconSet.size() - 1; break;
-        }
-    }
-
-    auto properties = CITempProperties{
-        .current = index,
-        .index = index,
-        .iconSet = iconSet,
-        .order = order,
-        .useAll = useAll,
-        .mirrorEnd = mirrorEnd,
-        .disabled = disabled
-    };
-
-    return {type, properties};
 }
 
 int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
