@@ -92,7 +92,7 @@ bool GlobalConfigLayer::setup() {
     globalOverrideBg->addChildAtPosition(iconOrderLabel, Anchor::Left, ccp(12.f, 8.f));
 
     m_iconOrderDropdown = DropdownMenu::create(
-        {"Random", "Forward", "Backward", "Don't Override"},
+        {"Random", "Forward", "Backward", "Shuffle", "Don't Override"},
         120.f,
         this, menu_selector(GlobalConfigLayer::onOrderDropdown)
     );
@@ -114,18 +114,6 @@ bool GlobalConfigLayer::setup() {
     includePlayerBtn->setUserObject(CCVariableRef<std::optional<bool>>::create(globalConfig.override.includePlayerIcon));
     globalOverrideMenu->addChildAtPosition(includePlayerBtn, Anchor::Left, ccp(20.f, listCheckboxYPos));
 
-    auto shuffleListBtn = CCMenuItemTriToggler::createWithLabel(
-        CCSprite::create("CI_checkDisabled.png"_spr),
-        CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png"),
-        CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png"),
-        this,
-        menu_selector(GlobalConfigLayer::onVarTriToggle),
-        "Shuffle List",
-        0.6f
-    );
-    shuffleListBtn->setUserObject(CCVariableRef<std::optional<bool>>::create(globalConfig.override.shuffleList));
-    globalOverrideMenu->addChildAtPosition(shuffleListBtn, Anchor::Left, ccp(20.f, listCheckboxYPos - toggleOffset));
-
     auto mirrorEndBtn = CCMenuItemTriToggler::createWithLabel(
         CCSprite::create("CI_checkDisabled.png"_spr),
         CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png"),
@@ -136,7 +124,7 @@ bool GlobalConfigLayer::setup() {
         0.6f
     );
     mirrorEndBtn->setUserObject(CCVariableRef<std::optional<bool>>::create(globalConfig.override.mirrorEnd));
-    globalOverrideMenu->addChildAtPosition(mirrorEndBtn, Anchor::Left, ccp(20.f, listCheckboxYPos - toggleOffset * 2));
+    globalOverrideMenu->addChildAtPosition(mirrorEndBtn, Anchor::Left, ccp(20.f, listCheckboxYPos - toggleOffset));
 
     m_gamemodeBar = CCMenu::create();
     m_gamemodeBar->setTouchPriority(CCTouchDispatcher::get()->getForcePrio() - 1);
@@ -232,10 +220,9 @@ bool GlobalConfigLayer::setup() {
     if (globalConfig.override.order) {
         m_iconOrderDropdown->setChoice(static_cast<int>(globalConfig.override.order.value()));
     } else {
-        m_iconOrderDropdown->setChoice(3);
+        m_iconOrderDropdown->setChoice(m_iconOrderDropdown->getChoiceCount() - 1);
     }
     includePlayerBtn->setState(globalConfig.override.includePlayerIcon);
-    shuffleListBtn->setState(globalConfig.override.shuffleList);
     mirrorEndBtn->setState(globalConfig.override.mirrorEnd);
     for (auto btn : CCArrayExt<CCMenuItemToggler*>(m_gamemodeBar->getChildren())) {
         auto btnType = static_cast<IconType>(btn->getTag());
@@ -263,7 +250,7 @@ void GlobalConfigLayer::onVarTriToggle(CCObject* sender) {
 
 void GlobalConfigLayer::onOrderDropdown(CCObject* sender) {
     auto& globalConfig = m_configManager->getGlobalConfig();
-    if (sender->getTag() == 3) {
+    if (sender->getTag() >= m_iconOrderDropdown->getChoiceCount() - 1) {
         globalConfig.override.order = std::nullopt;
     } else {
         globalConfig.override.order = static_cast<IconOrder>(sender->getTag());

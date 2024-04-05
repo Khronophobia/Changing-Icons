@@ -159,7 +159,7 @@ bool IconConfigLayer::setup() {
     iconOrderLabel->setScale(0.6f);
     m_mainLayer->addChildAtPosition(iconOrderLabel, Anchor::TopLeft, ccp(20.f, -124.f));
 
-    m_iconOrderDropdown = DropdownMenu::create({"Random", "Forward", "Backward"}, 110.f, this, menu_selector(IconConfigLayer::onOrderDropdown));
+    m_iconOrderDropdown = DropdownMenu::create({"Random", "Forward", "Backward", "Shuffle"}, 110.f, this, menu_selector(IconConfigLayer::onOrderDropdown));
     m_iconOrderDropdown->setZOrder(102);
     m_iconOrderDropdown->setAnchorPoint(ccp(1.f, 0.5f));
     m_iconOrderDropdown->setScale(0.9f);
@@ -168,14 +168,8 @@ bool IconConfigLayer::setup() {
     auto iconOrderInfoSpr = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
     iconOrderInfoSpr->setScale(0.4f);
     auto iconOrderInfoBtn = CCMenuItemSpriteExtra::create(
-        iconOrderInfoSpr, this, menu_selector(IconConfigLayer::onVarInfo)
+        iconOrderInfoSpr, this, menu_selector(IconConfigLayer::onOrderInfo)
     );
-    iconOrderInfoBtn->setUserObject(CCString::create(
-        "How icons should be picked within the list.\n"
-        "<cy>Random:</c> Pick icons randomly. This might result in the same icon being picked\n"
-        "<cy>Forward:</c> Traverse the list from the start to the end\n"
-        "<cy>Backward:</c> Traverse the list from the end to the start"
-    ));
     m_buttonMenu->addChildAtPosition(iconOrderInfoBtn, Anchor::TopLeft, ccp(84.f, -118.f));
 
     auto constexpr listCheckboxYPos = -150.f;
@@ -193,23 +187,9 @@ bool IconConfigLayer::setup() {
         "Include the player's icon on the <cy>list</c>."
     );
 
-    m_shuffleListBtn = utils::createToggleButton(
-        m_buttonMenu, m_mainLayer,
-        Anchor::TopLeft, ccp(30.f, listCheckboxYPos - listCheckboxOffset),
-        "Shuffle List",
-        this, menu_selector(IconConfigLayer::onVarToggle), 0.6f
-    );
-    auto shuffleListInfoBtn = utils::createToggleInfo(
-        m_buttonMenu, m_shuffleListBtn,
-        this, menu_selector(IconConfigLayer::onVarInfo),
-        "An alternative to setting <cy>Order</c> to <cj>Random</c>. "
-        "Shuffle the list during level start.\n"
-        "(You can also enable this and set <cy>Order</c> to <cj>Random</c>, but why would you do that?)"
-    );
-
     m_mirrorEndBtn = utils::createToggleButton(
         m_buttonMenu, m_mainLayer,
-        Anchor::TopLeft, ccp(30.f, listCheckboxYPos - listCheckboxOffset * 2),
+        Anchor::TopLeft, ccp(30.f, listCheckboxYPos - listCheckboxOffset),
         "Mirror After End",
         this, menu_selector(IconConfigLayer::onVarToggle), 0.6f
     );
@@ -312,8 +292,6 @@ void IconConfigLayer::refreshTab() {
     m_iconOrderDropdown->setChoice(static_cast<int>(currentConfig.order));
     m_includePlayerBtn->toggle(currentConfig.includePlayerIcon);
     m_includePlayerBtn->setUserObject(CCVariableRef<bool>::create(currentConfig.includePlayerIcon));
-    m_shuffleListBtn->toggle(currentConfig.shuffleList);
-    m_shuffleListBtn->setUserObject(CCVariableRef<bool>::create(currentConfig.shuffleList));
     m_mirrorEndBtn->toggle(currentConfig.mirrorEnd);
     m_mirrorEndBtn->setUserObject(CCVariableRef<bool>::create(currentConfig.mirrorEnd));
 
@@ -346,6 +324,21 @@ void IconConfigLayer::onVarToggle(CCObject* sender) {
 
 void IconConfigLayer::onOrderDropdown(CCObject* sender) {
     getCurrentConfig().order = static_cast<IconOrder>(sender->getTag());
+}
+
+void IconConfigLayer::onOrderInfo(CCObject* sender) {
+    FLAlertLayer::create(
+        nullptr,
+        "Info",
+        "How icons should be picked within the list.\n"
+        "<cy>Random:</c> Pick icons randomly. This might result in the same icon being picked\n"
+        "<cy>Forward:</c> Traverse the list from the start to the end\n"
+        "<cy>Backward:</c> Traverse the list from the end to the start\n"
+        "<cy>Shuffle:</c> Shuffle the list at the start of the level, then traverse forward. Alternative to <cj>Random</c>",
+        "OK",
+        nullptr,
+        400.f
+    )->show();
 }
 
 void IconConfigLayer::onAddIcon(CCObject*) {

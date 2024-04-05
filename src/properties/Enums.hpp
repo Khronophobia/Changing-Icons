@@ -5,6 +5,7 @@ namespace changing_icons {
         Random,
         Forward,
         Backward,
+        Shuffle,
     };
 }
 

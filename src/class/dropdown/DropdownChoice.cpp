@@ -28,7 +28,10 @@ bool DropdownChoice::init(char const* str, float width, CCObject* target, SEL_Me
     m_label->setAnchorPoint(ccp(0.f, 0.5f));
     m_label->setPosition(ccp(5.f, m_obContentSize.height / 2));
     if (selected) m_label->setColor(cc3x(0x00ff00));
-    m_label->limitLabelWidth(width - 30.f, 0.6f, 0.1f);
+    if (addArrow)
+        m_label->limitLabelWidth(width - 25.f, 0.6f, 0.1f);
+    else
+        m_label->limitLabelWidth(width - 10.f, 0.6f, 0.1f);
     this->addChild(m_label);
 
     if (addArrow) {
@@ -52,7 +55,10 @@ void DropdownChoice::setSelected(bool selected) {
 
 void DropdownChoice::setLabelText(char const* str) {
     m_label->setString(str);
-    m_label->limitLabelWidth(m_width - 30.f, 0.6f, 0.1f);
+    if (m_arrowSpr)
+        m_label->limitLabelWidth(m_width - 25.f, 0.6f, 0.1f);
+    else
+        m_label->limitLabelWidth(m_width - 10.f, 0.6f, 0.1f);
 }
 
 void DropdownChoice::selected() {

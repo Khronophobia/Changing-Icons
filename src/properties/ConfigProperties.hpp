@@ -9,7 +9,6 @@ namespace changing_icons {
         std::optional<bool> useAll = std::nullopt;
         std::optional<bool> includePlayerIcon = std::nullopt;
         std::optional<IconOrder> order = std::nullopt;
-        std::optional<bool> shuffleList = std::nullopt;
         std::optional<bool> mirrorEnd = std::nullopt;
         std::optional<bool> disabled = std::nullopt;
     };
@@ -25,7 +24,6 @@ namespace changing_icons {
         IconOrder order = IconOrder::Random;
         bool useAll;
         bool includePlayerIcon;
-        bool shuffleList;
         bool mirrorEnd;
         bool disabled;
     };

@@ -84,6 +84,14 @@ int DropdownMenu::getChoice() const {
     return m_choice;
 }
 
+int DropdownMenu::getChoiceCount() const {
+    return m_choiceList.size();
+}
+
+std::vector<std::string> DropdownMenu::getChoiceList() const {
+    return m_choiceList;
+}
+
 void DropdownMenu::onDropdown(CCObject* sender) {
     if (!m_isExpanded) {
         m_choiceMenu->setEnabled(true);

@@ -19,6 +19,8 @@ namespace changing_icons {
         static DropdownMenu* create(std::vector<std::string> const& choices, float width, cocos2d::CCObject* target, cocos2d::SEL_MenuHandler dropdownCallback, int selectedChoice = 0);
         void setChoice(int choice);
         int getChoice() const;
+        int getChoiceCount() const;
+        std::vector<std::string> getChoiceList() const;
 
         void onDropdown(CCObject*);
         void onDropdownChoice(CCObject*);

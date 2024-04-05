@@ -51,11 +51,6 @@ CIGlobalOverride matjson::Serialize<CIGlobalOverride>::from_json(matjson::Value 
             "order",
             CIGlobalOverride().order
         ),
-        .shuffleList = utils::tryGetJsonValue<std::optional<bool>>(
-            value,
-            "shuffle-list",
-            CIGlobalOverride().shuffleList
-        ),
         .mirrorEnd = utils::tryGetJsonValue<std::optional<bool>>(
             value,
             "mirror-end",
@@ -74,7 +69,6 @@ matjson::Value matjson::Serialize<CIGlobalOverride>::to_json(CIGlobalOverride co
     obj["use-all"] = value.useAll;
     obj["order"] = value.order;
     obj["include-player-icon"] = value.includePlayerIcon;
-    obj["shuffle-list"] = value.shuffleList;
     obj["mirror-end"] = value.mirrorEnd;
     obj["disabled"] = value.disabled;
     return obj;
@@ -182,11 +176,6 @@ CITabProperties matjson::Serialize<CITabProperties>::from_json(matjson::Value co
             "include-player-icon",
             CITabProperties().includePlayerIcon
         ),
-        .shuffleList = utils::tryGetJsonValue<bool>(
-            value,
-            "shuffle-list",
-            CITabProperties().shuffleList
-        ),
         .mirrorEnd = utils::tryGetJsonValue(
             value,
             "mirror-end",
@@ -206,7 +195,6 @@ matjson::Value matjson::Serialize<CITabProperties>::to_json(CITabProperties cons
     obj["order"] = static_cast<int>(value.order);
     obj["use-all"] = value.useAll;
     obj["include-player-icon"] = value.includePlayerIcon;
-    obj["shuffle-list"] = value.shuffleList;
     obj["mirror-end"] = value.mirrorEnd;
     obj["disabled"] = value.disabled;
     return obj;

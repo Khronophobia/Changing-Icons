@@ -231,7 +231,6 @@ std::pair<IconType, CITempProperties> CIPlayerObject::setupCIValues(IconType typ
     auto disabled = config.disabled;
     auto useAll = config.useAll;
     auto includePlayerIcon = config.includePlayerIcon;
-    auto shuffleList = config.shuffleList;
     auto mirrorEnd = config.mirrorEnd;
     if (globalConfig.globalOverrides.find(type) != globalConfig.globalOverrides.end()) {
         log::info("Gamemode {} listed in global overrides", static_cast<int>(type));
@@ -239,7 +238,6 @@ std::pair<IconType, CITempProperties> CIPlayerObject::setupCIValues(IconType typ
         if (globalConfig.override.disabled) disabled = globalConfig.override.disabled.value();
         if (globalConfig.override.useAll) useAll = globalConfig.override.useAll.value();
         if (globalConfig.override.includePlayerIcon) includePlayerIcon = globalConfig.override.includePlayerIcon.value();
-        if (globalConfig.override.shuffleList) shuffleList = globalConfig.override.shuffleList.value();
     }
 
     auto iconSet = config.iconSet;
@@ -260,19 +258,21 @@ std::pair<IconType, CITempProperties> CIPlayerObject::setupCIValues(IconType typ
         iconSet.push_back(IconProperties{ .iconID = playerIconID });
     }
     
-    if (shuffleList && !iconSet.empty())
+    if (order == IconOrder::Shuffle && !iconSet.empty())
         std::shuffle(iconSet.begin(), iconSet.end(), Random::mt);
     
     int index;
     if (useAll) {
         switch (order) {
             case IconOrder::Random: [[fallthrough]];
+            case IconOrder::Shuffle: [[fallthrough]];
             case IconOrder::Forward: index = 1; break;
             case IconOrder::Backward: index = gm->countForType(type); break;
         }
     } else {
         switch (order) {
             case IconOrder::Random: [[fallthrough]];
+            case IconOrder::Shuffle: [[fallthrough]];
             case IconOrder::Forward: index = 0; break;
             case IconOrder::Backward: index = iconSet.size() - 1; break;
         }
@@ -347,6 +347,7 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
         result = Random::get(start, end);
         config.current = result;
         break;
+    case IconOrder::Shuffle: [[fallthrough]];
     case IconOrder::Forward:
         result = config.index;
         config.current = result;

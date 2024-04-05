@@ -17,7 +17,6 @@ namespace changing_icons {
         CCMenuItemToggler* m_disableBtn;
         CCMenuItemToggler* m_useAllBtn;
         CCMenuItemToggler* m_includePlayerBtn;
-        CCMenuItemToggler* m_shuffleListBtn;
         CCMenuItemToggler* m_mirrorEndBtn;
         CIManager* m_configManager;
         DropdownMenu* m_iconOrderDropdown;
@@ -35,6 +34,7 @@ namespace changing_icons {
         void onVarInfo(CCObject*);
         void onVarToggle(CCObject*);
         void onOrderDropdown(CCObject*);
+        void onOrderInfo(CCObject*);
         void onAddIcon(CCObject*);
         void onClearList(CCObject*);
         void onSaveList(CCObject*);
