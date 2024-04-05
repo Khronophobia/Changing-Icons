@@ -152,28 +152,27 @@ bool IconConfigLayer::setup() {
 
     auto listSettingsLabel = CCLabelBMFont::create("List Settings", "goldFont.fnt");
     listSettingsLabel->setScale(0.75f);
-    m_mainLayer->addChildAtPosition(listSettingsLabel, Anchor::Top, ccp(-94.f, -100.f));
+    m_mainLayer->addChildAtPosition(listSettingsLabel, Anchor::Top, ccp(-94.f, -105.f));
 
     auto iconOrderLabel = CCLabelBMFont::create("Order", "bigFont.fnt");
     iconOrderLabel->setAnchorPoint(ccp(0.f, 0.5f));
     iconOrderLabel->setScale(0.6f);
-    m_mainLayer->addChildAtPosition(iconOrderLabel, Anchor::TopLeft, ccp(20.f, -124.f));
+    m_mainLayer->addChildAtPosition(iconOrderLabel, Anchor::TopLeft, ccp(20.f, -130.f));
 
     m_iconOrderDropdown = DropdownMenu::create({"Random", "Forward", "Backward", "Shuffle"}, 110.f, this, menu_selector(IconConfigLayer::onOrderDropdown));
     m_iconOrderDropdown->setZOrder(102);
     m_iconOrderDropdown->setAnchorPoint(ccp(1.f, 0.5f));
     m_iconOrderDropdown->setScale(0.9f);
-    m_mainLayer->addChildAtPosition(m_iconOrderDropdown, Anchor::TopLeft, ccp(196.f, -124.f));
+    m_mainLayer->addChildAtPosition(m_iconOrderDropdown, Anchor::TopLeft, ccp(196.f, -130.f));
 
     auto iconOrderInfoSpr = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
     iconOrderInfoSpr->setScale(0.4f);
     auto iconOrderInfoBtn = CCMenuItemSpriteExtra::create(
         iconOrderInfoSpr, this, menu_selector(IconConfigLayer::onOrderInfo)
     );
-    m_buttonMenu->addChildAtPosition(iconOrderInfoBtn, Anchor::TopLeft, ccp(84.f, -118.f));
+    m_buttonMenu->addChildAtPosition(iconOrderInfoBtn, Anchor::TopLeft, ccp(84.f, -124.f));
 
-    auto constexpr listCheckboxYPos = -150.f;
-    auto constexpr listCheckboxOffset = 26.f;
+    auto constexpr listCheckboxYPos = -160.f;
 
     m_includePlayerBtn = utils::createToggleButton(
         m_buttonMenu, m_mainLayer,
@@ -189,7 +188,7 @@ bool IconConfigLayer::setup() {
 
     m_mirrorEndBtn = utils::createToggleButton(
         m_buttonMenu, m_mainLayer,
-        Anchor::TopLeft, ccp(30.f, listCheckboxYPos - listCheckboxOffset),
+        Anchor::TopLeft, ccp(30.f, listCheckboxYPos - checkboxYOffset),
         "Mirror After End",
         this, menu_selector(IconConfigLayer::onVarToggle), 0.6f
     );
