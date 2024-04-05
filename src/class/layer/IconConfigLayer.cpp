@@ -308,12 +308,6 @@ void IconConfigLayer::onVarInfo(CCObject* sender) {
     )->show();
 }
 
-/* void IconConfigLayer::onRandomToggle(CCObject* sender) {
-    auto btn = static_cast<CCMenuItemToggler*>(sender);
-    IconConfigLayer::getCurrentConfig(m_activeTab).random = !btn->m_toggled;
-    log::debug("Random set to: {}", !btn->m_toggled);
-} */
-
 void IconConfigLayer::onVarToggle(CCObject* sender) {
     auto btn = static_cast<CCMenuItemToggler*>(sender);
     auto obj = static_cast<CCNode*>(sender)->getUserObject();
