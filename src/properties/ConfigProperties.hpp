@@ -21,7 +21,7 @@ namespace changing_icons {
 
     struct CITabProperties {
         std::vector<IconProperties> iconSet;
-        IconOrder order = IconOrder::Random;
+        IconOrder order = IconOrder::Shuffle;
         bool useAll;
         bool includePlayerIcon;
         bool mirrorEnd;
