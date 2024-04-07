@@ -36,27 +36,27 @@ bool matjson::Serialize<IconOrder>::is_json(matjson::Value const& value) {
 
 CIGlobalOverride matjson::Serialize<CIGlobalOverride>::from_json(matjson::Value const& value) {
     return CIGlobalOverride {
-        .useAll = utils::tryGetJsonValue<std::optional<bool>>(
+        .useAll = utils::tryGetJsonValue(
             value,
             "use-all",
             CIGlobalOverride().useAll
         ),
-        .includePlayerIcon = utils::tryGetJsonValue<std::optional<bool>>(
+        .includePlayerIcon = utils::tryGetJsonValue(
             value,
             "include-player-icon",
             CIGlobalOverride().includePlayerIcon
         ),
-        .order = utils::tryGetJsonValue<std::optional<IconOrder>>(
+        .order = utils::tryGetJsonValue(
             value,
             "order",
             CIGlobalOverride().order
         ),
-        .mirrorEnd = utils::tryGetJsonValue<std::optional<bool>>(
+        .mirrorEnd = utils::tryGetJsonValue(
             value,
             "mirror-end",
             CIGlobalOverride().mirrorEnd
         ),
-        .disabled = utils::tryGetJsonValue<std::optional<bool>>(
+        .disabled = utils::tryGetJsonValue(
             value,
             "disabled",
             CIGlobalOverride().disabled
@@ -80,17 +80,17 @@ bool matjson::Serialize<CIGlobalOverride>::is_json(matjson::Value const& value) 
 
 CIGlobalProperties matjson::Serialize<CIGlobalProperties>::from_json(matjson::Value const& value) {
     return CIGlobalProperties {
-        .currentTab = utils::tryGetJsonValue<IconType>(
+        .currentTab = utils::tryGetJsonValue(
             value,
             "current-tab",
             CIGlobalProperties().currentTab
         ),
-        .globalOverrides = utils::tryGetJsonValue<std::unordered_set<IconType>>(
+        .globalOverrides = utils::tryGetJsonValue(
             value,
             "global-overrides",
             CIGlobalProperties().globalOverrides
         ),
-        .override = utils::tryGetJsonValue<CIGlobalOverride>(
+        .override = utils::tryGetJsonValue(
             value,
             "override",
             CIGlobalProperties().override
@@ -117,22 +117,22 @@ IconProperties matjson::Serialize<IconProperties>::from_json(matjson::Value cons
             "ID",
             IconProperties().iconID
         ),
-        .color1 = utils::tryGetJsonValue<std::optional<int>>(
+        .color1 = utils::tryGetJsonValue(
             value,
             "color1",
             IconProperties().color1
         ),
-        .color2 = utils::tryGetJsonValue<std::optional<int>>(
+        .color2 = utils::tryGetJsonValue(
             value,
             "color2",
             IconProperties().color2
         ),
-        .overrideGlow = utils::tryGetJsonValue<bool>(
+        .overrideGlow = utils::tryGetJsonValue(
             value,
             "override-glow",
             IconProperties().overrideGlow
         ),
-        .glowColor = utils::tryGetJsonValue<std::optional<int>>(
+        .glowColor = utils::tryGetJsonValue(
             value,
             "glow-color",
             IconProperties().color2
@@ -156,22 +156,22 @@ bool matjson::Serialize<IconProperties>::is_json(matjson::Value const& value) {
 
 CITabProperties matjson::Serialize<CITabProperties>::from_json(matjson::Value const& value) {
     return CITabProperties {
-        .iconSet = utils::tryGetJsonValue<std::vector<IconProperties>>(
+        .iconSet = utils::tryGetJsonValue(
             value,
             "icon-set",
             CITabProperties().iconSet
         ),
-        .order = utils::tryGetJsonValue<IconOrder>(
+        .order = utils::tryGetJsonValue(
             value,
             "order",
             CITabProperties().order
         ),
-        .useAll = utils::tryGetJsonValue<bool>(
+        .useAll = utils::tryGetJsonValue(
             value,
             "use-all",
             CITabProperties().useAll
         ),
-        .includePlayerIcon = utils::tryGetJsonValue<bool>(
+        .includePlayerIcon = utils::tryGetJsonValue(
             value,
             "include-player-icon",
             CITabProperties().includePlayerIcon
@@ -181,7 +181,7 @@ CITabProperties matjson::Serialize<CITabProperties>::from_json(matjson::Value co
             "mirror-end",
             CITabProperties().mirrorEnd
         ),
-        .disabled = utils::tryGetJsonValue<bool>(
+        .disabled = utils::tryGetJsonValue(
             value,
             "disabled",
             CITabProperties().disabled
