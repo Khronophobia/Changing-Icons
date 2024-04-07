@@ -124,6 +124,10 @@ std::pair<IconType, CITempProperties> CIPlayLayer::setupCIValues(IconType type) 
     }
 
     auto iconSet = config.iconSet;
+    
+    if (order == IconOrder::Shuffle && !iconSet.empty())
+        std::shuffle(iconSet.begin(), iconSet.end(), Random::mt);
+
     if (includePlayerIcon && !iconSet.empty()) {
         int playerIconID;
         switch (type) {
@@ -140,9 +144,6 @@ std::pair<IconType, CITempProperties> CIPlayLayer::setupCIValues(IconType type) 
         }
         iconSet.push_back(IconProperties{ .iconID = playerIconID });
     }
-    
-    if (order == IconOrder::Shuffle && !iconSet.empty())
-        std::shuffle(iconSet.begin(), iconSet.end(), Random::mt);
     
     int index;
     if (useAll) {
