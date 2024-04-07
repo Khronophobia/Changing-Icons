@@ -15,6 +15,7 @@ namespace changing_icons {
         geode::Ref<cocos2d::CCArray> m_colorPageNodes = cocos2d::CCArray::create();
         IconType m_iconType;
         cocos2d::CCMenu* m_iconList;
+        geode::Ref<cocos2d::CCSprite> m_iconCursorSpr;
         int m_currentIconPage;
         int m_iconPageMax;
         SimplePlayer* m_iconDisplay;
@@ -32,13 +33,17 @@ namespace changing_icons {
         CCMenuItemSpriteExtra* m_glowColorBtn;
         CCMenuItemToggler* m_overrideGlowBtn;
         int m_selectedColorType;
-        cocos2d::CCSprite* m_selectedColorSpr;
+        geode::Ref<cocos2d::CCSprite> m_colorTypeCursorSpr;
+        geode::Ref<cocos2d::CCSprite> m_color1CursorSpr;
+        geode::Ref<cocos2d::CCSprite> m_color2CursorSpr;
+        geode::Ref<cocos2d::CCSprite> m_glowColorCursorSpr;
         cocos2d::CCMenu* m_colorMenu;
 
         bool setup(IconType iconType, IconConfigLayer* configLayer, IconProperties iconProps, std::optional<int> index) override;
         void setupIcons(int page);
         void setIconColor(std::optional<int> color, int colorType);
         void updateIconColors();
+        void updateIconCursor();
     public:
         static AddIconLayer* create(IconType iconType, IconConfigLayer* configLayer, IconProperties iconProps, std::optional<int> index = std::nullopt);
         static AddIconLayer* create(
