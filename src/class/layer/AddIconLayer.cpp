@@ -397,6 +397,9 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
     for (auto& node : CCArrayExt<CCNode*>(m_colorPageNodes)) node->setVisible(false);
     updateIconColors();
 
+    CCNode* hehe = nullptr;
+    m_mainLayer->addChild(hehe);
+
     return true;
 }
 
