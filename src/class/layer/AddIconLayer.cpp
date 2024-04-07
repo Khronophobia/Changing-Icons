@@ -102,7 +102,7 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
     auto iconListBG = CCScale9Sprite::create("square02_001.png");
     iconListBG->setContentSize(ccp(350.f, 140.f));
     iconListBG->setOpacity(95);
-    m_mainLayer->addChildAtPosition(iconListBG, Anchor::Bottom, ccp(0.f, 120.f));
+    m_mainLayer->addChildAtPosition(iconListBG, Anchor::Bottom, ccp(0.f, 130.f));
 
     m_iconList = CCMenu::create();
     m_iconList->ignoreAnchorPointForPosition(false);
@@ -124,7 +124,7 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
         auto nextIconPageBtn = CCMenuItemSpriteExtra::create(
             nextIconPageSpr,
             this,
-            menu_selector(AddIconLayer::onIconPage)
+            menu_selector(AddIconLayer::onIconPageArrow)
         );
         nextIconPageBtn->setTag(1);
 
@@ -133,29 +133,45 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
         auto prevIconPageBtn = CCMenuItemSpriteExtra::create(
             prevIconPageSpr,
             this,
-            menu_selector(AddIconLayer::onIconPage)
+            menu_selector(AddIconLayer::onIconPageArrow)
         );
         prevIconPageBtn->setTag(-1);
 
         m_buttonMenu->addChildAtPosition(
             nextIconPageBtn,
             Anchor::Bottom,
-            ccp(iconListBG->getContentWidth() / 2 + 20.f, 120.f)
+            ccp(iconListBG->getContentWidth() / 2 + 20.f, 130.f)
         );
         m_buttonMenu->addChildAtPosition(
             prevIconPageBtn,
             Anchor::Bottom,
-            ccp(-iconListBG->getContentWidth() / 2 - 20.f, 120.f)
+            ccp(-iconListBG->getContentWidth() / 2 - 20.f, 130.f)
         );
+
+        m_iconListPageMenu = CCMenu::create();
+        iconListBG->addChildAtPosition(m_iconListPageMenu, Anchor::Bottom, ccp(0.f, -12.f));
+        m_iconListPageMenu->setContentWidth(iconListBG->getContentWidth());
+        m_iconListPageMenu->setLayout(RowLayout::create()->setGap(7.5f));
+        for (int i = 0; i <= m_iconPageMax; i++) {
+            auto spr = CCSprite::createWithSpriteFrameName("gj_navDotBtn_off_001.png");
+            auto btn = CCMenuItemSpriteExtra::create(
+                spr, this, menu_selector(AddIconLayer::onIconPage)
+            );
+            btn->setTag(i);
+            btn->setLayoutOptions(AxisLayoutOptions::create()->setMaxScale(0.85f));
+            m_iconListPageMenu->addChild(btn);
+        }
+        m_iconListPageMenu->updateLayout();
 
         m_iconPageNodes->addObject(prevIconPageBtn);
         m_iconPageNodes->addObject(nextIconPageBtn);
+        m_iconPageNodes->addObject(m_iconListPageMenu);
     }
 
     m_iconCursorSpr = CCSprite::createWithSpriteFrameName("GJ_select_001.png");
     m_iconCursorSpr->setScale(1.15f);
 
-    setupIcons(m_currentIconPage);
+    setupIconPage(m_currentIconPage);
 
     m_iconPageNodes->addObject(colorPageBtn);
     m_iconPageNodes->addObject(iconListBG);
@@ -337,7 +353,7 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
     return true;
 }
 
-void AddIconLayer::setupIcons(int page) {
+void AddIconLayer::setupIconPage(int page) {
     m_iconList->removeAllChildren();
     auto const iconAmount = GameManager::get()->countForType(m_iconType);
     for (
@@ -370,6 +386,14 @@ void AddIconLayer::setupIcons(int page) {
     }
     m_iconList->updateLayout();
     updateIconCursor();
+    if (m_iconListPageMenu) {
+        for (auto& btn : CCArrayExt<CCMenuItemSpriteExtra*>(m_iconListPageMenu->getChildren())) {
+            if (btn->getTag() == m_currentIconPage)
+                btn->setNormalImage(CCSprite::createWithSpriteFrameName("gj_navDotBtn_on_001.png"));
+            else
+                btn->setNormalImage(CCSprite::createWithSpriteFrameName("gj_navDotBtn_off_001.png"));
+        }
+    }
 }
 
 void AddIconLayer::updateIconCursor() {
@@ -454,11 +478,17 @@ void AddIconLayer::onPage(CCObject* sender) {
     }
 }
 
-void AddIconLayer::onIconPage(CCObject* sender) {
+void AddIconLayer::onIconPageArrow(CCObject* sender) {
     m_currentIconPage += sender->getTag();
     if (m_currentIconPage < 0) m_currentIconPage = m_iconPageMax;
     else if (m_currentIconPage > m_iconPageMax) m_currentIconPage = 0;
-    AddIconLayer::setupIcons(m_currentIconPage);
+    setupIconPage(m_currentIconPage);
+}
+
+void AddIconLayer::onIconPage(CCObject* sender) {
+    if (m_currentIconPage == sender->getTag()) return;
+    m_currentIconPage = sender->getTag();
+    setupIconPage(m_currentIconPage);
 }
 
 void AddIconLayer::onSelectIcon(CCObject* sender) {

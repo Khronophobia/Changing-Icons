@@ -15,6 +15,7 @@ namespace changing_icons {
         geode::Ref<cocos2d::CCArray> m_colorPageNodes = cocos2d::CCArray::create();
         IconType m_iconType;
         cocos2d::CCMenu* m_iconList;
+        cocos2d::CCMenu* m_iconListPageMenu;
         geode::Ref<cocos2d::CCSprite> m_iconCursorSpr;
         int m_currentIconPage;
         int m_iconPageMax;
@@ -40,7 +41,7 @@ namespace changing_icons {
         cocos2d::CCMenu* m_colorMenu;
 
         bool setup(IconType iconType, IconConfigLayer* configLayer, IconProperties iconProps, std::optional<int> index) override;
-        void setupIcons(int page);
+        void setupIconPage(int page);
         void setIconColor(std::optional<int> color, int colorType);
         void updateIconColors();
         void updateIconCursor();
@@ -54,6 +55,7 @@ namespace changing_icons {
             std::optional<int> color2 = std::nullopt
         );
         void onPage(CCObject* sender);
+        void onIconPageArrow(CCObject* sender);
         void onIconPage(CCObject* sender);
         void onSelectIcon(CCObject* sender);
         void onAddIcon(CCObject* sender);
