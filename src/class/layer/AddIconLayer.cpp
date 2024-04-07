@@ -1,6 +1,7 @@
 #include <Geode/Geode.hpp>
 #include "AddIconLayer.hpp"
 #include "IconConfigLayer.hpp"
+#include "CustomColorPopup.hpp"
 #include <CIConstants.hpp>
 #include <CIUtilities.hpp>
 
@@ -384,6 +385,13 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
     );
     m_buttonMenu->addChildAtPosition(clearColorBtn, Anchor::TopRight, ccp(-120.f, -80.f));
 
+    auto customColorPopupBtn = CCMenuItemSpriteExtra::create(
+        ButtonSprite::create("Button"),
+        this,
+        menu_selector(AddIconLayer::onCustomColor)
+    );
+    m_buttonMenu->addChildAtPosition(customColorPopupBtn, Anchor::Top);
+
     m_colorPageNodes->addObject(iconPageBtn);
     m_colorPageNodes->addObject(m_color1Btn);
     m_colorPageNodes->addObject(m_color2Btn);
@@ -647,6 +655,10 @@ void AddIconLayer::onClearColor(CCObject* sender) {
     }
     if (!cursorSpr) return;
     cursorSpr->removeFromParent();
+}
+
+void AddIconLayer::onCustomColor(CCObject* sender) {
+    CustomColorPopup::create(this)->show();
 }
 
 void AddIconLayer::onToggleGlow(CCObject* sender) {
