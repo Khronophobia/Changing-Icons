@@ -52,6 +52,19 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
         ->setOffset(ccp(10.f, -10.f));
     m_mainLayer->updateLayout();
 
+    if (m_selectedIcon.color1) {
+        if (auto value = std::get_if<ccColor3B>(&m_selectedIcon.color1.value()))
+            m_tempCustomColors[0] = *value;
+    }
+    if (m_selectedIcon.color2) {
+        if (auto value = std::get_if<ccColor3B>(&m_selectedIcon.color2.value()))
+            m_tempCustomColors[1] = *value;
+    }
+    if (m_selectedIcon.glowColor) {
+        if (auto value = std::get_if<ccColor3B>(&m_selectedIcon.glowColor.value()))
+            m_tempCustomColors[2] = *value;
+    }
+
     auto screenMenu = CCMenu::create();
     m_mainLayer->addChildAtPosition(screenMenu, Anchor::Center);
     
@@ -301,6 +314,18 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
             lockSpr->setVisible(false);
         }
     }
+    m_customColorSpr = ColorChannelSprite::create();
+    m_customColorSpr->setColor(m_tempCustomColors[0]);
+    m_customColorSpr->setScale(0.8f);
+    m_customColorBtn = CCMenuItemSpriteExtra::create(
+        m_customColorSpr, this, menu_selector(AddIconLayer::onSelectCustomColor)
+    );
+    auto customColorLabel = CCLabelBMFont::create("C", "bigFont.fnt");
+    customColorLabel->setScale(0.6f);
+    customColorLabel->setPosition(m_customColorBtn->getContentSize() / 2);
+    m_customColorBtn->addChild(customColorLabel);
+    m_colorMenu->addChild(m_customColorBtn);
+
     m_colorMenu->updateLayout();
 
     m_color1CursorSpr = CCSprite::createWithSpriteFrameName("GJ_select_001.png");
@@ -314,19 +339,40 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
     m_glowColorCursorSpr->setColor(cc3x(0x32));
     
     if (m_selectedIcon.color1) {
-        auto colorNode = m_colorMenu->getChildByTag(m_selectedIcon.color1.value());
-        m_color1CursorSpr->setPosition(colorNode->getContentSize() / 2);
-        colorNode->addChild(m_color1CursorSpr);
+        if (std::holds_alternative<int>(m_selectedIcon.color1.value())) {
+            auto colorNode = m_colorMenu->getChildByTag(
+                std::get<int>(m_selectedIcon.color1.value())
+            );
+            m_color1CursorSpr->setPosition(colorNode->getContentSize() / 2);
+            colorNode->addChild(m_color1CursorSpr);
+        } else {
+            m_color1CursorSpr->setPosition(m_customColorBtn->getContentSize() / 2);
+            m_customColorBtn->addChild(m_color1CursorSpr);
+        }
     }
     if (m_selectedIcon.color2) {
-        auto colorNode = m_colorMenu->getChildByTag(m_selectedIcon.color2.value());
-        m_color2CursorSpr->setPosition(colorNode->getContentSize() / 2);
-        colorNode->addChild(m_color2CursorSpr);
+        if (std::holds_alternative<int>(m_selectedIcon.color2.value())) {
+            auto colorNode = m_colorMenu->getChildByTag(
+                std::get<int>(m_selectedIcon.color2.value())
+            );
+            m_color2CursorSpr->setPosition(colorNode->getContentSize() / 2);
+            colorNode->addChild(m_color2CursorSpr);
+        } else {
+            m_color2CursorSpr->setPosition(m_customColorBtn->getContentSize() / 2);
+            m_customColorBtn->addChild(m_color2CursorSpr);
+        }
     }
     if (m_selectedIcon.glowColor) {
-        auto colorNode = m_colorMenu->getChildByTag(m_selectedIcon.glowColor.value());
-        m_glowColorCursorSpr->setPosition(colorNode->getContentSize() / 2);
-        colorNode->addChild(m_glowColorCursorSpr);
+        if (std::holds_alternative<int>(m_selectedIcon.glowColor.value())) {
+            auto colorNode = m_colorMenu->getChildByTag(
+                std::get<int>(m_selectedIcon.glowColor.value())
+            );
+            m_glowColorCursorSpr->setPosition(colorNode->getContentSize() / 2);
+            colorNode->addChild(m_glowColorCursorSpr);
+        } else {
+            m_glowColorCursorSpr->setPosition(m_customColorBtn->getContentSize() / 2);
+            m_customColorBtn->addChild(m_glowColorCursorSpr);
+        }
     }
 
     auto clearColorSpr = CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png");
@@ -404,7 +450,7 @@ void AddIconLayer::updateIconCursor() {
     }
 }
 
-void AddIconLayer::setIconColor(std::optional<int> color, int colorType) {
+void AddIconLayer::setIconColor(std::optional<std::variant<int, ccColor3B>> color, int colorType) {
     switch(colorType) {
         case 0: m_selectedIcon.color1 = color; break;
         case 1: m_selectedIcon.color2 = color; break;
@@ -420,10 +466,10 @@ void AddIconLayer::updateIconColors() {
     else
         m_color1DisabledSpr->setVisible(true);
     m_color1Display->setColor(
-        gm->colorForIdx(m_selectedIcon.color1.value_or(17))
+        utils::getColorFromVariant(m_selectedIcon.color1.value_or(17))
     );
     m_iconDisplay->setColor(
-        gm->colorForIdx(m_selectedIcon.color1.value_or(gm->getPlayerColor()))
+        utils::getColorFromVariant(m_selectedIcon.color1.value_or(gm->getPlayerColor()))
     );
 
     if (m_selectedIcon.color2)
@@ -431,10 +477,10 @@ void AddIconLayer::updateIconColors() {
     else
         m_color2DisabledSpr->setVisible(true);
     m_color2Display->setColor(
-        gm->colorForIdx(m_selectedIcon.color2.value_or(12))
+        utils::getColorFromVariant(m_selectedIcon.color2.value_or(12))
     );
     m_iconDisplay->setSecondColor(
-        gm->colorForIdx(m_selectedIcon.color2.value_or(gm->getPlayerColor2()))
+        utils::getColorFromVariant(m_selectedIcon.color2.value_or(gm->getPlayerColor2()))
     );
 
     if (m_selectedIcon.glowColor)
@@ -442,13 +488,13 @@ void AddIconLayer::updateIconColors() {
     else
         m_glowColorDisabledSpr->setVisible(true);
     m_glowColorDisplay->setColor(
-        gm->colorForIdx(m_selectedIcon.glowColor.value_or(17))
+        utils::getColorFromVariant(m_selectedIcon.glowColor.value_or(17))
     );
 
     if (m_selectedIcon.overrideGlow) {
         if (m_selectedIcon.glowColor) {
             m_iconDisplay->setGlowOutline(
-                gm->colorForIdx(m_selectedIcon.glowColor.value())
+                utils::getColorFromVariant(m_selectedIcon.glowColor.value())
             );
         } else {
             m_iconDisplay->disableGlowOutline();
@@ -519,6 +565,8 @@ void AddIconLayer::onColorType(CCObject* sender) {
     m_colorTypeCursorSpr->setPosition(colorNode->getContentSize() / 2);
     colorNode->addChild(m_colorTypeCursorSpr);
 
+    m_customColorSpr->setColor(m_tempCustomColors[m_selectedColorType]);
+
     UnlockType colorUnlockType;
     switch (m_selectedColorType) {
     case 0:
@@ -542,6 +590,7 @@ void AddIconLayer::onColorType(CCObject* sender) {
     }
     if (Mod::get()->getSettingValue<bool>("disable-locked-icons")) {
         for (auto& btn : CCArrayExt<CCMenuItemSpriteExtra*>(m_colorMenu->getChildren())) {
+            if (btn == m_customColorBtn) continue;
             auto lockSpr = getChildOfType<CCSprite>(btn->getNormalImage(), 0);
             if (!GameManager::get()->isColorUnlocked(btn->getTag(), colorUnlockType)) {
                 lockSpr->setVisible(true);
@@ -569,6 +618,22 @@ void AddIconLayer::onSelectColor(CCObject* sender) {
     cursorSpr->removeFromParent();
     cursorSpr->setPosition(colorNode->getContentSize() / 2);
     colorNode->addChild(cursorSpr);
+}
+
+void AddIconLayer::onSelectCustomColor(CCObject* sender) {
+    setIconColor(m_tempCustomColors[m_selectedColorType], m_selectedColorType);
+
+    CCSprite* cursorSpr = nullptr;
+    switch (m_selectedColorType) {
+        default:
+        case 0: cursorSpr = m_color1CursorSpr; break;
+        case 1: cursorSpr = m_color2CursorSpr; break;
+        case 2: cursorSpr = m_glowColorCursorSpr; break;
+    }
+    if (!cursorSpr) return;
+    cursorSpr->removeFromParent();
+    cursorSpr->setPosition(m_customColorBtn->getContentSize() / 2);
+    m_customColorBtn->addChild(cursorSpr);
 }
 
 void AddIconLayer::onClearColor(CCObject* sender) {

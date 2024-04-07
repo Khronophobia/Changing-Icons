@@ -40,6 +40,8 @@ namespace changing_icons::utils {
     CCMenuItemSpriteExtra* createToggleInfo(
         cocos2d::CCMenu* menu, CCMenuItemToggler* btn, cocos2d::CCObject* target, cocos2d::SEL_MenuHandler callback, gd::string const& infoDesc = ""
     );
+
+    cocos2d::ccColor3B getColorFromVariant(std::variant<int, cocos2d::ccColor3B> const& color);
 }
 
 template<>

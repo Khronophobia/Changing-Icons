@@ -1,5 +1,6 @@
 #include "PresetCell.hpp"
 #include <CIConstants.hpp>
+#include <CIUtilities.hpp>
 #include <class/layer/LoadPresetLayer.hpp>
 #include <properties/ConfigProperties.hpp>
 
@@ -30,8 +31,8 @@ bool PresetCell::init(LoadPresetLayer* presetLayer, int index, IconType type, CI
         this->setOpacity(100);
     else
         this->setOpacity(50);
-    auto playerColor1 = GameManager::get()->getPlayerColor();
-    auto playerColor2 = GameManager::get()->getPlayerColor2();
+    auto playerColor1 = GameManager::get()->colorForIdx(GameManager::get()->getPlayerColor());
+    auto playerColor2 = GameManager::get()->colorForIdx(GameManager::get()->getPlayerColor2());
 
     m_presetName = CCLabelBMFont::create(preset.name.c_str(), "bigFont.fnt");
     m_presetName->setAnchorPoint(ccp(0.f, 0.5f));
@@ -39,14 +40,14 @@ bool PresetCell::init(LoadPresetLayer* presetLayer, int index, IconType type, CI
     this->addChildAtPosition(m_presetName, Anchor::TopLeft, ccp(2.f, -8.f));
 
     auto const& firstIcon = preset.iconSet.at(0);
-    if (firstIcon.color1) playerColor1 = firstIcon.color1.value();
-    if (firstIcon.color2) playerColor2 = firstIcon.color2.value();
+    if (firstIcon.color1) playerColor1 = utils::getColorFromVariant(firstIcon.color1.value());
+    if (firstIcon.color2) playerColor2 = utils::getColorFromVariant(firstIcon.color2.value());
 
     auto iconDisplay = SimplePlayer::create(0);
     iconDisplay->setScale(0.7f);
     iconDisplay->updatePlayerFrame(firstIcon.iconID, type);
-    iconDisplay->setColor(GameManager::get()->colorForIdx(playerColor1));
-    iconDisplay->setSecondColor(GameManager::get()->colorForIdx(playerColor2));
+    iconDisplay->setColor(playerColor1);
+    iconDisplay->setSecondColor(playerColor2);
     this->addChildAtPosition(iconDisplay, Anchor::BottomLeft, ccp(24.f, 16.f));
 
     auto menu = CCMenu::create();

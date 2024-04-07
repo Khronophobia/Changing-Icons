@@ -3,10 +3,10 @@
 namespace changing_icons {
     struct IconProperties {
         int iconID;
-        std::optional<int> color1 = std::nullopt;
-        std::optional<int> color2 = std::nullopt;
+        std::optional<std::variant<int, cocos2d::ccColor3B>> color1 = std::nullopt;
+        std::optional<std::variant<int, cocos2d::ccColor3B>> color2 = std::nullopt;
         bool overrideGlow;
-        std::optional<int> glowColor = std::nullopt;
+        std::optional<std::variant<int, cocos2d::ccColor3B>> glowColor = std::nullopt;
     };
 }
 

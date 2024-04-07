@@ -3,6 +3,7 @@
 #include "Preset.hpp"
 #include "CIUtilities.hpp"
 #include <matjson/stl_serialize.hpp>
+#include "std_variant.hpp"
 
 using namespace changing_icons;
 

@@ -33,6 +33,9 @@ namespace changing_icons {
         CCMenuItemSpriteExtra* m_color2Btn;
         CCMenuItemSpriteExtra* m_glowColorBtn;
         CCMenuItemToggler* m_overrideGlowBtn;
+        ColorChannelSprite* m_customColorSpr;
+        CCMenuItemSpriteExtra* m_customColorBtn;
+        std::array<cocos2d::ccColor3B, 3> m_tempCustomColors{geode::cocos::cc3x(0xff), geode::cocos::cc3x(0xff), geode::cocos::cc3x(0xff)};
         int m_selectedColorType;
         geode::Ref<cocos2d::CCSprite> m_colorTypeCursorSpr;
         geode::Ref<cocos2d::CCSprite> m_color1CursorSpr;
@@ -42,7 +45,7 @@ namespace changing_icons {
 
         bool setup(IconType iconType, IconConfigLayer* configLayer, IconProperties iconProps, std::optional<int> index) override;
         void setupIconPage(int page);
-        void setIconColor(std::optional<int> color, int colorType);
+        void setIconColor(std::optional<std::variant<int, cocos2d::ccColor3B>> color, int colorType);
         void updateIconColors();
         void updateIconCursor();
     public:
@@ -61,6 +64,7 @@ namespace changing_icons {
         void onAddIcon(CCObject* sender);
         void onColorType(CCObject* sender);
         void onSelectColor(CCObject* sender);
+        void onSelectCustomColor(CCObject* sender);
         void onClearColor(CCObject* sender);
         void onToggleGlow(CCObject* sender);
     };

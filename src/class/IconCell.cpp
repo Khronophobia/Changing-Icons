@@ -1,6 +1,7 @@
 #include "IconCell.hpp"
 #include <class/layer/IconConfigLayer.hpp>
 #include <CIConstants.hpp>
+#include <CIUtilities.hpp>
 
 using namespace geode::prelude;
 using namespace changing_icons;
@@ -51,15 +52,17 @@ bool IconCell::init(
         this->setOpacity(50);
     m_index = index;
 
-    auto playerColor1 = gm->getPlayerColor();
-    auto playerColor2 = gm->getPlayerColor2();
+    auto playerColor1 = gm->colorForIdx(gm->getPlayerColor());
+    auto playerColor2 = gm->colorForIdx(gm->getPlayerColor2());
 
     if (icon.color1) {
         auto color1Display = ColorChannelSprite::create();
         color1Display->setScale(0.5f);
-        color1Display->setColor(gm->colorForIdx(icon.color1.value()));
+        color1Display->setColor(
+            utils::getColorFromVariant(icon.color1.value())
+        );
         this->addChildAtPosition(color1Display, Anchor::Left, ccp(50.f, 0.f));
-        playerColor1 = icon.color1.value();
+        playerColor1 = utils::getColorFromVariant(icon.color1.value());
 
         auto colorLabel = CCLabelBMFont::create("1", "bigFont.fnt");
         // colorLabel->setColor(cc3x(0x7f));
@@ -72,9 +75,11 @@ bool IconCell::init(
     if (icon.color2) {
         auto color2Display = ColorChannelSprite::create();
         color2Display->setScale(0.5f);
-        color2Display->setColor(gm->colorForIdx(icon.color2.value()));
+        color2Display->setColor(
+            utils::getColorFromVariant(icon.color2.value())
+        );
         this->addChildAtPosition(color2Display, Anchor::Left, ccp(70.f, 0.f));
-        playerColor2 = icon.color2.value();
+        playerColor2 = utils::getColorFromVariant(icon.color2.value());
 
         auto colorLabel = CCLabelBMFont::create("2", "bigFont.fnt");
         // colorLabel->setColor(cc3x(0x7f));
@@ -87,16 +92,16 @@ bool IconCell::init(
     auto iconDisplay = SimplePlayer::create(0);
     iconDisplay->setScale(0.7f);
     iconDisplay->updatePlayerFrame(icon.iconID, iconType);
-    iconDisplay->setColor(gm->colorForIdx(playerColor1));
-    iconDisplay->setSecondColor(gm->colorForIdx(playerColor2));
+    iconDisplay->setColor(playerColor1);
+    iconDisplay->setSecondColor(playerColor2);
     if (icon.overrideGlow) {
         auto glowDisplay = ColorChannelSprite::create();
         glowDisplay->setScale(0.5f);
-        glowDisplay->setColor(gm->colorForIdx(icon.glowColor.value_or(17)));
+        glowDisplay->setColor(utils::getColorFromVariant(icon.glowColor.value_or(17)));
         this->addChildAtPosition(glowDisplay, Anchor::Left, ccp(90.f, 0.f));
 
         if (icon.glowColor) {
-            iconDisplay->setGlowOutline(gm->colorForIdx(icon.glowColor.value()));
+            iconDisplay->setGlowOutline(utils::getColorFromVariant(icon.glowColor.value()));
         } else {
             auto glowDisabledSpr = CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png");
             glowDisabledSpr->setPosition(glowDisplay->getContentSize() / 2);

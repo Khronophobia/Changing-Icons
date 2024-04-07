@@ -76,6 +76,14 @@ namespace changing_icons::utils {
 
         return infoBtn;
     }
+
+    // Return ccColor3B from an int or another ccColor3B
+    ccColor3B getColorFromVariant(std::variant<int, cocos2d::ccColor3B> const& color) {
+        if (std::holds_alternative<int>(color))
+            return GameManager::get()->colorForIdx(std::get<int>(color));
+
+        return std::get<ccColor3B>(color);
+    }
 }
 
 fmt::appender fmt::formatter<IconType>::format(IconType type, format_context& ctx) const {
