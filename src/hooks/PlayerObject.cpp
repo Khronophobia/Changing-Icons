@@ -248,6 +248,9 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
         return unlockedIcons[0];
     }
 
+    if (config.order == IconOrder::Shuffle && config.useAll)
+        config.order = IconOrder::Random;
+
     int start = 0;
     int end = config.iconSet.size() - 1;
     int result;
