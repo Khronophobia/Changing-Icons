@@ -4,7 +4,7 @@
 using namespace geode::prelude;
 using namespace changing_icons;
 
-/* $on_mod(Loaded) {
+$on_mod(Loaded) {
     Mod::get()->setSavedValue("version", 0);
     if (auto res = file::createDirectoryAll(CIManager::getPresetDir(IconType::Cube)); res.isErr()) {
         log::error("Creating cube preset directory failed: {}", res.error());
@@ -33,8 +33,4 @@ using namespace changing_icons;
     if (auto res = file::createDirectoryAll(CIManager::getPresetDir(IconType::Jetpack)); res.isErr()) {
         log::error("Creating jetpack preset directory failed: {}", res.error());
     }
-
-    for (auto const& pair : CIManager::get()->getConfigMap()) {
-        CIManager::get()->refreshUnlockedIcons(pair.first);
-    }
-} */
+}
