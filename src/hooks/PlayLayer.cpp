@@ -8,12 +8,10 @@ using namespace changing_icons;
 
 $override
 void CIPlayLayer::setupHasCompleted() {
-    if (Mod::get()->getSettingValue<bool>("disable-locked-icons")) {
-        for (auto const& pair : CIManager::get()->getConfigMap()) {
-            CIManager::get()->refreshUnlockedIcons(pair.first);
-        }
-        log::info("Unlocked icons refreshed");
+    for (auto const& pair : CIManager::get()->getConfigMap()) {
+        CIManager::get()->refreshUnlockedIcons(pair.first);
     }
+    log::info("Unlocked icons refreshed");
 
     auto ciPlayer1 = static_cast<CIPlayerObject*>(m_player1);
     auto ciPlayer2 = static_cast<CIPlayerObject*>(m_player2);
