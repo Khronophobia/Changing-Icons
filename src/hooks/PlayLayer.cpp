@@ -142,14 +142,26 @@ std::pair<IconType, CITempProperties> CIPlayLayer::setupCIValues(IconType type) 
         }
         iconSet.push_back(IconProperties{ .iconID = playerIconID });
     }
+
+    auto const& unlockedIcons = CIManager::get()->getUnlockedIcons(type);
     
     int index;
     if (useAll) {
         switch (order) {
             case IconOrder::Random: [[fallthrough]];
             case IconOrder::Shuffle: [[fallthrough]];
-            case IconOrder::Forward: index = 1; break;
-            case IconOrder::Backward: index = gm->countForType(type); break;
+            case IconOrder::Forward:
+                if (Mod::get()->getSettingValue<bool>("disable-locked-icons") && !unlockedIcons.empty())
+                    index = 0;
+                else
+                    index = 1;
+                break;
+            case IconOrder::Backward:
+                if (Mod::get()->getSettingValue<bool>("disable-locked-icons") && !unlockedIcons.empty())
+                    index = unlockedIcons.size() - 1;
+                else
+                    index = gm->countForType(type);
+                break;
         }
     } else {
         switch (order) {

@@ -226,7 +226,7 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
     }
 
     if (!config.useAll && config.iconSet.size() == 1) {
-        auto const& iconProps = config.iconSet.at(0);
+        auto const& iconProps = config.iconSet[0];
         if (iconProps.color1)
             color1 = changing_icons::utils::getColorFromVariant(iconProps.color1.value());
         if (iconProps.color2)
@@ -245,7 +245,7 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
     if (config.useAll && disableLockedIcons && unlockedIcons.size() == 1) {
         setColorsCI(type, color1, color2);
         setGlowColorCI(type, enableGlow, glowColor);
-        return unlockedIcons.at(0);
+        return unlockedIcons[0];
     }
 
     int start = 0;
