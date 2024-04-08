@@ -25,7 +25,7 @@ namespace changing_icons {
         CITabProperties& getConfig(IconType type);
         std::unordered_map<IconType, CITabProperties>& getConfigMap();
         void refreshUnlockedIcons(IconType type);
-        std::vector<int> const& getUnlockedIcons(IconType type);
+        std::vector<int> getUnlockedIcons(IconType type);
         static ghc::filesystem::path getPresetDir(IconType type);
     };
 }

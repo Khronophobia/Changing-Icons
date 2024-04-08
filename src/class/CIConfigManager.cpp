@@ -69,13 +69,15 @@ void CIManager::refreshUnlockedIcons(IconType type) {
             unlockedIcons.push_back(id);
     }
     if (m_unlockedIcons.contains(type))
-        m_unlockedIcons.at(type) = unlockedIcons;
+        m_unlockedIcons[type] = unlockedIcons;
     else
         m_unlockedIcons.insert({type, unlockedIcons});
 }
 
-std::vector<int> const& CIManager::getUnlockedIcons(IconType type) {
-    return m_unlockedIcons.at(type);
+std::vector<int> CIManager::getUnlockedIcons(IconType type) {
+    if (m_unlockedIcons.contains(type)) return m_unlockedIcons[type];
+
+    return {};
 }
 
 ghc::filesystem::path CIManager::getPresetDir(IconType type) {

@@ -252,7 +252,7 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
     int end = config.iconSet.size() - 1;
     int result;
     if (config.useAll) {
-        if (disableLockedIcons) {
+        if (disableLockedIcons && !unlockedIcons.empty()) {
             end = unlockedIcons.size() - 1;
         } else {
             start = 1;
@@ -292,7 +292,7 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
 
     int newIcon;
     if (config.useAll) {
-        if (disableLockedIcons) newIcon = unlockedIcons.at(result);
+        if (disableLockedIcons && !unlockedIcons.empty()) newIcon = unlockedIcons.at(result);
         else newIcon = result;
     }
     else {
