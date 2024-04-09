@@ -211,21 +211,18 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
     auto gm = GameManager::get();
     auto& config = getActiveProperties(type);
 
-    auto disableLockedIcons = Mod::get()->getSettingValue<bool>("disable-locked-icons");
-    auto const& unlockedIcons = CIManager::get()->getUnlockedIcons(type);
-
     ccColor3B color1 = gm->colorForIdx(m_fields->m_ogColor1);
     ccColor3B color2 = gm->colorForIdx(m_fields->m_ogColor2);
     ccColor3B glowColor = gm->colorForIdx(m_fields->m_ogGlowColor);
     bool enableGlow = m_fields->m_ogHasGlow;
 
-    if (config.disabled || (!config.useAll && config.iconSet.empty())) {
+    if (config.disabled || config.iconSet.empty()) {
         setColorsCI(type, color1, color2);
         setGlowColorCI(type, enableGlow, glowColor);
         return originalFrame;
     }
 
-    if (!config.useAll && config.iconSet.size() == 1) {
+    if (config.iconSet.size() == 1) {
         auto const& iconProps = config.iconSet[0];
         if (iconProps.color1)
             color1 = changing_icons::utils::getColorFromVariant(iconProps.color1.value());
@@ -242,26 +239,9 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
         return iconProps.iconID;
     }
 
-    if (config.useAll && disableLockedIcons && unlockedIcons.size() == 1) {
-        setColorsCI(type, color1, color2);
-        setGlowColorCI(type, enableGlow, glowColor);
-        return unlockedIcons[0];
-    }
-
-    if (config.order == IconOrder::Shuffle && config.useAll)
-        config.order = IconOrder::Random;
-
     int start = 0;
     int end = config.iconSet.size() - 1;
     int result;
-    if (config.useAll) {
-        if (disableLockedIcons && !unlockedIcons.empty()) {
-            end = unlockedIcons.size() - 1;
-        } else {
-            start = 1;
-            end = gm->countForType(type);
-        }
-    }
     switch (config.order) {
     case IconOrder::Random:
         // https://www.learncpp.com/cpp-tutorial/global-random-numbers-random-h/
@@ -294,33 +274,18 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
     }
 
     int newIcon;
-    if (config.useAll) {
-        if (disableLockedIcons && !unlockedIcons.empty()) newIcon = unlockedIcons.at(result);
-        else newIcon = result;
+    auto const& iconProps = config.iconSet.at(result);
+    newIcon = iconProps.iconID;
+    if (iconProps.color1) {
+        color1 = changing_icons::utils::getColorFromVariant(iconProps.color1.value());
     }
-    else {
-        auto const& iconProps = config.iconSet.at(result);
-        newIcon = iconProps.iconID;
-        if (iconProps.color1) {
-            if (auto value = std::get_if<int>(&iconProps.color1.value()))
-                color1 = gm->colorForIdx(*value);
-            else if (auto value = std::get_if<ccColor3B>(&iconProps.color1.value()))
-                color1 = *value;
-        }
-        if (iconProps.color2) {
-            if (auto value = std::get_if<int>(&iconProps.color2.value()))
-                color2 = gm->colorForIdx(*value);
-            else if (auto value = std::get_if<ccColor3B>(&iconProps.color2.value()))
-                color2 = *value;
-        }
-        if (iconProps.overrideGlow) {
-            enableGlow = iconProps.glowColor.has_value();
-            if (iconProps.glowColor) {
-                if (auto value = std::get_if<int>(&iconProps.glowColor.value()))
-                    glowColor = gm->colorForIdx(*value);
-                else if (auto value = std::get_if<ccColor3B>(&iconProps.glowColor.value()))
-                    glowColor = *value;
-            }
+    if (iconProps.color2) {
+        color2 = changing_icons::utils::getColorFromVariant(iconProps.color2.value());
+    }
+    if (iconProps.overrideGlow) {
+        enableGlow = iconProps.glowColor.has_value();
+        if (iconProps.glowColor) {
+            glowColor = changing_icons::utils::getColorFromVariant(iconProps.glowColor.value());
         }
     }
     setColorsCI(type, color1, color2);
@@ -335,7 +300,7 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
 
 void CIPlayerObject::refreshColorsCI() {
     auto const& config = getActiveProperties(getGamemode());
-    if (config.disabled || config.useAll || config.iconSet.empty()) return;
+    if (config.disabled || config.iconSet.empty()) return;
     bool enableGlow = m_fields->m_ogHasGlow;
     auto const& icon = config.iconSet.at(config.current);
     if (icon.overrideGlow) enableGlow = icon.glowColor.has_value();

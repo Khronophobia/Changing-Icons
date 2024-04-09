@@ -327,8 +327,7 @@ void IconConfigLayer::onOrderInfo(CCObject* sender) {
         "<cy>Random:</c> Pick icons randomly. This might result in the same icon being picked twice or more\n"
         "<cy>Forward:</c> Traverse the list from the start to the end\n"
         "<cy>Backward:</c> Traverse the list from the end to the start\n"
-        "<cy>Shuffle:</c> Shuffle the list at the start of the level, then traverse forward. Alternative to <cj>Random</c>"
-        " (Note: Will fallback to <cj>Random</c> if <cp>Use All Icons</c> is enabled)",
+        "<cy>Shuffle:</c> Shuffle the list at the start of the level, then traverse forward. Alternative to <cj>Random</c>",
         "OK",
         nullptr,
         400.f

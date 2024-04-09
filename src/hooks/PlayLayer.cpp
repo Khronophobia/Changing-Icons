@@ -8,11 +8,6 @@ using namespace changing_icons;
 
 $override
 void CIPlayLayer::setupHasCompleted() {
-    for (auto const& pair : CIManager::get()->getConfigMap()) {
-        CIManager::get()->refreshUnlockedIcons(pair.first);
-    }
-    log::info("Unlocked icons refreshed");
-
     auto ciPlayer1 = static_cast<CIPlayerObject*>(m_player1);
     auto ciPlayer2 = static_cast<CIPlayerObject*>(m_player2);
     ciPlayer1->m_fields->m_ciProperties = {
@@ -121,12 +116,16 @@ std::pair<IconType, CITempProperties> CIPlayLayer::setupCIValues(IconType type) 
         if (globalConfig.override.includePlayerIcon) includePlayerIcon = globalConfig.override.includePlayerIcon.value();
     }
 
-    auto iconSet = config.iconSet;
+    std::vector<IconProperties> iconSet;
+    if (useAll)
+        iconSet = CIManager::get()->generateIconKitList(type);
+    else
+        iconSet = config.iconSet;
     
     if (order == IconOrder::Shuffle && !iconSet.empty())
         std::shuffle(iconSet.begin(), iconSet.end(), Random::mt);
 
-    if (includePlayerIcon && !iconSet.empty()) {
+    if (includePlayerIcon && !iconSet.empty() && !useAll) {
         int playerIconID;
         switch (type) {
             default:
@@ -142,34 +141,13 @@ std::pair<IconType, CITempProperties> CIPlayLayer::setupCIValues(IconType type) 
         }
         iconSet.push_back(IconProperties{ .iconID = playerIconID });
     }
-
-    auto const& unlockedIcons = CIManager::get()->getUnlockedIcons(type);
     
     int index;
-    if (useAll) {
-        switch (order) {
-            case IconOrder::Random: [[fallthrough]];
-            case IconOrder::Shuffle: [[fallthrough]];
-            case IconOrder::Forward:
-                if (Mod::get()->getSettingValue<bool>("disable-locked-icons") && !unlockedIcons.empty())
-                    index = 0;
-                else
-                    index = 1;
-                break;
-            case IconOrder::Backward:
-                if (Mod::get()->getSettingValue<bool>("disable-locked-icons") && !unlockedIcons.empty())
-                    index = unlockedIcons.size() - 1;
-                else
-                    index = gm->countForType(type);
-                break;
-        }
-    } else {
-        switch (order) {
-            case IconOrder::Random: [[fallthrough]];
-            case IconOrder::Shuffle: [[fallthrough]];
-            case IconOrder::Forward: index = 0; break;
-            case IconOrder::Backward: index = iconSet.size() - 1; break;
-        }
+    switch (order) {
+        case IconOrder::Random: [[fallthrough]];
+        case IconOrder::Shuffle: [[fallthrough]];
+        case IconOrder::Forward: index = 0; break;
+        case IconOrder::Backward: index = iconSet.size() - 1; break;
     }
 
     auto properties = CITempProperties{
@@ -177,7 +155,6 @@ std::pair<IconType, CITempProperties> CIPlayLayer::setupCIValues(IconType type) 
         .index = index,
         .iconSet = iconSet,
         .order = order,
-        .useAll = useAll,
         .mirrorEnd = mirrorEnd,
         .disabled = disabled
     };

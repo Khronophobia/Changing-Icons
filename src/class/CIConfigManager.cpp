@@ -25,15 +25,6 @@ bool CIManager::init() {
         {IconType::Swing, Mod::get()->getSavedValue<CITabProperties>("swing")},
         {IconType::Jetpack, Mod::get()->getSavedValue<CITabProperties>("jetpack")}
     };
-    /* m_cubeConfig = Mod::get()->getSavedValue<CITabProperties>("cube");
-    m_shipConfig = Mod::get()->getSavedValue<CITabProperties>("ship");
-    m_ballConfig = Mod::get()->getSavedValue<CITabProperties>("ball");
-    m_birdConfig = Mod::get()->getSavedValue<CITabProperties>("bird");
-    m_dartConfig = Mod::get()->getSavedValue<CITabProperties>("dart");
-    m_robotConfig = Mod::get()->getSavedValue<CITabProperties>("robot");
-    m_spiderConfig = Mod::get()->getSavedValue<CITabProperties>("spider");
-    m_swingConfig = Mod::get()->getSavedValue<CITabProperties>("swing");
-    m_jetpackConfig = Mod::get()->getSavedValue<CITabProperties>("jetpack"); */
 
     return true;
 }
@@ -43,41 +34,22 @@ CIGlobalProperties& CIManager::getGlobalConfig() {
 }
 
 CITabProperties& CIManager::getConfig(IconType type) {
-    /* switch (type) {
-        default:
-        case IconType::Cube: return m_cubeConfig;
-        case IconType::Ship: return m_shipConfig;
-        case IconType::Ball: return m_ballConfig;
-        case IconType::Ufo: return m_birdConfig;
-        case IconType::Wave: return m_dartConfig;
-        case IconType::Robot: return m_robotConfig;
-        case IconType::Spider: return m_spiderConfig;
-        case IconType::Swing: return m_swingConfig;
-        case IconType::Jetpack: return m_jetpackConfig;
-    } */
-    return m_iconConfigs.at(type);
+    return m_iconConfigs[type];
 }
 
 std::unordered_map<IconType, CITabProperties>& CIManager::getConfigMap() {
     return m_iconConfigs;
 }
 
-void CIManager::refreshUnlockedIcons(IconType type) {
-    std::vector<int> unlockedIcons;
+std::vector<IconProperties> CIManager::generateIconKitList(IconType type) {
+    auto disableLockedIcons = Mod::get()->getSettingValue<bool>("disable-locked-icons");
+    std::vector<IconProperties> iconKitList;
     for (int id = 1; id <= GameManager::get()->countForType(type); id++) {
-        if (GameManager::get()->isIconUnlocked(id, type))
-            unlockedIcons.push_back(id);
+        if (GameManager::get()->isIconUnlocked(id, type) || !disableLockedIcons)
+            iconKitList.push_back(IconProperties{.iconID = id});
     }
-    if (m_unlockedIcons.contains(type))
-        m_unlockedIcons[type] = unlockedIcons;
-    else
-        m_unlockedIcons.insert({type, unlockedIcons});
-}
 
-std::vector<int> CIManager::getUnlockedIcons(IconType type) {
-    if (m_unlockedIcons.contains(type)) return m_unlockedIcons[type];
-
-    return {};
+    return iconKitList;
 }
 
 ghc::filesystem::path CIManager::getPresetDir(IconType type) {

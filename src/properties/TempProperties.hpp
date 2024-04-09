@@ -8,7 +8,6 @@ namespace changing_icons {
         int index;
         std::vector<IconProperties> iconSet;
         IconOrder order;
-        bool useAll;
         bool mirrorEnd;
         bool disabled;
     };
