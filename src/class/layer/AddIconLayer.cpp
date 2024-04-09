@@ -1,7 +1,6 @@
 #include <Geode/Geode.hpp>
 #include "AddIconLayer.hpp"
 #include "IconConfigLayer.hpp"
-#include "CustomColorPopup.hpp"
 #include <CIConstants.hpp>
 #include <CIUtilities.hpp>
 
@@ -648,10 +647,6 @@ void AddIconLayer::onClearColor(CCObject* sender) {
     }
     if (!cursorSpr) return;
     cursorSpr->removeFromParent();
-}
-
-void AddIconLayer::onCustomColor(CCObject* sender) {
-    CustomColorPopup::create(this)->show();
 }
 
 void AddIconLayer::onToggleGlow(CCObject* sender) {

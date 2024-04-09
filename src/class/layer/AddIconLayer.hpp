@@ -66,7 +66,6 @@ namespace changing_icons {
         void onSelectColor(CCObject* sender);
         void onSelectCustomColor(CCObject* sender);
         void onClearColor(CCObject* sender);
-        void onCustomColor(CCObject* sender);
         void onToggleGlow(CCObject* sender);
     };
 }
