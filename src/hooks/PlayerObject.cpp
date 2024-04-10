@@ -129,6 +129,23 @@ void CIPlayerObject::switchedToMode(GameObjectType p0) { // Need to do this beca
 }
 
 $override
+void CIPlayerObject::spawnFromPlayer(PlayerObject* p0, bool p1) {
+    PlayerObject::spawnFromPlayer(p0, p1);
+    auto gm = GameManager::get();
+    if (m_isBall)
+        PlayerObject::updatePlayerRollFrame(gm->getPlayerBall());
+    else if (m_isDart)
+        PlayerObject::updatePlayerDartFrame(gm->getPlayerDart());
+    else if (m_isSwing)
+        PlayerObject::updatePlayerSwingFrame(gm->getPlayerSwing());
+    else if (!m_isRobot && !m_isSpider)
+        PlayerObject::updatePlayerFrame(gm->getPlayerFrame());
+
+    if (m_isShip || m_isBird)
+        refreshColorsCI();
+}
+
+$override
 void CIPlayerObject::resetObject() { // I need something that gets called after init,
     PlayerObject::resetObject();     // And this seems the closest to what I want
     if (!PlayLayer::get()) return;
@@ -200,7 +217,7 @@ IconType CIPlayerObject::getGamemode() {
 
 CITempProperties& CIPlayerObject::getActiveProperties(IconType type) {
     if (m_fields->m_ciProperties.contains(type))
-        return m_fields->m_ciProperties.at(type);
+        return m_fields->m_ciProperties[type];
 
     return m_fields->s_emptyCIProperty;
 }
@@ -300,18 +317,26 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
 
 void CIPlayerObject::refreshColorsCI() {
     auto const& config = getActiveProperties(getGamemode());
-    if (config.disabled || config.iconSet.empty()) return;
+
     bool enableGlow = m_fields->m_ogHasGlow;
+    auto color1 = GameManager::get()->colorForIdx(m_fields->m_ogColor1);
+    auto color2 = GameManager::get()->colorForIdx(m_fields->m_ogColor2);
+    auto glowColor = GameManager::get()->colorForIdx(m_fields->m_ogGlowColor);
+
+    if (config.disabled || config.iconSet.empty()) {
+        setColorsCI(getGamemode(), color1, color2);
+        setGlowColorCI(getGamemode(), enableGlow, glowColor);
+        return;
+    }
+
     auto const& icon = config.iconSet.at(config.current);
     if (icon.overrideGlow) enableGlow = icon.glowColor.has_value();
-    setColorsCI(
-        getGamemode(),
-        changing_icons::utils::getColorFromVariant(icon.color1.value_or(m_fields->m_ogColor1)),
-        changing_icons::utils::getColorFromVariant(icon.color2.value_or(m_fields->m_ogColor2))
-    );
-    setGlowColorCI(
-        getGamemode(),
-        enableGlow,
-        changing_icons::utils::getColorFromVariant(icon.glowColor.value_or(m_fields->m_ogGlowColor))
-    );
+    if (icon.color1)
+        color1 = changing_icons::utils::getColorFromVariant(icon.color1.value());
+    if (icon.color2)
+        color2 = changing_icons::utils::getColorFromVariant(icon.color2.value());
+    if (icon.glowColor)
+        glowColor = changing_icons::utils::getColorFromVariant(icon.glowColor.value());
+    setColorsCI(getGamemode(), color1, color2);
+    setGlowColorCI(getGamemode(), enableGlow, glowColor);
 }

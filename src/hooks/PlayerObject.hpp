@@ -29,6 +29,7 @@ class $modify(CIPlayerObject, PlayerObject) {
     void updatePlayerDartFrame(int frame);
     void updatePlayerSwingFrame(int frame);
     void switchedToMode(GameObjectType p0);
+    void spawnFromPlayer(PlayerObject* p0, bool p1);
     void resetObject();
 
     void setVehicleColor(cocos2d::ccColor3B const& color);
