@@ -72,44 +72,44 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
     m_mainLayer->addChild(m_iconPageLayer);
     m_iconPageMenu = CCMenu::create();
     m_iconPageLayer->addChild(m_iconPageMenu);
-    m_iconPageLayer->setLayout(CopySizeLayout::create()->add(m_iconPageMenu));
 
     m_colorPageLayer = CCLayer::create();
     m_colorPageLayer->setVisible(false);
     m_mainLayer->addChild(m_colorPageLayer);
     m_colorPageMenu = CCMenu::create();
     m_colorPageLayer->addChild(m_colorPageMenu);
-    m_colorPageLayer->setLayout(CopySizeLayout::create()->add(m_colorPageMenu));
+    
 
     static_cast<CopySizeLayout*>(m_mainLayer->getLayout())
         ->add(m_iconPageLayer)
         ->add(m_colorPageLayer);
     
     auto iconPageSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png");
-    auto iconPageBtn = CCMenuItemSpriteExtra::create(
+    m_iconPageBtn = CCMenuItemSpriteExtra::create(
         iconPageSpr,
         this,
         menu_selector(AddIconLayer::onPage)
     );
-    iconPageBtn->setTag(0);
+    m_iconPageBtn->setTag(0);
+    m_iconPageBtn->setVisible(false);
     screenMenu->addChildAtPosition(
-        iconPageBtn,
+        m_iconPageBtn,
         Anchor::Left,
-        ccp(iconPageBtn->getContentWidth() / 2 + 4.f, 0.f)
+        ccp(m_iconPageBtn->getContentWidth() / 2 + 4.f, 0.f)
     );
 
     auto colorPageSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png");
     colorPageSpr->setFlipX(true);
-    auto colorPageBtn = CCMenuItemSpriteExtra::create(
+    m_colorPageBtn = CCMenuItemSpriteExtra::create(
         colorPageSpr,
         this,
         menu_selector(AddIconLayer::onPage)
     );
-    colorPageBtn->setTag(1);
+    m_colorPageBtn->setTag(1);
     screenMenu->addChildAtPosition(
-        colorPageBtn,
+        m_colorPageBtn,
         Anchor::Right,
-        ccp(-colorPageBtn->getContentWidth() / 2 - 4.f, 0.f)
+        ccp(-m_colorPageBtn->getContentWidth() / 2 - 4.f, 0.f)
     );
 
     ButtonSprite* addIconSpr;
@@ -322,6 +322,8 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
             lockSpr->setVisible(false);
         }
     }
+    m_colorMenu->updateLayout();
+
     m_customColorSpr = ColorChannelSprite::create();
     m_customColorSpr->setColor(m_tempCustomColors[0]);
     m_customColorSpr->setScale(0.8f);
@@ -332,9 +334,7 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
     customColorLabel->setScale(0.6f);
     customColorLabel->setPosition(m_customColorBtn->getContentSize() / 2);
     m_customColorBtn->addChild(customColorLabel);
-    m_colorMenu->addChild(m_customColorBtn);
-
-    m_colorMenu->updateLayout();
+    m_colorPageMenu->addChildAtPosition(m_customColorBtn, Anchor::BottomRight, ccp(-24.f, 24.f));
 
     m_color1CursorSpr = CCSprite::createWithSpriteFrameName("GJ_select_001.png");
     m_color1CursorSpr->setScale(0.85f);
@@ -392,8 +392,29 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
     );
     m_colorPageMenu->addChildAtPosition(clearColorBtn, Anchor::TopRight, ccp(-120.f, -80.f));
 
-    updateIconColors();
+    m_customColorLayer = CCLayer::create();
+    m_colorPageLayer->addChild(m_customColorLayer);
 
+    m_colorPicker = CCControlColourPicker::colourPicker();
+    m_colorPicker->setContentSize(CCSizeZero);
+    m_colorPicker->setColorValue(m_tempCustomColors[0]);
+    m_colorPicker->setDelegate(this);
+
+    if (auto const& color = getSelectedColor(); color && std::holds_alternative<ccColor3B>(color.value())) {
+        toggleColorPicker(true);
+    } else {
+        toggleColorPicker(false);
+    }
+
+    updateIconColors();
+    m_iconPageLayer->setLayout(
+        CopySizeLayout::create()->add(m_iconPageMenu)
+    );
+    m_colorPageLayer->setLayout(
+        CopySizeLayout::create()
+            ->add(m_colorPageMenu)
+            ->add(m_customColorLayer)
+    );
     m_mainLayer->updateLayout();
     return true;
 }
@@ -449,64 +470,117 @@ void AddIconLayer::updateIconCursor() {
     }
 }
 
-void AddIconLayer::setIconColor(std::optional<std::variant<int, ccColor3B>> color, int colorType) {
+void AddIconLayer::setIconColor(std::optional<IconColor> color, int colorType) {
     switch(colorType) {
-        case 0: m_selectedIcon.color1 = color; break;
-        case 1: m_selectedIcon.color2 = color; break;
-        case 2: m_selectedIcon.glowColor = color; break;
+        case Col1: m_selectedIcon.color1 = color; break;
+        case Col2: m_selectedIcon.color2 = color; break;
+        case Glow: m_selectedIcon.glowColor = color; break;
     }
-    updateIconColors();
+    updateIconColor(colorType);
+}
+
+void AddIconLayer::updateIconColor(int colorType) {
+    auto gm = GameManager::get();
+    switch (colorType) {
+    case Col1:
+        if (m_selectedIcon.color1) {
+            m_color1DisabledSpr->setVisible(false);
+        } else {
+            m_color1DisabledSpr->setVisible(true);
+        }
+        m_color1Display->setColor(
+            utils::getColorFromVariant(m_selectedIcon.color1.value_or(17))
+        );
+        m_iconDisplay->setColor(
+            utils::getColorFromVariant(m_selectedIcon.color1.value_or(gm->getPlayerColor()))
+        );
+        break;
+    case Col2:
+        if (m_selectedIcon.color2) {
+            m_color2DisabledSpr->setVisible(false);
+        } else {
+            m_color2DisabledSpr->setVisible(true);
+        }
+        m_color2Display->setColor(
+            utils::getColorFromVariant(m_selectedIcon.color2.value_or(12))
+        );
+        m_iconDisplay->setSecondColor(
+            utils::getColorFromVariant(m_selectedIcon.color2.value_or(gm->getPlayerColor2()))
+        );
+        break;
+    case Glow:
+        if (m_selectedIcon.glowColor) {
+            m_glowColorDisabledSpr->setVisible(false);
+        } else {
+            m_glowColorDisabledSpr->setVisible(true);
+        }
+        m_glowColorDisplay->setColor(
+            utils::getColorFromVariant(m_selectedIcon.glowColor.value_or(17))
+        );
+
+        if (m_selectedIcon.overrideGlow) {
+            if (m_selectedIcon.glowColor) {
+                m_iconDisplay->setGlowOutline(
+                    utils::getColorFromVariant(m_selectedIcon.glowColor.value())
+                );
+            } else {
+                m_iconDisplay->disableGlowOutline();
+            }
+        } else {
+            if (gm->getPlayerGlow()) {
+                m_iconDisplay->setGlowOutline(
+                    gm->colorForIdx(gm->getPlayerGlowColor())
+                );
+            } else {
+                m_iconDisplay->disableGlowOutline();
+            }
+        }
+        break;
+    }
 }
 
 void AddIconLayer::updateIconColors() {
-    auto gm = GameManager::get();
-    if (m_selectedIcon.color1)
-        m_color1DisabledSpr->setVisible(false);
-    else
-        m_color1DisabledSpr->setVisible(true);
-    m_color1Display->setColor(
-        utils::getColorFromVariant(m_selectedIcon.color1.value_or(17))
-    );
-    m_iconDisplay->setColor(
-        utils::getColorFromVariant(m_selectedIcon.color1.value_or(gm->getPlayerColor()))
-    );
+    updateIconColor(Col1);
+    updateIconColor(Col2);
+    updateIconColor(Glow);
+}
 
-    if (m_selectedIcon.color2)
-        m_color2DisabledSpr->setVisible(false);
-    else
-        m_color2DisabledSpr->setVisible(true);
-    m_color2Display->setColor(
-        utils::getColorFromVariant(m_selectedIcon.color2.value_or(12))
-    );
-    m_iconDisplay->setSecondColor(
-        utils::getColorFromVariant(m_selectedIcon.color2.value_or(gm->getPlayerColor2()))
-    );
-
-    if (m_selectedIcon.glowColor)
-        m_glowColorDisabledSpr->setVisible(false);
-    else
-        m_glowColorDisabledSpr->setVisible(true);
-    m_glowColorDisplay->setColor(
-        utils::getColorFromVariant(m_selectedIcon.glowColor.value_or(17))
-    );
-
-    if (m_selectedIcon.overrideGlow) {
-        if (m_selectedIcon.glowColor) {
-            m_iconDisplay->setGlowOutline(
-                utils::getColorFromVariant(m_selectedIcon.glowColor.value())
-            );
-        } else {
-            m_iconDisplay->disableGlowOutline();
-        }
+void AddIconLayer::toggleColorPicker(bool toggle) {
+    if (toggle) {
+        m_customColorLayer->setVisible(true);
+        m_colorMenu->setVisible(false);
+        if (!m_colorPicker->getParent())
+            m_customColorLayer->addChildAtPosition(m_colorPicker, Anchor::Center, ccp(0.f, -24.f));
     } else {
-        if (gm->getPlayerGlow()) {
-            m_iconDisplay->setGlowOutline(
-                gm->colorForIdx(gm->getPlayerGlowColor())
-            );
-        } else {
-            m_iconDisplay->disableGlowOutline();
-        }
+        m_customColorLayer->setVisible(false);
+        m_colorMenu->setVisible(true);
+        // This fucker stays enabled even when invisible
+        m_colorPicker->removeFromParent();
     }
+}
+
+std::optional<IconColor>& AddIconLayer::getSelectedColor() {
+    switch (m_selectedColorType) {
+        default:
+        case Col1: return m_selectedIcon.color1;
+        case Col2: return m_selectedIcon.color2;
+        case Glow: return m_selectedIcon.glowColor;
+    }
+}
+
+void AddIconLayer::setPickerColor(ccColor3B const& color) {
+    // Set color without trigerring colorValueChanged
+    auto delegate = m_colorPicker->getDelegate();
+    m_colorPicker->setDelegate(nullptr);
+
+    m_colorPicker->setColorValue(color);
+
+    m_colorPicker->setDelegate(delegate);
+}
+
+void AddIconLayer::colorValueChanged(ccColor3B color) {
+    m_tempCustomColors[m_selectedColorType] = color;
+    setIconColor(color, m_selectedColorType);
 }
 
 void AddIconLayer::onPage(CCObject* sender) {
@@ -515,10 +589,14 @@ void AddIconLayer::onPage(CCObject* sender) {
     case 0:
         m_iconPageLayer->setVisible(true);
         m_colorPageLayer->setVisible(false);
+        m_colorPageBtn->setVisible(true);
+        m_iconPageBtn->setVisible(false);
         break;
     case 1:
         m_iconPageLayer->setVisible(false);
         m_colorPageLayer->setVisible(true);
+        m_colorPageBtn->setVisible(false);
+        m_iconPageBtn->setVisible(true);
         break;
     }
 }
@@ -568,25 +646,33 @@ void AddIconLayer::onColorType(CCObject* sender) {
 
     UnlockType colorUnlockType;
     switch (m_selectedColorType) {
-    case 0:
+    case Col1:
         m_color1CursorSpr->setColor(cc3x(0xff));
         m_color2CursorSpr->setColor(cc3x(0x32));
         m_glowColorCursorSpr->setColor(cc3x(0x32));
         colorUnlockType = UnlockType::Col1;
         break;
-    case 1:
+    case Col2:
         m_color1CursorSpr->setColor(cc3x(0x32));
         m_color2CursorSpr->setColor(cc3x(0xff));
         m_glowColorCursorSpr->setColor(cc3x(0x32));
         colorUnlockType = UnlockType::Col2;
         break;
-    case 2:
+    case Glow:
         m_color1CursorSpr->setColor(cc3x(0x32));
         m_color2CursorSpr->setColor(cc3x(0x32));
         m_glowColorCursorSpr->setColor(cc3x(0xff));
         colorUnlockType = UnlockType::Col2;
         break;
     }
+
+    setPickerColor(m_tempCustomColors[m_selectedColorType]);
+    if (auto const& color = getSelectedColor(); color && std::holds_alternative<ccColor3B>(color.value())) {
+        toggleColorPicker(true);
+    } else {
+        toggleColorPicker(false);
+    }
+
     if (Mod::get()->getSettingValue<bool>("disable-locked-icons")) {
         for (auto& btn : CCArrayExt<CCMenuItemSpriteExtra*>(m_colorMenu->getChildren())) {
             if (btn == m_customColorBtn) continue;
@@ -608,9 +694,9 @@ void AddIconLayer::onSelectColor(CCObject* sender) {
     CCSprite* cursorSpr = nullptr;
     switch (m_selectedColorType) {
         default:
-        case 0: cursorSpr = m_color1CursorSpr; break;
-        case 1: cursorSpr = m_color2CursorSpr; break;
-        case 2: cursorSpr = m_glowColorCursorSpr; break;
+        case Col1: cursorSpr = m_color1CursorSpr; break;
+        case Col2: cursorSpr = m_color2CursorSpr; break;
+        case Glow: cursorSpr = m_glowColorCursorSpr; break;
     }
     if (!cursorSpr) return; // Just in case
     auto colorNode = static_cast<CCNode*>(sender);
@@ -625,14 +711,16 @@ void AddIconLayer::onSelectCustomColor(CCObject* sender) {
     CCSprite* cursorSpr = nullptr;
     switch (m_selectedColorType) {
         default:
-        case 0: cursorSpr = m_color1CursorSpr; break;
-        case 1: cursorSpr = m_color2CursorSpr; break;
-        case 2: cursorSpr = m_glowColorCursorSpr; break;
+        case Col1: cursorSpr = m_color1CursorSpr; break;
+        case Col2: cursorSpr = m_color2CursorSpr; break;
+        case Glow: cursorSpr = m_glowColorCursorSpr; break;
     }
     if (!cursorSpr) return;
     cursorSpr->removeFromParent();
     cursorSpr->setPosition(m_customColorBtn->getContentSize() / 2);
     m_customColorBtn->addChild(cursorSpr);
+
+    toggleColorPicker(true);
 }
 
 void AddIconLayer::onClearColor(CCObject* sender) {
@@ -640,16 +728,18 @@ void AddIconLayer::onClearColor(CCObject* sender) {
     CCSprite* cursorSpr = nullptr;
     switch (m_selectedColorType) {
         default:
-        case 0: cursorSpr = m_color1CursorSpr; break;
-        case 1: cursorSpr = m_color2CursorSpr; break;
-        case 2: cursorSpr = m_glowColorCursorSpr; break;
+        case Col1: cursorSpr = m_color1CursorSpr; break;
+        case Col2: cursorSpr = m_color2CursorSpr; break;
+        case Glow: cursorSpr = m_glowColorCursorSpr; break;
     }
     if (!cursorSpr) return;
     cursorSpr->removeFromParent();
+
+    toggleColorPicker(false);
 }
 
 void AddIconLayer::onToggleGlow(CCObject* sender) {
     auto btn = static_cast<CCMenuItemToggler*>(sender);
     m_selectedIcon.overrideGlow = !btn->isToggled();
-    updateIconColors();
+    updateIconColor(Glow);
 }

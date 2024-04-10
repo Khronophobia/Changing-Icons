@@ -3,9 +3,16 @@
 #include <properties/IconProperties.hpp>
 
 namespace changing_icons {
+    using IconColor = std::variant<int, cocos2d::ccColor3B>;
     class IconConfigLayer;
 
-    class AddIconLayer : public geode::Popup<IconType, IconConfigLayer*, IconProperties, std::optional<int>> {
+    class AddIconLayer : public geode::Popup<IconType, IconConfigLayer*, IconProperties, std::optional<int>>, cocos2d::extension::ColorPickerDelegate {
+    private:
+        enum ColorType {
+            Col1 = 0,
+            Col2 = 1,
+            Glow = 2
+        };
     protected:
         IconConfigLayer* m_configLayer;
         IconProperties m_selectedIcon;
@@ -13,8 +20,10 @@ namespace changing_icons {
         int m_currentPage;
         cocos2d::CCLayer* m_iconPageLayer;
         cocos2d::CCMenu* m_iconPageMenu;
+        CCMenuItemSpriteExtra* m_iconPageBtn;
         cocos2d::CCLayer* m_colorPageLayer;
         cocos2d::CCMenu* m_colorPageMenu;
+        CCMenuItemSpriteExtra* m_colorPageBtn;
         IconType m_iconType;
         cocos2d::CCMenu* m_iconList;
         cocos2d::CCMenu* m_iconListPageMenu;
@@ -44,12 +53,17 @@ namespace changing_icons {
         geode::Ref<cocos2d::CCSprite> m_color2CursorSpr;
         geode::Ref<cocos2d::CCSprite> m_glowColorCursorSpr;
         cocos2d::CCMenu* m_colorMenu;
+        cocos2d::CCLayer* m_customColorLayer;
+        geode::Ref<cocos2d::extension::CCControlColourPicker> m_colorPicker;
 
         bool setup(IconType iconType, IconConfigLayer* configLayer, IconProperties iconProps, std::optional<int> index) override;
         void setupIconPage(int page);
         void setIconColor(std::optional<std::variant<int, cocos2d::ccColor3B>> color, int colorType);
+        void updateIconColor(int colorType);
         void updateIconColors();
         void updateIconCursor();
+        void toggleColorPicker(bool toggle);
+        std::optional<IconColor>& getSelectedColor();
     public:
         static AddIconLayer* create(IconType iconType, IconConfigLayer* configLayer, IconProperties iconProps, std::optional<int> index = std::nullopt);
         static AddIconLayer* create(
@@ -59,6 +73,10 @@ namespace changing_icons {
             std::optional<int> color1 = std::nullopt,
             std::optional<int> color2 = std::nullopt
         );
+
+        void setPickerColor(cocos2d::ccColor3B const& color);
+        void colorValueChanged(cocos2d::ccColor3B color) override;
+
         void onPage(CCObject* sender);
         void onIconPageArrow(CCObject* sender);
         void onIconPage(CCObject* sender);
