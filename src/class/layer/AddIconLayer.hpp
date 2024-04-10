@@ -11,8 +11,10 @@ namespace changing_icons {
         IconProperties m_selectedIcon;
         std::optional<int> m_index;
         int m_currentPage;
-        geode::Ref<cocos2d::CCArray> m_iconPageNodes = cocos2d::CCArray::create();
-        geode::Ref<cocos2d::CCArray> m_colorPageNodes = cocos2d::CCArray::create();
+        cocos2d::CCLayer* m_iconPageLayer;
+        cocos2d::CCMenu* m_iconPageMenu;
+        cocos2d::CCLayer* m_colorPageLayer;
+        cocos2d::CCMenu* m_colorPageMenu;
         IconType m_iconType;
         cocos2d::CCMenu* m_iconList;
         cocos2d::CCMenu* m_iconListPageMenu;
