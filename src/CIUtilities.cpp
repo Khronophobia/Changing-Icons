@@ -94,6 +94,23 @@ namespace changing_icons::utils {
 
         return input;
     }
+
+    IconType getIconTypeFromGamemode(PlayerObject* player, bool isVehicle) {
+        if (isVehicle) {
+                if (player->m_isShip) {
+                if (player->m_isPlatformer) return IconType::Jetpack;
+                return IconType::Ship;
+            }
+            return IconType::Ufo;
+        } else {
+            if (player->m_isBall) return IconType::Ball;
+            if (player->m_isDart) return IconType::Wave;
+            if (player->m_isRobot) return IconType::Robot;
+            if (player->m_isSpider) return IconType::Spider;
+            if (player->m_isSwing) return IconType::Swing;
+            return IconType::Cube;
+        }
+    }
 }
 
 fmt::appender fmt::formatter<IconType>::format(IconType type, format_context& ctx) const {

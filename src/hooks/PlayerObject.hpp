@@ -35,11 +35,10 @@ class $modify(CIPlayerObject, PlayerObject) {
     void setVehicleColor(cocos2d::ccColor3B const& color);
     void setVehicleSecondColor(cocos2d::ccColor3B const& color);
     void enableCustomVehicleGlowColor(cocos2d::ccColor3B const& color);
-    void setGlowColorCI(IconType type, bool enable, cocos2d::ccColor3B const& color);
-    void setGlowColorCI(IconType type, bool enable, int color);
-    void setColorsCI(IconType type, cocos2d::ccColor3B const& color1, cocos2d::ccColor3B const& color2);
-    void setColorsCI(IconType type, int color1, int color2);
-    IconType getGamemode();
+    void setGlowColorCI(bool isVehicle, bool enable, cocos2d::ccColor3B const& color);
+    void setGlowColorCI(bool isVehicle, bool enable, int color);
+    void setColorsCI(bool isVehicle, cocos2d::ccColor3B const& color1, cocos2d::ccColor3B const& color2);
+    void setColorsCI(bool isVehicle, int color1, int color2);
     changing_icons::CITempProperties& getActiveProperties(IconType type);
     int getNextIconCI(IconType type, int originalFrame);
     void refreshColorsCI();
