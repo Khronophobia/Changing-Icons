@@ -70,6 +70,10 @@ bool IconCell::init(
         colorLabel->setScale(0.7f);
         colorLabel->setPosition(color1Display->getContentSize() / 2);
         color1Display->addChild(colorLabel);
+        if (std::holds_alternative<ccColor3B>(icon.color1.value())) {
+            colorLabel->setString("1c");
+            colorLabel->setScale(0.6f);
+        }
     }
 
     if (icon.color2) {
@@ -87,6 +91,10 @@ bool IconCell::init(
         colorLabel->setScale(0.7f);
         colorLabel->setPosition(color2Display->getContentSize() / 2);
         color2Display->addChild(colorLabel);
+        if (std::holds_alternative<ccColor3B>(icon.color2.value())) {
+            colorLabel->setString("2c");
+            colorLabel->setScale(0.6f);
+        }
     }
 
     auto iconDisplay = SimplePlayer::create(0);
@@ -113,6 +121,10 @@ bool IconCell::init(
         glowLabel->setScale(0.7f);
         glowLabel->setPosition(glowDisplay->getContentSize() / 2);
         glowDisplay->addChild(glowLabel);
+        if (icon.glowColor && std::holds_alternative<ccColor3B>(icon.glowColor.value())) {
+            glowLabel->setString("Gc");
+            glowLabel->setScale(0.6f);
+        }
     } else {
         if (gm->getPlayerGlow()) {
             iconDisplay->setGlowOutline(gm->colorForIdx(gm->getPlayerGlowColor()));
