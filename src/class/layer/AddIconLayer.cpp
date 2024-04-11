@@ -438,7 +438,7 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
             m_colorWheel->setColorValue(color.value());
     });
     m_hexInput->setString(cc3bToHexString(m_tempCustomColors[0]));
-    m_customColorLayer->addChildAtPosition(m_hexInput, Anchor::Center, ccp(-150.f, -60.f));
+    m_customColorLayer->addChildAtPosition(m_hexInput, Anchor::Center, ccp(-130.f, -60.f));
 
     updateIconColors();
     m_iconPageLayer->setLayout(
