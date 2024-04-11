@@ -627,7 +627,7 @@ void AddIconLayer::textChanged(CCTextInputNode* input) {
         255
     );
 
-    auto color = m_colorWheel->getColorValue();
+    auto color = static_cast<CCColourPickerFix*>(m_colorWheel)->getColorValue();
     switch (input->getTag()) {
         case Red: color.r = value; break;
         case Green: color.g = value; break;

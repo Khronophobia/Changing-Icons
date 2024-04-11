@@ -1,6 +1,7 @@
 #pragma once
 #include <Geode/ui/TextInput.hpp>
 #include <properties/IconProperties.hpp>
+#include <class/ColorPicker.hpp>
 
 namespace changing_icons {
     using IconColor = std::variant<int, cocos2d::ccColor3B>;
