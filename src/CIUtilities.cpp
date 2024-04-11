@@ -84,6 +84,16 @@ namespace changing_icons::utils {
 
         return std::get<ccColor3B>(color);
     }
+
+    TextInput* textInputWithLabel(float width, std::string const& placeholder, char const* labelStr) {
+        auto input = TextInput::create(width, placeholder);
+        auto label = CCLabelBMFont::create(labelStr, "goldFont.fnt");
+        label->setScale(0.8f);
+        label->setAnchorPoint(ccp(0.5f, 0.f));
+        input->addChildAtPosition(label, Anchor::Top, ccp(0.f, 4.f));
+
+        return input;
+    }
 }
 
 fmt::appender fmt::formatter<IconType>::format(IconType type, format_context& ctx) const {

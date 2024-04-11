@@ -392,19 +392,53 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
     );
     m_colorPageMenu->addChildAtPosition(clearColorBtn, Anchor::TopRight, ccp(-120.f, -80.f));
 
+    // Custom Color Layer
     m_customColorLayer = CCLayer::create();
-    m_colorPageLayer->addChild(m_customColorLayer);
 
-    m_colorPicker = CCControlColourPicker::colourPicker();
-    m_colorPicker->setContentSize(CCSizeZero);
-    m_colorPicker->setColorValue(m_tempCustomColors[0]);
-    m_colorPicker->setDelegate(this);
+    m_colorWheel = CCControlColourPicker::colourPicker();
+    m_colorWheel->setContentSize(CCSizeZero);
+    m_colorWheel->setColorValue(m_tempCustomColors[0]);
+    m_colorWheel->setDelegate(this);
+    m_customColorLayer->addChildAtPosition(m_colorWheel, Anchor::Center, ccp(60.f, -24.f));
 
     if (auto const& color = getSelectedColor(); color && std::holds_alternative<ccColor3B>(color.value())) {
-        toggleColorPicker(true);
+        toggleColorWheel(true);
     } else {
-        toggleColorPicker(false);
+        toggleColorWheel(false);
     }
+
+    m_redInput = utils::textInputWithLabel(50.f, "", "R:");
+    m_redInput->setScale(0.8f);
+    m_redInput->setCommonFilter(CommonFilter::Uint);
+    m_redInput->setDelegate(this, Red);
+    m_redInput->setString(geode::utils::numToString(static_cast<int>(m_tempCustomColors[0].r)));
+    m_customColorLayer->addChildAtPosition(m_redInput, Anchor::Center, ccp(-180.f, 10.f));
+
+    m_greenInput = utils::textInputWithLabel(50.f, "", "G:");
+    m_greenInput->setScale(0.8f);
+    m_greenInput->setCommonFilter(CommonFilter::Uint);
+    m_greenInput->setDelegate(this, Green);
+    m_greenInput->setString(geode::utils::numToString(static_cast<int>(m_tempCustomColors[0].g)));
+    m_customColorLayer->addChildAtPosition(m_greenInput, Anchor::Center, ccp(-130.f, 10.f));
+
+    m_blueInput = utils::textInputWithLabel(50.f, "", "B:");
+    m_blueInput->setScale(0.8f);
+    m_blueInput->setCommonFilter(CommonFilter::Uint);
+    m_blueInput->setDelegate(this, Blue);
+    m_blueInput->setString(geode::utils::numToString(static_cast<int>(m_tempCustomColors[0].b)));
+    m_customColorLayer->addChildAtPosition(m_blueInput, Anchor::Center, ccp(-80.f, 10.f));
+
+    m_hexInput = utils::textInputWithLabel(80.f, "", "Hex:");
+    m_hexInput->setScale(0.8f);
+    m_hexInput->setCommonFilter(CommonFilter::Hex);
+    m_hexInput->setMaxCharCount(6);
+    m_hexInput->setCallback([this](std::string const& str) {
+        m_hexInput->setString(string::toUpper(str));
+        if (auto color = cc3bFromHexString(str, true))
+            m_colorWheel->setColorValue(color.value());
+    });
+    m_hexInput->setString(cc3bToHexString(m_tempCustomColors[0]));
+    m_customColorLayer->addChildAtPosition(m_hexInput, Anchor::Center, ccp(-150.f, -60.f));
 
     updateIconColors();
     m_iconPageLayer->setLayout(
@@ -545,17 +579,15 @@ void AddIconLayer::updateIconColors() {
     updateIconColor(Glow);
 }
 
-void AddIconLayer::toggleColorPicker(bool toggle) {
+void AddIconLayer::toggleColorWheel(bool toggle) {
     if (toggle) {
-        m_customColorLayer->setVisible(true);
+        if (!m_customColorLayer->getParent()) {
+            m_colorPageLayer->addChild(m_customColorLayer);
+        }
         m_colorMenu->setVisible(false);
-        if (!m_colorPicker->getParent())
-            m_customColorLayer->addChildAtPosition(m_colorPicker, Anchor::Center, ccp(0.f, -24.f));
     } else {
-        m_customColorLayer->setVisible(false);
+        m_customColorLayer->removeFromParent();
         m_colorMenu->setVisible(true);
-        // This fucker stays enabled even when invisible
-        m_colorPicker->removeFromParent();
     }
 }
 
@@ -568,19 +600,40 @@ std::optional<IconColor>& AddIconLayer::getSelectedColor() {
     }
 }
 
-void AddIconLayer::setPickerColor(ccColor3B const& color) {
-    // Set color without trigerring colorValueChanged
-    auto delegate = m_colorPicker->getDelegate();
-    m_colorPicker->setDelegate(nullptr);
-
-    m_colorPicker->setColorValue(color);
-
-    m_colorPicker->setDelegate(delegate);
+void AddIconLayer::setWheelColor(ccColor3B const& color) {
+    this->setUserObject("dont-set-color"_spr, CCBool::create(true));
+    m_colorWheel->setColorValue(color);
 }
 
 void AddIconLayer::colorValueChanged(ccColor3B color) {
     m_tempCustomColors[m_selectedColorType] = color;
+    m_redInput->setString(geode::utils::numToString(static_cast<int>(color.r)));
+    m_greenInput->setString(geode::utils::numToString(static_cast<int>(color.g)));
+    m_blueInput->setString(geode::utils::numToString(static_cast<int>(color.b)));
+    if (color != cc3bFromHexString(m_hexInput->getString(), true)) {
+        m_hexInput->setString(cc3bToHexString(color));
+    }
+    if (this->getUserObject("dont-set-color"_spr)) {
+        this->setUserObject("dont-set-color"_spr, nullptr);
+        return;
+    }
     setIconColor(color, m_selectedColorType);
+}
+
+void AddIconLayer::textChanged(CCTextInputNode* input) {
+    auto value = std::clamp(
+        geode::utils::numFromString<int>(input->getString()).value_or(0),
+        0,
+        255
+    );
+
+    auto color = m_colorWheel->getColorValue();
+    switch (input->getTag()) {
+        case Red: color.r = value; break;
+        case Green: color.g = value; break;
+        case Blue: color.b = value; break;
+    }
+    m_colorWheel->setColorValue(color);
 }
 
 void AddIconLayer::onPage(CCObject* sender) {
@@ -666,11 +719,11 @@ void AddIconLayer::onColorType(CCObject* sender) {
         break;
     }
 
-    setPickerColor(m_tempCustomColors[m_selectedColorType]);
+    setWheelColor(m_tempCustomColors[m_selectedColorType]);
     if (auto const& color = getSelectedColor(); color && std::holds_alternative<ccColor3B>(color.value())) {
-        toggleColorPicker(true);
+        toggleColorWheel(true);
     } else {
-        toggleColorPicker(false);
+        toggleColorWheel(false);
     }
 
     if (Mod::get()->getSettingValue<bool>("disable-locked-icons")) {
@@ -720,7 +773,7 @@ void AddIconLayer::onSelectCustomColor(CCObject* sender) {
     cursorSpr->setPosition(m_customColorBtn->getContentSize() / 2);
     m_customColorBtn->addChild(cursorSpr);
 
-    toggleColorPicker(true);
+    toggleColorWheel(true);
 }
 
 void AddIconLayer::onClearColor(CCObject* sender) {
@@ -735,7 +788,7 @@ void AddIconLayer::onClearColor(CCObject* sender) {
     if (!cursorSpr) return;
     cursorSpr->removeFromParent();
 
-    toggleColorPicker(false);
+    toggleColorWheel(false);
 }
 
 void AddIconLayer::onToggleGlow(CCObject* sender) {

@@ -1,17 +1,22 @@
 #pragma once
-#include <Geode/ui/Popup.hpp>
+#include <Geode/ui/TextInput.hpp>
 #include <properties/IconProperties.hpp>
 
 namespace changing_icons {
     using IconColor = std::variant<int, cocos2d::ccColor3B>;
     class IconConfigLayer;
 
-    class AddIconLayer : public geode::Popup<IconType, IconConfigLayer*, IconProperties, std::optional<int>>, cocos2d::extension::ColorPickerDelegate {
+    class AddIconLayer : public geode::Popup<IconType, IconConfigLayer*, IconProperties, std::optional<int>>, cocos2d::extension::ColorPickerDelegate, TextInputDelegate {
     private:
         enum ColorType {
             Col1 = 0,
             Col2 = 1,
             Glow = 2
+        };
+        enum Color {
+            Red,
+            Green,
+            Blue
         };
     protected:
         IconConfigLayer* m_configLayer;
@@ -53,8 +58,12 @@ namespace changing_icons {
         geode::Ref<cocos2d::CCSprite> m_color2CursorSpr;
         geode::Ref<cocos2d::CCSprite> m_glowColorCursorSpr;
         cocos2d::CCMenu* m_colorMenu;
-        cocos2d::CCLayer* m_customColorLayer;
-        geode::Ref<cocos2d::extension::CCControlColourPicker> m_colorPicker;
+        geode::Ref<cocos2d::CCLayer> m_customColorLayer;
+        cocos2d::extension::CCControlColourPicker* m_colorWheel;
+        geode::TextInput* m_redInput;
+        geode::TextInput* m_greenInput;
+        geode::TextInput* m_blueInput;
+        geode::TextInput* m_hexInput;
 
         bool setup(IconType iconType, IconConfigLayer* configLayer, IconProperties iconProps, std::optional<int> index) override;
         void setupIconPage(int page);
@@ -62,7 +71,7 @@ namespace changing_icons {
         void updateIconColor(int colorType);
         void updateIconColors();
         void updateIconCursor();
-        void toggleColorPicker(bool toggle);
+        void toggleColorWheel(bool toggle);
         std::optional<IconColor>& getSelectedColor();
     public:
         static AddIconLayer* create(IconType iconType, IconConfigLayer* configLayer, IconProperties iconProps, std::optional<int> index = std::nullopt);
@@ -74,8 +83,10 @@ namespace changing_icons {
             std::optional<int> color2 = std::nullopt
         );
 
-        void setPickerColor(cocos2d::ccColor3B const& color);
+        void setWheelColor(cocos2d::ccColor3B const& color);
         void colorValueChanged(cocos2d::ccColor3B color) override;
+
+        void textChanged(CCTextInputNode* input) override;
 
         void onPage(CCObject* sender);
         void onIconPageArrow(CCObject* sender);

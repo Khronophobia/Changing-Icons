@@ -1,4 +1,5 @@
 #pragma once
+#include <Geode/ui/TextInput.hpp>
 
 namespace changing_icons {
     enum class IconOrder;
@@ -42,6 +43,8 @@ namespace changing_icons::utils {
     );
 
     cocos2d::ccColor3B getColorFromVariant(std::variant<int, cocos2d::ccColor3B> const& color);
+
+    geode::TextInput* textInputWithLabel(float width, std::string const& placeholder, char const* labelStr);
 }
 
 template<>
