@@ -9,6 +9,12 @@ namespace changing_icons {
     class DropdownMenu;
 
     class IconConfigLayer : public geode::Popup<> {
+    private:
+        enum MoveTo {
+            Ignore = -1,
+            ToBottom = 0,
+            ToTop = 1,
+        };
     protected:
         IconType m_currentTab;
         cocos2d::CCMenu* m_gamemodeBar;
@@ -23,7 +29,7 @@ namespace changing_icons {
         
         bool setup() override;
         void refreshTab();
-        void refreshIconList(IconType currentTab, bool toTop = false);
+        void refreshIconList(IconType currentTab, int moveTo = Ignore, bool isRemove = false);
         ~IconConfigLayer();
     public:
         static IconConfigLayer* create();

@@ -294,7 +294,7 @@ void IconConfigLayer::refreshTab() {
     m_mirrorEndBtn->toggle(currentConfig.mirrorEnd);
     m_mirrorEndBtn->setUserObject(CCVariableRef<bool>::create(currentConfig.mirrorEnd));
 
-    refreshIconList(m_currentTab, true);
+    refreshIconList(m_currentTab, ToTop);
 }
 
 void IconConfigLayer::onVarInfo(CCObject* sender) {
@@ -351,7 +351,7 @@ void IconConfigLayer::onClearList(CCObject*) {
         [this](auto, bool btn2) {
             if (btn2) {
                 getCurrentConfig().iconSet.clear();
-                refreshIconList(m_currentTab, true);
+                refreshIconList(m_currentTab, ToTop);
             }
         }
     );
@@ -370,7 +370,7 @@ void IconConfigLayer::onLoadList(CCObject* sender) {
     LoadPresetLayer::create(this, m_currentTab)->show();
 }
 
-void IconConfigLayer::refreshIconList(IconType currentTab, bool toTop) {
+void IconConfigLayer::refreshIconList(IconType currentTab, int moveTo, bool isRemove) {
     auto& currentConfig = getCurrentConfig();
     auto iconList = currentConfig.iconSet;
     auto content = m_iconList->m_contentLayer;
@@ -378,7 +378,7 @@ void IconConfigLayer::refreshIconList(IconType currentTab, bool toTop) {
     auto height = std::max(m_iconList->getContentHeight(), iconList.size() * constants::ICONCELL_HEIGHT);
     content->setContentHeight(height);
 
-    m_iconList->m_contentLayer->removeAllChildren();
+    content->removeAllChildren();
     size_t i = 0;
     for (auto const& icon : iconList) {
         bool isLast = false;
@@ -395,22 +395,30 @@ void IconConfigLayer::refreshIconList(IconType currentTab, bool toTop) {
         content->addChild(cell);
         i++;
     }
-    if (toTop) {
+    switch (moveTo) {
+    case ToTop:
         m_iconList->moveToTop();
-        return;
+        break;
+    case Ignore:
+        if (isRemove) {
+            auto maxScrollPos = m_iconList->getContentHeight() - content->getContentHeight();
+            content->setPositionY(std::clamp<float>(
+                content->getPositionY() + constants::ICONCELL_HEIGHT,
+                maxScrollPos,
+                0.f
+            ));
+        }
+        break;
+    case ToBottom:
+        content->setPositionY(0);
+        break;
     }
-    auto maxScrollPos = m_iconList->getContentHeight() - content->getContentHeight();
-    content->setPositionY(std::clamp<float>(
-        content->getPositionY() + constants::ICONCELL_HEIGHT,
-        maxScrollPos,
-        0.f
-    ));
 }
 
 void IconConfigLayer::addIcon(IconProperties icon) {
     log::info("Added icon ID {}", icon.iconID);
     getCurrentConfig().iconSet.push_back(icon);
-    refreshIconList(m_currentTab);
+    refreshIconList(m_currentTab, ToBottom);
 }
 
 void IconConfigLayer::swapIcons(int icon1, int icon2) {
@@ -431,12 +439,12 @@ void IconConfigLayer::deleteIcon(int index) {
     log::info("Removed icon at index {}", index);
     auto& iconSet = getCurrentConfig().iconSet;
     iconSet.erase(iconSet.begin() + index);
-    refreshIconList(m_currentTab);
+    refreshIconList(m_currentTab, Ignore, true);
 }
 
 void IconConfigLayer::replaceList(std::vector<IconProperties> const& list) {
     getCurrentConfig().iconSet = list;
-    refreshIconList(m_currentTab, true);
+    refreshIconList(m_currentTab, ToTop);
 }
 
 IconConfigLayer::~IconConfigLayer() {
