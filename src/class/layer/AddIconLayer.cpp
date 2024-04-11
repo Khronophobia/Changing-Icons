@@ -431,7 +431,11 @@ bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconPr
     m_hexInput = utils::textInputWithLabel(80.f, "", "Hex:");
     m_hexInput->setScale(0.8f);
     m_hexInput->setCommonFilter(CommonFilter::Hex);
+    #ifdef GEODE_IS_MOBILE
+    m_hexInput->setMaxCharCount(7);
+    #else
     m_hexInput->setMaxCharCount(6);
+    #endif
     m_hexInput->setCallback([this](std::string const& str) {
         m_hexInput->setString(string::toUpper(str));
         if (auto color = cc3bFromHexString(str, true))
