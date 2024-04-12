@@ -41,7 +41,6 @@ void CIPlayLayer::setupHasCompleted() {
 
     auto startMode = m_levelSettings->m_startMode;
     auto dualMode = m_levelSettings->m_startDual;
-    log::info("Is startDual {}", dualMode);
     switch (startMode) {
     default: break;
     case 0:
