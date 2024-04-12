@@ -6,16 +6,16 @@ namespace changing_icons {
     class CIManager;
     class DropdownMenu;
 
-    class GlobalConfigLayer : public geode::Popup<> {
+    class GlobalConfigLayer : public geode::Popup<bool> {
     protected:
         CIManager* m_configManager;
         cocos2d::CCLabelBMFont* m_iconOrderLabel;
         DropdownMenu* m_iconOrderDropdown;
         cocos2d::CCMenu* m_gamemodeBar;
 
-        bool setup() override;
+        bool setup(bool fromModSettings) override;
     public:
-        static GlobalConfigLayer* create();
+        static GlobalConfigLayer* create(bool fromModSettings);
         void onTriTogglerInfo(CCObject* sender);
         void onVarTriToggle(CCObject* sender);
         void onOrderDropdown(CCObject* sender);

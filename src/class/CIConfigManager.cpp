@@ -29,6 +29,14 @@ bool CIManager::init() {
     return true;
 }
 
+void CIManager::setConfigLayer(IconConfigLayer* configLayer) {
+    m_configLayer = configLayer;
+}
+
+IconConfigLayer* CIManager::getConfigLayer() {
+    return m_configLayer;
+}
+
 CIGlobalProperties& CIManager::getGlobalConfig() {
     return m_globalConfig;
 }

@@ -1,10 +1,13 @@
 #include <Geode/Geode.hpp>
 #include <class/CIConfigManager.hpp>
+#include "OpenConfigSetting.hpp"
 
 using namespace geode::prelude;
 using namespace changing_icons;
 
 $on_mod(Loaded) {
+    Mod::get()->addCustomSetting<OpenConfigSettingValue>("open-config", 0);
+
     Mod::get()->setSavedValue("version", 0);
     if (auto res = file::createDirectoryAll(CIManager::getPresetDir(IconType::Cube)); res.isErr()) {
         log::error("Creating cube preset directory failed: {}", res.error());

@@ -29,6 +29,10 @@
 			"description": "Prevents locked icons and colors from being added to the list. Also prevents locked icons from being picked when <cy>Use All Icons</c> is enabled. Does not affect existing lists",
 			"type": "bool",
 			"default": true
+		},
+		"open-config": {
+			"name": "Open Config",
+			"type": "custom"
 		}
 	},
 	"incompatibilities": [

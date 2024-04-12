@@ -14,9 +14,9 @@
 using namespace geode::prelude;
 using namespace changing_icons;
 
-IconConfigLayer* IconConfigLayer::create() {
+IconConfigLayer* IconConfigLayer::create(bool fromModSettings) {
     auto ret = new IconConfigLayer();
-    if (ret && ret->initAnchored(400.f, 300.f)) {
+    if (ret && ret->initAnchored(400.f, 300.f, fromModSettings)) {
         ret->autorelease();
         return ret;
     }
@@ -24,8 +24,10 @@ IconConfigLayer* IconConfigLayer::create() {
     return nullptr;
 }
 
-bool IconConfigLayer::setup() {
+bool IconConfigLayer::setup(bool fromModSettings) {
+    m_fromModSettings = fromModSettings;
     m_configManager = CIManager::get();
+    m_configManager->setConfigLayer(this);
 
     m_noElasticity = true;
     m_currentTab = m_configManager->getGlobalConfig().currentTab;
@@ -263,7 +265,7 @@ CITabProperties& IconConfigLayer::getCurrentConfig() {
 }
 
 void IconConfigLayer::onGlobalConfig(CCObject* sender) {
-    GlobalConfigLayer::create()->show();
+    GlobalConfigLayer::create(m_fromModSettings)->show();
 }
 
 void IconConfigLayer::onSwitchTab(CCObject* sender) {
@@ -448,6 +450,7 @@ void IconConfigLayer::replaceList(std::vector<IconProperties> const& list) {
 }
 
 IconConfigLayer::~IconConfigLayer() {
+    m_configManager->setConfigLayer(nullptr);
     log::info("Saving config.");
     Mod::get()->setSavedValue("global", m_configManager->getGlobalConfig());
     Mod::get()->setSavedValue("cube", m_configManager->getConfig(IconType::Cube));

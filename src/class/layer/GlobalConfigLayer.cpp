@@ -9,9 +9,9 @@
 using namespace geode::prelude;
 using namespace changing_icons;
 
-GlobalConfigLayer* GlobalConfigLayer::create() {
+GlobalConfigLayer* GlobalConfigLayer::create(bool fromModSettings) {
     auto ret = new GlobalConfigLayer();
-    if (ret && ret->initAnchored(400.f, 300.f, "GJ_square05.png")) {
+    if (ret && ret->initAnchored(400.f, 300.f, fromModSettings, "GJ_square05.png")) {
         ret->autorelease();
         return ret;
     }
@@ -19,7 +19,7 @@ GlobalConfigLayer* GlobalConfigLayer::create() {
     return nullptr;
 }
 
-bool GlobalConfigLayer::setup() {
+bool GlobalConfigLayer::setup(bool fromModSettings) {
     m_configManager = CIManager::get();
     m_noElasticity = true;
     this->setTitle("Global Settings");
@@ -29,12 +29,14 @@ bool GlobalConfigLayer::setup() {
         ->setOffset(ccp(10.f, -10.f));
     m_buttonMenu->updateLayout();
 
-    auto modSettingsBtn = CCMenuItemSpriteExtra::create(
-        CCSprite::createWithSpriteFrameName("GJ_optionsBtn02_001.png"),
-        this,
-        menu_selector(GlobalConfigLayer::onModSettings)
-    );
-    m_buttonMenu->addChildAtPosition(modSettingsBtn, Anchor::TopRight, ccp(-10.f, -10.f));
+    if (!fromModSettings) {
+        auto modSettingsBtn = CCMenuItemSpriteExtra::create(
+            CCSprite::createWithSpriteFrameName("GJ_optionsBtn02_001.png"),
+            this,
+            menu_selector(GlobalConfigLayer::onModSettings)
+        );
+        m_buttonMenu->addChildAtPosition(modSettingsBtn, Anchor::TopRight, ccp(-10.f, -10.f));
+    }
 
     auto globalOverrideBg = CCScale9Sprite::create("square02_001.png");
     globalOverrideBg->setAnchorPoint(ccp(0.5f, 0.5f));

@@ -8,7 +8,7 @@ namespace changing_icons {
     class CIManager;
     class DropdownMenu;
 
-    class IconConfigLayer : public geode::Popup<> {
+    class IconConfigLayer : public geode::Popup<bool> {
     private:
         enum MoveTo {
             Ignore = -1,
@@ -16,6 +16,7 @@ namespace changing_icons {
             ToTop = 1,
         };
     protected:
+        bool m_fromModSettings;
         IconType m_currentTab;
         cocos2d::CCMenu* m_gamemodeBar;
         geode::ScrollLayer* m_iconList;
@@ -27,12 +28,12 @@ namespace changing_icons {
         CIManager* m_configManager;
         DropdownMenu* m_iconOrderDropdown;
         
-        bool setup() override;
+        bool setup(bool fromModSettings) override;
         void refreshTab();
         void refreshIconList(IconType currentTab, int moveTo = Ignore, bool isRemove = false);
         ~IconConfigLayer();
     public:
-        static IconConfigLayer* create();
+        static IconConfigLayer* create(bool fromModSettings = false);
         CITabProperties& getCurrentConfig();
 
         void onGlobalConfig(CCObject*);
