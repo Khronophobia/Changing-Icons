@@ -47,6 +47,7 @@ void CIPlayerObject::updatePlayerFrame(int frame) {
         return;
 
     PlayerObject::updatePlayerFrame(getNextIconCI(IconType::Cube, frame));
+    refreshColorsCI();
 }
 
 $override
@@ -57,6 +58,7 @@ void CIPlayerObject::updatePlayerShipFrame(int frame) {
         return;
 
     PlayerObject::updatePlayerShipFrame(getNextIconCI(IconType::Ship, frame));
+    refreshColorsCI();
 }
 
 $override
@@ -67,6 +69,7 @@ void CIPlayerObject::updatePlayerJetpackFrame(int frame) {
         return;
 
     PlayerObject::updatePlayerJetpackFrame(getNextIconCI(IconType::Jetpack, frame));
+    refreshColorsCI();
 }
 
 $override
@@ -77,6 +80,7 @@ void CIPlayerObject::updatePlayerRollFrame(int frame) {
         return;
 
     PlayerObject::updatePlayerRollFrame(getNextIconCI(IconType::Ball, frame));
+    refreshColorsCI();
 }
 
 $override
@@ -87,6 +91,7 @@ void CIPlayerObject::updatePlayerBirdFrame(int frame) {
         return;
 
     PlayerObject::updatePlayerBirdFrame(getNextIconCI(IconType::Ufo, frame));
+    refreshColorsCI();
 }
 
 $override
@@ -97,6 +102,7 @@ void CIPlayerObject::updatePlayerDartFrame(int frame) {
         return;
 
     PlayerObject::updatePlayerDartFrame(getNextIconCI(IconType::Wave, frame));
+    refreshColorsCI();
 }
 
 $override
@@ -107,6 +113,7 @@ void CIPlayerObject::updatePlayerSwingFrame(int frame) {
         return;
 
     PlayerObject::updatePlayerSwingFrame(getNextIconCI(IconType::Swing, frame));
+    refreshColorsCI();
 }
 
 $override
@@ -125,7 +132,7 @@ void CIPlayerObject::switchedToMode(GameObjectType p0) { // Need to do this beca
         PlayerObject::updatePlayerSpiderFrame(getNextIconCI(IconType::Spider, GameManager::get()->getPlayerSpider()));
         break;
     }
-    PlayerObject::updateGlowColor();
+    refreshColorsCI();
 }
 
 $override
@@ -222,8 +229,6 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
     bool enableGlow = m_fields->m_ogHasGlow;
 
     if (config.disabled || config.iconSet.empty()) {
-        setColorsCI(isVehicle, color1, color2);
-        setGlowColorCI(isVehicle, enableGlow, glowColor);
         return originalFrame;
     }
 
@@ -239,8 +244,6 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
                 glowColor = changing_icons::utils::getColorFromVariant(iconProps.glowColor.value());
             }
         }
-        setColorsCI(isVehicle, color1, color2);
-        setGlowColorCI(isVehicle, enableGlow, glowColor);
         return iconProps.iconID;
     }
 
@@ -293,8 +296,6 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
             glowColor = changing_icons::utils::getColorFromVariant(iconProps.glowColor.value());
         }
     }
-    setColorsCI(isVehicle, color1, color2);
-    setGlowColorCI(isVehicle, enableGlow, glowColor);
 
     std::string_view playerName = "P1";
     if (this == m_gameLayer->m_player2) playerName = "P2";
@@ -317,12 +318,6 @@ void CIPlayerObject::refreshColorsCI() {
     auto color2 = GameManager::get()->colorForIdx(m_fields->m_ogColor2);
     auto glowColor = GameManager::get()->colorForIdx(m_fields->m_ogGlowColor);
 
-    if (config.disabled || config.iconSet.empty()) {
-        setColorsCI(false, color1, color2);
-        setGlowColorCI(false, enableGlow, glowColor);
-        return;
-    }
-
     if (!config.disabled && !config.iconSet.empty()) {
         auto const& icon = config.iconSet.at(config.current);
         if (icon.overrideGlow) enableGlow = icon.glowColor.has_value();
@@ -343,7 +338,7 @@ void CIPlayerObject::refreshColorsCI() {
         auto glowColor = GameManager::get()->colorForIdx(m_fields->m_ogGlowColor);
 
         if (!vehConfig.disabled && !vehConfig.iconSet.empty()) {
-            auto const& icon = vehConfig.iconSet.at(config.current);
+            auto const& icon = vehConfig.iconSet[vehConfig.current];
             if (icon.overrideGlow) enableGlow = icon.glowColor.has_value();
             if (icon.color1)
                 color1 = changing_icons::utils::getColorFromVariant(icon.color1.value());
