@@ -131,6 +131,7 @@ void CIPlayerObject::switchedToMode(GameObjectType p0) { // Need to do this beca
 $override
 void CIPlayerObject::spawnFromPlayer(PlayerObject* p0, bool p1) {
     PlayerObject::spawnFromPlayer(p0, p1);
+    if (!PlayLayer::get()) return;
     if (PlayLayer::get()->m_player2 != this) return;
     auto gm = GameManager::get();
     if (m_isBall)
