@@ -9,12 +9,8 @@ namespace changing_icons {
         CCVariableRef(T& varRef) : m_varRef(varRef) {}
         static CCVariableRef* create(T& varRef) {
             auto ret = new CCVariableRef(varRef);
-            if (ret) {
-                ret->autorelease();
-                return ret;
-            }
-            CC_SAFE_DELETE(ret);
-            return nullptr;
+            ret->autorelease();
+            return ret;
         }
         T& getVarRef() {
             return m_varRef;
