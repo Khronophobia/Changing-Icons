@@ -22,6 +22,12 @@ bool CIPlayerObject::init(int p0, int p1, GJBaseGameLayer* p2, cocos2d::CCLayer*
 }
 
 $override
+void CIPlayerObject::setColor(ccColor3B const& color) {
+    PlayerObject::setColor(color);
+    m_fields->m_currentColor = color;
+}
+
+$override
 void CIPlayerObject::updateGlowColor() {
     PlayerObject::updateGlowColor();
     m_vehicleGlow->setColor(m_fields->m_vehicleGlowColor);
@@ -149,9 +155,6 @@ void CIPlayerObject::spawnFromPlayer(PlayerObject* p0, bool p1) {
         PlayerObject::updatePlayerSwingFrame(gm->getPlayerSwing());
     else if (!m_isRobot && !m_isSpider)
         PlayerObject::updatePlayerFrame(gm->getPlayerFrame());
-
-    if (m_isShip || m_isBird)
-        refreshColorsCI();
 }
 
 $override
@@ -166,6 +169,7 @@ void CIPlayerObject::resetObject() { // I need something that gets called after 
 
 void CIPlayerObject::setVehicleColor(ccColor3B const& color) {
     m_vehicleSprite->setColor(color);
+    m_fields->m_currentVehicleColor = color;
 }
 
 void CIPlayerObject::setVehicleSecondColor(ccColor3B const& color) {
@@ -181,11 +185,9 @@ void CIPlayerObject::setColorsCI(bool isVehicle, ccColor3B const& color1, ccColo
     if (isVehicle) {
         setVehicleColor(color1);
         setVehicleSecondColor(color2);
-        m_fields->m_currentVehicleColor = color1;
     } else {
         PlayerObject::setColor(color1);
         PlayerObject::setSecondColor(color2);
-        m_fields->m_currentColor = color1;
     }
 }
 
@@ -305,6 +307,7 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
 }
 
 void CIPlayerObject::refreshColorsCI() {
+    if (!m_fields->m_levelStarted) return;
     auto const& config = getActiveProperties(
         changing_icons::utils::getIconTypeFromGamemode(this, false)
     );

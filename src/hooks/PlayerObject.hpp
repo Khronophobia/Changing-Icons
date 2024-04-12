@@ -18,6 +18,7 @@ class $modify(CIPlayerObject, PlayerObject) {
 
     $override
     bool init(int p0, int p1, GJBaseGameLayer* p2, cocos2d::CCLayer* p3, bool p4);
+    void setColor(cocos2d::ccColor3B const& color);
     void updateGlowColor();
     void updatePlayerGlow();
     void flashPlayer(float p0, float p1, cocos2d::ccColor3B mainColor, cocos2d::ccColor3B secondColor);
