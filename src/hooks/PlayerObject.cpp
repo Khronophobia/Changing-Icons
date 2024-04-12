@@ -43,7 +43,7 @@ $override
 void CIPlayerObject::updatePlayerFrame(int frame) {
     PlayerObject::updatePlayerFrame(frame);
     if (!PlayLayer::get()) return;
-    if (PlayLayer::get()->m_player1 != this && PlayLayer::get()->m_player2 != this)
+    if (m_gameLayer->m_player1 != this && m_gameLayer->m_player2 != this)
         return;
 
     PlayerObject::updatePlayerFrame(getNextIconCI(IconType::Cube, frame));
@@ -53,7 +53,7 @@ $override
 void CIPlayerObject::updatePlayerShipFrame(int frame) {
     PlayerObject::updatePlayerShipFrame(frame);
     if (!PlayLayer::get()) return;
-    if (PlayLayer::get()->m_player1 != this && PlayLayer::get()->m_player2 != this)
+    if (m_gameLayer->m_player1 != this && m_gameLayer->m_player2 != this)
         return;
 
     PlayerObject::updatePlayerShipFrame(getNextIconCI(IconType::Ship, frame));
@@ -63,7 +63,7 @@ $override
 void CIPlayerObject::updatePlayerJetpackFrame(int frame) {
     PlayerObject::updatePlayerJetpackFrame(frame);
     if (!PlayLayer::get()) return;
-    if (PlayLayer::get()->m_player1 != this && PlayLayer::get()->m_player2 != this)
+    if (m_gameLayer->m_player1 != this && m_gameLayer->m_player2 != this)
         return;
 
     PlayerObject::updatePlayerJetpackFrame(getNextIconCI(IconType::Jetpack, frame));
@@ -73,7 +73,7 @@ $override
 void CIPlayerObject::updatePlayerRollFrame(int frame) {
     PlayerObject::updatePlayerRollFrame(frame);
     if (!PlayLayer::get()) return;
-    if (PlayLayer::get()->m_player1 != this && PlayLayer::get()->m_player2 != this)
+    if (m_gameLayer->m_player1 != this && m_gameLayer->m_player2 != this)
         return;
 
     PlayerObject::updatePlayerRollFrame(getNextIconCI(IconType::Ball, frame));
@@ -83,7 +83,7 @@ $override
 void CIPlayerObject::updatePlayerBirdFrame(int frame) {
     PlayerObject::updatePlayerBirdFrame(frame);
     if (!PlayLayer::get()) return;
-    if (PlayLayer::get()->m_player1 != this && PlayLayer::get()->m_player2 != this)
+    if (m_gameLayer->m_player1 != this && m_gameLayer->m_player2 != this)
         return;
 
     PlayerObject::updatePlayerBirdFrame(getNextIconCI(IconType::Ufo, frame));
@@ -93,7 +93,7 @@ $override
 void CIPlayerObject::updatePlayerDartFrame(int frame) {
     PlayerObject::updatePlayerDartFrame(frame);
     if (!PlayLayer::get()) return;
-    if (PlayLayer::get()->m_player1 != this && PlayLayer::get()->m_player2 != this)
+    if (m_gameLayer->m_player1 != this && m_gameLayer->m_player2 != this)
         return;
 
     PlayerObject::updatePlayerDartFrame(getNextIconCI(IconType::Wave, frame));
@@ -103,7 +103,7 @@ $override
 void CIPlayerObject::updatePlayerSwingFrame(int frame) {
     PlayerObject::updatePlayerSwingFrame(frame);
     if (!PlayLayer::get()) return;
-    if (PlayLayer::get()->m_player1 != this && PlayLayer::get()->m_player2 != this)
+    if (m_gameLayer->m_player1 != this && m_gameLayer->m_player2 != this)
         return;
 
     PlayerObject::updatePlayerSwingFrame(getNextIconCI(IconType::Swing, frame));
@@ -113,7 +113,7 @@ $override
 void CIPlayerObject::switchedToMode(GameObjectType p0) { // Need to do this because updatePlayerRobotFrame
     PlayerObject::switchedToMode(p0);                    // and updatePlayerSpiderFrame are inlined
     if (!PlayLayer::get()) return;
-    if (PlayLayer::get()->m_player1 != this && PlayLayer::get()->m_player2 != this)
+    if (m_gameLayer->m_player1 != this && m_gameLayer->m_player2 != this)
         return;
 
     switch (p0) {
@@ -132,7 +132,7 @@ $override
 void CIPlayerObject::spawnFromPlayer(PlayerObject* p0, bool p1) {
     PlayerObject::spawnFromPlayer(p0, p1);
     if (!PlayLayer::get()) return;
-    if (PlayLayer::get()->m_player2 != this) return;
+    if (m_gameLayer->m_player2 != this) return;
     auto gm = GameManager::get();
     if (m_isBall)
         PlayerObject::updatePlayerRollFrame(gm->getPlayerBall());
@@ -151,7 +151,7 @@ $override
 void CIPlayerObject::resetObject() { // I need something that gets called after init,
     PlayerObject::resetObject();     // And this seems the closest to what I want
     if (!PlayLayer::get()) return;
-    if (PlayLayer::get()->m_player1 != this && PlayLayer::get()->m_player2 != this)
+    if (m_gameLayer->m_player1 != this && m_gameLayer->m_player2 != this)
         return;
 
     if (m_fields->m_levelStarted) refreshColorsCI();
@@ -297,7 +297,7 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
     setGlowColorCI(isVehicle, enableGlow, glowColor);
 
     std::string_view playerName = "P1";
-    if (this == PlayLayer::get()->m_player2) playerName = "P2";
+    if (this == m_gameLayer->m_player2) playerName = "P2";
 
     log::info("{}: Changed {} icon to ID {} (Index: {}, Order: {})", playerName, type, newIcon, config.current, config.order);
     return newIcon;
