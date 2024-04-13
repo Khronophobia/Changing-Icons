@@ -18,6 +18,7 @@ namespace changing_icons {
         static GlobalConfigLayer* create(bool fromModSettings);
         void onTriTogglerInfo(CCObject* sender);
         void onVarTriToggle(CCObject* sender);
+        void onVarToggle(CCObject* sender);
         void onOrderDropdown(CCObject* sender);
         void onAddToOverride(CCObject* sender);
         void onModSettings(CCObject* sender);

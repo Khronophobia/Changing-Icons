@@ -5,6 +5,7 @@
 #include <class/dropdown/DropdownMenu.hpp>
 #include "TriTogglerInfoLayer.hpp"
 #include <Geode/ui/GeodeUI.hpp>
+#include <CIUtilities.hpp>
 
 using namespace geode::prelude;
 using namespace changing_icons;
@@ -42,7 +43,7 @@ bool GlobalConfigLayer::setup(bool fromModSettings) {
     globalOverrideBg->setAnchorPoint(ccp(0.5f, 0.5f));
     globalOverrideBg->setContentSize(ccp(200.f, 154.f));
     globalOverrideBg->setOpacity(95);
-    m_mainLayer->addChildAtPosition(globalOverrideBg, Anchor::Center, ccp(0.f, 20.f));
+    m_mainLayer->addChildAtPosition(globalOverrideBg, Anchor::Center, ccp(-80.f, 20.f));
 
     auto globalOverrideLabel = CCLabelBMFont::create("Overrides", "bigFont.fnt");
     globalOverrideLabel->setScale(0.55f);
@@ -216,6 +217,14 @@ bool GlobalConfigLayer::setup(bool fromModSettings) {
     gamemodeOverrideText->setScale(0.6f);
     m_mainLayer->addChildAtPosition(gamemodeOverrideText, Anchor::Bottom, ccp(0.f, 55.f));
 
+    auto flipP2ColorsBtn = utils::createToggleButton(
+        m_buttonMenu, m_mainLayer,
+        Anchor::Center, ccp(40.f, 20.f),
+        "Flip P2 Colors",
+        this, menu_selector(GlobalConfigLayer::onVarToggle), 0.6f
+    );
+    flipP2ColorsBtn->setUserObject(CCVariableRef<bool>::create(m_configManager->getGlobalConfig().flipP2Colors));
+
     // Initialize values
     disableBtn->setState(globalConfig.override.disabled);
     useAllBtn->setState(globalConfig.override.useAll);
@@ -234,8 +243,17 @@ bool GlobalConfigLayer::setup(bool fromModSettings) {
             btn->toggle(false);
         }
     }
+    flipP2ColorsBtn->toggle(m_configManager->getGlobalConfig().flipP2Colors);
 
     return true;
+}
+
+void GlobalConfigLayer::onVarToggle(CCObject* sender) {
+    auto btn = static_cast<CCMenuItemToggler*>(sender);
+    auto obj = btn->getUserObject();
+    if (auto ref = typeinfo_cast<CCVariableRef<bool>*>(obj)) {
+        ref->getVarRef() = !btn->m_toggled;
+    }
 }
 
 void GlobalConfigLayer::onTriTogglerInfo(CCObject* sender) {

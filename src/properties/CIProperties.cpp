@@ -86,6 +86,11 @@ CIGlobalProperties matjson::Serialize<CIGlobalProperties>::from_json(matjson::Va
             "current-tab",
             CIGlobalProperties().currentTab
         ),
+        .flipP2Colors = utils::tryGetJsonValue(
+            value,
+            "flip-p2-colors",
+            CIGlobalProperties().flipP2Colors
+        ),
         .globalOverrides = utils::tryGetJsonValue(
             value,
             "global-overrides",
@@ -102,6 +107,7 @@ CIGlobalProperties matjson::Serialize<CIGlobalProperties>::from_json(matjson::Va
 matjson::Value matjson::Serialize<CIGlobalProperties>::to_json(CIGlobalProperties const& value) {
     auto obj = matjson::Object();
     obj["current-tab"] = static_cast<int>(value.currentTab);
+    obj["flip-p2-colors"] = value.flipP2Colors;
     obj["global-overrides"] = value.globalOverrides;
     obj["override"] = value.override;
     return obj;

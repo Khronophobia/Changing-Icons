@@ -308,12 +308,9 @@ int CIPlayerObject::getNextIconCI(IconType type, int originalFrame) {
 
 void CIPlayerObject::refreshColorsCI() {
     if (!m_fields->m_levelStarted) return;
+    auto isPlayer2 = this == m_gameLayer->m_player2;
     auto const& config = getActiveProperties(
         changing_icons::utils::getIconTypeFromGamemode(this, false)
-    );
-    auto hasVehicle = m_isShip || m_isBird;
-    auto const& vehConfig = getActiveProperties(
-        changing_icons::utils::getIconTypeFromGamemode(this, true)
     );
 
     auto enableGlow = m_fields->m_ogHasGlow;
@@ -331,10 +328,18 @@ void CIPlayerObject::refreshColorsCI() {
         if (icon.glowColor)
             glowColor = changing_icons::utils::getColorFromVariant(icon.glowColor.value());
     }
-    setColorsCI(false, color1, color2);
+    if ((CIManager::get()->getGlobalConfig().flipP2Colors || config.disabled) && isPlayer2) {
+        setColorsCI(false, color2, color1);
+    } else {
+        setColorsCI(false, color1, color2);
+    }
     setGlowColorCI(false, enableGlow, glowColor);
 
+    auto hasVehicle = m_isShip || m_isBird;
     if (hasVehicle) {
+        auto const& vehConfig = getActiveProperties(
+            changing_icons::utils::getIconTypeFromGamemode(this, true)
+        );
         auto enableGlow = m_fields->m_ogHasGlow;
         auto color1 = GameManager::get()->colorForIdx(m_fields->m_ogColor1);
         auto color2 = GameManager::get()->colorForIdx(m_fields->m_ogColor2);
@@ -350,7 +355,11 @@ void CIPlayerObject::refreshColorsCI() {
             if (icon.glowColor)
                 glowColor = changing_icons::utils::getColorFromVariant(icon.glowColor.value());
         }
-        setColorsCI(true, color1, color2);
+        if ((CIManager::get()->getGlobalConfig().flipP2Colors || vehConfig.disabled) && isPlayer2) {
+            setColorsCI(true, color2, color1);
+        } else {
+            setColorsCI(true, color1, color2);
+        }
         setGlowColorCI(true, enableGlow, glowColor);
     }
 }

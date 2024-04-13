@@ -15,6 +15,7 @@ namespace changing_icons {
 
     struct CIGlobalProperties {
         IconType currentTab = IconType::Cube;
+        bool flipP2Colors;
         std::unordered_set<IconType> globalOverrides;
         CIGlobalOverride override;
     };
