@@ -1,15 +1,16 @@
 #include <Geode/Geode.hpp>
 #include "AddIconLayer.hpp"
 #include "IconConfigLayer.hpp"
+#include <class/CIConfigManager.hpp>
 #include <CIConstants.hpp>
 #include <CIUtilities.hpp>
 
 using namespace geode::prelude;
 using namespace changing_icons;
 
-AddIconLayer* AddIconLayer::create(IconType iconType, IconConfigLayer* configLayer, IconProperties iconProps, std::optional<int> index) {
+AddIconLayer* AddIconLayer::create(IconType iconType, IconProperties iconProps, std::optional<int> index) {
     auto ret = new AddIconLayer();
-    if (ret && ret->initAnchored(480.f, 300.f, iconType, configLayer, iconProps, index, "GJ_square02.png")) {
+    if (ret && ret->initAnchored(480.f, 300.f, iconType, iconProps, index, "GJ_square02.png")) {
         ret->autorelease();
         return ret;
     }
@@ -19,7 +20,6 @@ AddIconLayer* AddIconLayer::create(IconType iconType, IconConfigLayer* configLay
 
 AddIconLayer* AddIconLayer::create(
             IconType iconType,
-            IconConfigLayer* configLayer,
             int ID,
             std::optional<int> color1,
             std::optional<int> color2
@@ -30,7 +30,7 @@ AddIconLayer* AddIconLayer::create(
         .color2 = color2
     };
     auto ret = new AddIconLayer();
-    if (ret && ret->initAnchored(480.f, 300.f, iconType, configLayer, iconProps, std::nullopt, "GJ_square02.png")) {
+    if (ret && ret->initAnchored(480.f, 300.f, iconType, iconProps, std::nullopt, "GJ_square02.png")) {
         ret->autorelease();
         return ret;
     }
@@ -38,11 +38,10 @@ AddIconLayer* AddIconLayer::create(
     return nullptr;
 }
 
-bool AddIconLayer::setup(IconType iconType, IconConfigLayer* configLayer, IconProperties iconProps, std::optional<int> index) {
+bool AddIconLayer::setup(IconType iconType, IconProperties iconProps, std::optional<int> index) {
     m_noElasticity = true;
     m_iconType = iconType;
     m_selectedIcon = iconProps;
-    m_configLayer = configLayer;
     m_index = index;
     m_iconPageMax = GameManager::get()->countForType(iconType) / constants::ICONS_PER_PAGE;
     if (m_index) this->setTitle("Edit Icon");
@@ -684,9 +683,9 @@ void AddIconLayer::onSelectIcon(CCObject* sender) {
 
 void AddIconLayer::onAddIcon(CCObject* sender) {
     if (m_index) {
-        m_configLayer->replaceIcon(m_selectedIcon, m_index.value());
+        CIManager::get()->getConfigLayer()->replaceIcon(m_selectedIcon, m_index.value());
     } else {
-        m_configLayer->addIcon(m_selectedIcon);
+        CIManager::get()->getConfigLayer()->addIcon(m_selectedIcon);
     }
     AddIconLayer::onClose(nullptr);
 }

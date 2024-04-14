@@ -7,7 +7,7 @@ namespace changing_icons {
     using IconColor = std::variant<int, cocos2d::ccColor3B>;
     class IconConfigLayer;
 
-    class AddIconLayer : public geode::Popup<IconType, IconConfigLayer*, IconProperties, std::optional<int>>, cocos2d::extension::ColorPickerDelegate, TextInputDelegate {
+    class AddIconLayer : public geode::Popup<IconType, IconProperties, std::optional<int>>, cocos2d::extension::ColorPickerDelegate, TextInputDelegate {
     private:
         enum ColorType {
             Col1 = 0,
@@ -20,7 +20,6 @@ namespace changing_icons {
             Blue
         };
     protected:
-        IconConfigLayer* m_configLayer;
         IconProperties m_selectedIcon;
         std::optional<int> m_index;
         int m_currentPage;
@@ -66,7 +65,7 @@ namespace changing_icons {
         geode::TextInput* m_blueInput;
         geode::TextInput* m_hexInput;
 
-        bool setup(IconType iconType, IconConfigLayer* configLayer, IconProperties iconProps, std::optional<int> index) override;
+        bool setup(IconType iconType, IconProperties iconProps, std::optional<int> index) override;
         void setupIconPage(int page);
         void setIconColor(std::optional<std::variant<int, cocos2d::ccColor3B>> color, int colorType);
         void updateIconColor(int colorType);
@@ -75,10 +74,9 @@ namespace changing_icons {
         void toggleColorWheel(bool toggle);
         std::optional<IconColor>& getSelectedColor();
     public:
-        static AddIconLayer* create(IconType iconType, IconConfigLayer* configLayer, IconProperties iconProps, std::optional<int> index = std::nullopt);
+        static AddIconLayer* create(IconType iconType, IconProperties iconProps, std::optional<int> index = std::nullopt);
         static AddIconLayer* create(
             IconType iconType,
-            IconConfigLayer* configLayer,
             int ID = 1,
             std::optional<int> color1 = std::nullopt,
             std::optional<int> color2 = std::nullopt

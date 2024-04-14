@@ -337,12 +337,12 @@ void IconConfigLayer::onOrderInfo(CCObject* sender) {
 }
 
 void IconConfigLayer::onAddIcon(CCObject*) {
-    AddIconLayer::create(m_currentTab, this)->show();
+    AddIconLayer::create(m_currentTab)->show();
 }
 
 void IconConfigLayer::editIconAtIndex(int index) {
     auto const& prevIcon = getCurrentConfig().iconSet.at(index);
-    AddIconLayer::create(m_currentTab, this, prevIcon, index)->show();
+    AddIconLayer::create(m_currentTab, prevIcon, index)->show();
 }
 
 void IconConfigLayer::onClearList(CCObject*) {
