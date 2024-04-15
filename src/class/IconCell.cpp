@@ -182,7 +182,21 @@ bool IconCell::init(
 }
 
 void IconCell::onDelete(CCObject*) {
-    m_delegate->deleteIcon(m_index);
+    if (Mod::get()->getSettingValue<bool>("delete-confirmation")) {
+        createQuickPopup(
+            "Delete icon",
+            "Are you sure you want to delete this icon?\n"
+            "<cy>(You can disable this popup in mod settings)</c>",
+            "Cancel", "Yes",
+            [this](auto, bool btn2) {
+                if (btn2) {
+                    m_delegate->deleteIcon(m_index);
+                }
+            }
+        );
+    } else {
+        m_delegate->deleteIcon(m_index);
+    }  
 }
 
 void IconCell::onEdit(CCObject*) {

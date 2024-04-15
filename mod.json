@@ -30,6 +30,12 @@
 			"type": "bool",
 			"default": true
 		},
+		"delete-confirmation": {
+			"name": "Show Delete Confirmations",
+			"description": "Show delete confirmations when removing icons from a list",
+			"type": "bool",
+			"default": true
+		},
 		"open-config": {
 			"name": "Open Config",
 			"type": "custom"
