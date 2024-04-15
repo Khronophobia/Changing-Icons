@@ -21,7 +21,6 @@ bool PresetCell::init(LoadPresetLayer* presetLayer, int index, IconType type, CI
     if (!CCLayerColor::init()) return false;
     m_presetLayer = presetLayer;
     m_preset = preset;
-    m_index = index;
     m_iconType = type;
     m_filename = filename;
 
@@ -31,84 +30,64 @@ bool PresetCell::init(LoadPresetLayer* presetLayer, int index, IconType type, CI
         this->setOpacity(100);
     else
         this->setOpacity(50);
-    auto playerColor1 = GameManager::get()->colorForIdx(GameManager::get()->getPlayerColor());
-    auto playerColor2 = GameManager::get()->colorForIdx(GameManager::get()->getPlayerColor2());
 
-    m_presetName = CCLabelBMFont::create(preset.name.c_str(), "bigFont.fnt");
-    m_presetName->setAnchorPoint(ccp(0.f, 0.5f));
-    m_presetName->limitLabelWidth(constants::PRESETCELL_WIDTH - 4, 0.4f, 0.1f);
-    this->addChildAtPosition(m_presetName, Anchor::TopLeft, ccp(2.f, -8.f));
+    auto title = CCLabelBMFont::create(m_preset.name.c_str(), "bigFont.fnt");
+    title->setAnchorPoint(ccp(0.f, 1.f));
+    title->limitLabelWidth(m_obContentSize.width - 8.f, 0.4f, 0.1f);
+    this->addChildAtPosition(title, Anchor::TopLeft, ccp(4.f, 0.f));
 
-    auto const& firstIcon = preset.iconSet.at(0);
-    if (firstIcon.color1) playerColor1 = utils::getColorFromVariant(firstIcon.color1.value());
-    if (firstIcon.color2) playerColor2 = utils::getColorFromVariant(firstIcon.color2.value());
-
+    auto const& icon = m_preset.iconSet[0];
     auto iconDisplay = SimplePlayer::create(0);
     iconDisplay->setScale(0.7f);
-    iconDisplay->updatePlayerFrame(firstIcon.iconID, type);
-    iconDisplay->setColor(playerColor1);
-    iconDisplay->setSecondColor(playerColor2);
-    this->addChildAtPosition(iconDisplay, Anchor::BottomLeft, ccp(24.f, 16.f));
+    iconDisplay->updatePlayerFrame(icon.iconID, m_iconType);
+    iconDisplay->setColor(
+        utils::getColorFromVariant(icon.color1.value_or(GameManager::get()->getPlayerColor()))
+    );
+    iconDisplay->setSecondColor(
+        utils::getColorFromVariant(icon.color2.value_or(GameManager::get()->getPlayerColor2()))
+    );
+    if (icon.overrideGlow) {
+        if (icon.glowColor) {
+            iconDisplay->setGlowOutline(
+                utils::getColorFromVariant(icon.glowColor.value_or(GameManager::get()->getPlayerColor()))
+            );
+        } else {
+            iconDisplay->disableGlowOutline();
+        }
+    } else {
+        if (GameManager::get()->getPlayerGlow()) {
+            iconDisplay->setGlowOutline(GameManager::get()->colorForIdx(GameManager::get()->getPlayerGlowColor()));
+        }
+    }
+    this->addChildAtPosition(iconDisplay, Anchor::Left, ccp(22.f, -6.f));
 
     auto menu = CCMenu::create();
-    menu->setContentSize(ccp(20.f, 20.f));
-    this->addChildAtPosition(menu, Anchor::BottomRight, ccp(0.f, 16.f), false);
+    menu->setPosition(ccp(m_obContentSize.width, m_obContentSize.height / 2 - 6.f));
+    this->addChild(menu);
 
-    auto loadBtnSpr = ButtonSprite::create("Load");
-    loadBtnSpr->setScale(0.5f);
-    auto loadBtn = CCMenuItemSpriteExtra::create(
-        loadBtnSpr,
-        this,
-        menu_selector(PresetCell::onLoad)
+    auto selectBtnSpr = ButtonSprite::create("Select");
+    selectBtnSpr->setScale(0.5f);
+    auto selectBtn = CCMenuItemSpriteExtra::create(
+        selectBtnSpr, this, menu_selector(PresetCell::onSelect)
     );
-    loadBtn->setPositionX(-24.f);
-    menu->addChild(loadBtn);
-
-    auto previewBtnSpr = ButtonSprite::create("View");
-    previewBtnSpr->setScale(0.5f);
-    auto previewBtn = CCMenuItemSpriteExtra::create(
-        previewBtnSpr,
-        this,
-        menu_selector(PresetCell::onView)
-    );
-    previewBtn->setPositionX(-64.f);
-    menu->addChild(previewBtn);
+    selectBtn->setPosition(ccp(-30.f, 0.f));
+    menu->addChild(selectBtn);
 
     auto deleteBtnSpr = ButtonSprite::create("Delete");
     deleteBtnSpr->setScale(0.5f);
     auto deleteBtn = CCMenuItemSpriteExtra::create(
-        deleteBtnSpr,
-        this,
-        menu_selector(PresetCell::onDelete)
+        deleteBtnSpr, this, menu_selector(PresetCell::onDelete)
     );
-    deleteBtn->setPositionX(-110.f);
+    deleteBtn->setPosition(ccp(-85.f, 0.f));
     menu->addChild(deleteBtn);
 
     return true;
 }
 
-void PresetCell::onLoad(CCObject* sender) {
-    createQuickPopup(
-        "Load Set",
-        "Load <cy>" + m_preset.name + "</c>?",
-        "Cancel", "Load",
-        [this](auto, bool btn2) {
-            if (btn2) {
-                m_presetLayer->loadPreset(m_preset);
-            }
-        }
-    );
-}
-
-void PresetCell::onView(CCObject* sender) {
-    m_presetLayer->viewPreset(m_preset);
-}
-
-void PresetCell::onDelete(CCObject* sender) {
-    createQuickPopup(
-        "Delete Set",
-        "Are you sure you want to delete <cy>" +
-            m_preset.name + "</c>?",
+void PresetCell::onDelete(CCObject*) {
+    auto popup = createQuickPopup(
+        "Delete List",
+        "Are you sure you want to delete <cy>" + m_preset.name + "</c>?",
         "Cancel", "Yes",
         [this](auto, bool btn2) {
             if (btn2) {
@@ -116,4 +95,8 @@ void PresetCell::onDelete(CCObject* sender) {
             }
         }
     );
+}
+
+void PresetCell::onSelect(CCObject*) {
+    m_presetLayer->selectPreset(m_preset);
 }

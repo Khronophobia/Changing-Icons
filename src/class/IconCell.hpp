@@ -1,5 +1,6 @@
 #pragma once
 #include <properties/IconProperties.hpp>
+#include "IconCellDelegate.hpp"
 
 namespace changing_icons {
     class IconConfigLayer;
@@ -7,10 +8,10 @@ namespace changing_icons {
     class IconCell : public cocos2d::CCLayerColor {
     protected:
         int m_index;
-        IconConfigLayer* m_configLayer;
+        IconCellDelegate* m_delegate;
 
         bool init(
-            IconConfigLayer* configLayer,
+            IconCellDelegate* delegate,
             int index,
             IconType iconType,
             IconProperties const& icon,
@@ -19,7 +20,7 @@ namespace changing_icons {
         );
     public:
         static IconCell* create(
-            IconConfigLayer* m_configLayer,
+            IconCellDelegate* delegate,
             int index,
             IconType iconType,
             IconProperties const& icon,

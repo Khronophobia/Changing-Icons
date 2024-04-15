@@ -340,7 +340,7 @@ void IconConfigLayer::onAddIcon(CCObject*) {
     AddIconLayer::create(m_currentTab)->show();
 }
 
-void IconConfigLayer::editIconAtIndex(int index) {
+void IconConfigLayer::editIcon(int index) {
     auto const& prevIcon = getCurrentConfig().iconSet.at(index);
     AddIconLayer::create(m_currentTab, prevIcon, index)->show();
 }
@@ -369,7 +369,7 @@ void IconConfigLayer::onSaveList(CCObject* sender) {
 }
 
 void IconConfigLayer::onLoadList(CCObject* sender) {
-    LoadPresetLayer::create(this, m_currentTab)->show();
+    LoadPresetLayer::create(m_currentTab)->show();
 }
 
 void IconConfigLayer::refreshIconList(IconType currentTab, int moveTo, bool isRemove) {

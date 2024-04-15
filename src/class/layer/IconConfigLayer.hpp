@@ -1,5 +1,5 @@
 #pragma once
-#include <Geode/ui/Popup.hpp>
+#include <class/IconCellDelegate.hpp>
 
 namespace changing_icons {
     enum class IconOrder;
@@ -8,7 +8,7 @@ namespace changing_icons {
     class CIManager;
     class DropdownMenu;
 
-    class IconConfigLayer : public geode::Popup<bool> {
+    class IconConfigLayer : public geode::Popup<bool>, IconCellDelegate {
     private:
         enum MoveTo {
             Ignore = -1,
@@ -47,11 +47,11 @@ namespace changing_icons {
         void onSaveList(CCObject*);
         void onLoadList(CCObject*);
 
-        void editIconAtIndex(int index);
+        void editIcon(int index) override;
+        void swapIcons(int icon1, int icon2) override;
+        void deleteIcon(int index) override;
         void addIcon(IconProperties properties);
-        void swapIcons(int icon1, int icon2);
         void replaceIcon(IconProperties properties, int index);
-        void deleteIcon(int index);
         void replaceList(std::vector<IconProperties> const& list);
     };
 }

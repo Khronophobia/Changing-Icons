@@ -7,14 +7,14 @@ using namespace geode::prelude;
 using namespace changing_icons;
 
 IconCell* IconCell::create(
-        IconConfigLayer* configLayer,
+        IconCellDelegate* delegate,
         int index,
         IconType iconType,
         IconProperties const& icon,
         bool isLast
     ) {
     auto ret = new IconCell();
-    if (ret && ret->init(configLayer, index, iconType, icon, false, isLast)) {
+    if (ret && ret->init(delegate, index, iconType, icon, false, isLast)) {
         ret->autorelease();
         return ret;
     }
@@ -33,7 +33,7 @@ IconCell* IconCell::create(int index, IconType type, IconProperties const& icon)
 }
 
 bool IconCell::init(
-        IconConfigLayer* configLayer,
+        IconCellDelegate* delegate,
         int index,
         IconType iconType,
         IconProperties const& icon,
@@ -41,7 +41,7 @@ bool IconCell::init(
         bool isLast
     ) {
     if (!CCLayerColor::init()) return false;
-    m_configLayer = configLayer;
+    m_delegate = delegate;
     auto gm = GameManager::get();
 
     this->setContentSize(ccp(constants::ICONCELL_WIDTH, constants::ICONCELL_HEIGHT));
@@ -182,17 +182,17 @@ bool IconCell::init(
 }
 
 void IconCell::onDelete(CCObject*) {
-    m_configLayer->deleteIcon(m_index);
+    m_delegate->deleteIcon(m_index);
 }
 
 void IconCell::onEdit(CCObject*) {
-    m_configLayer->editIconAtIndex(m_index);
+    m_delegate->editIcon(m_index);
 }
 
 void IconCell::onMoveDown(CCObject*) {
-    m_configLayer->swapIcons(m_index, m_index + 1);
+    m_delegate->swapIcons(m_index, m_index + 1);
 }
 
 void IconCell::onMoveUp(CCObject*) {
-    m_configLayer->swapIcons(m_index, m_index - 1);
+    m_delegate->swapIcons(m_index, m_index - 1);
 }

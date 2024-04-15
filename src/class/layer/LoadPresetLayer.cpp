@@ -4,13 +4,14 @@
 #include <class/PresetCell.hpp>
 #include <class/IconCell.hpp>
 #include <CIConstants.hpp>
+#include <properties/IconProperties.hpp>
 
 using namespace geode::prelude;
 using namespace changing_icons;
 
-LoadPresetLayer* LoadPresetLayer::create(IconConfigLayer* configLayer, IconType type) {
+LoadPresetLayer* LoadPresetLayer::create(IconType type) {
     auto ret = new LoadPresetLayer();
-    if (ret && ret->initAnchored(270.f, 300.f, configLayer, type, "GJ_square04.png")) {
+    if (ret && ret->initAnchored(400.f, 300.f, type, "GJ_square04.png")) {
         ret->autorelease();
         return ret;
     }
@@ -18,156 +19,132 @@ LoadPresetLayer* LoadPresetLayer::create(IconConfigLayer* configLayer, IconType 
     return nullptr;
 }
 
-bool LoadPresetLayer::setup(IconConfigLayer* configLayer, IconType type) {
-    this->setTitle("Load List");
+bool LoadPresetLayer::setup(IconType type) {
     m_noElasticity = true;
-    m_configLayer = configLayer;
     m_iconType = type;
+    this->setTitle("Saved Lists");
     static_cast<AnchorLayoutOptions*>(m_closeBtn->getLayoutOptions())
         ->setOffset(ccp(10.f, -10.f));
     m_buttonMenu->updateLayout();
 
-    m_setsListBg = CCLayerColor::create({0, 0, 0, 95});
-    m_setsListBg->ignoreAnchorPointForPosition(false);
-    m_setsListBg->setContentSize(ccp(constants::PRESETCELL_WIDTH, 250.f));
-    m_mainLayer->addChildAtPosition(m_setsListBg, Anchor::Center, ccp(0.f, -10.f));
-
-    m_setsList = ScrollLayer::create(m_setsListBg->getContentSize(), false);
-    m_setsListBg->addChild(m_setsList);
-
-    m_setsScrollbar = Scrollbar::create(m_setsList);
-    m_setsListBg->addChildAtPosition(
-        m_setsScrollbar, Anchor::Right, ccp(5.f, 0.f), false
+    auto loadBtnSpr = ButtonSprite::create("Load");
+    loadBtnSpr->setScale(0.7f);
+    auto loadBtn = CCMenuItemSpriteExtra::create(
+        loadBtnSpr, this, menu_selector(LoadPresetLayer::onLoadSelected)
     );
+    m_buttonMenu->addChildAtPosition(loadBtn, Anchor::Bottom, ccp(0.f, 20.f));
 
-    refreshSets(true);
+    auto presetListBG = CCLayerColor::create();
+    presetListBG->ignoreAnchorPointForPosition(false);
+    presetListBG->setAnchorPoint(ccp(0.f, 0.5f));
+    presetListBG->setOpacity(95);
+    presetListBG->setContentSize(ccp(constants::PRESETCELL_WIDTH, 230.f));
+    m_mainLayer->addChildAtPosition(presetListBG, Anchor::Left, ccp(20.f, 0.f));
 
-    m_presetViewBg = CCLayerColor::create({0, 0, 0, 95});
-    m_presetViewBg->ignoreAnchorPointForPosition(false);
-    m_presetViewBg->setContentSize(ccp(constants::ICONCELL_WIDTH, 216.f));
-    m_mainLayer->addChildAtPosition(m_presetViewBg, Anchor::Center);
+    m_presetList = ScrollLayer::create(presetListBG->getContentSize(), false);
+    presetListBG->addChild(m_presetList);
 
-    m_presetViewList = ScrollLayer::create(m_presetViewBg->getContentSize(), false);
-    m_presetViewBg->addChild(m_presetViewList);
+    m_selectedText = CCLabelBMFont::create("None Selected", "bigFont.fnt");
+    m_selectedText->setColor(cc3x(0x00ff00));
+    m_selectedText->setScale(0.4f);
+    m_mainLayer->addChildAtPosition(m_selectedText, Anchor::Right, ccp(-105.f, 114.f));
 
-    m_presetScrollbar = Scrollbar::create(m_presetViewList);
+    auto previewListBG = CCLayerColor::create();
+    previewListBG->ignoreAnchorPointForPosition(false);
+    previewListBG->setAnchorPoint(ccp(1.f, 0.5f));
+    previewListBG->setOpacity(95);
+    previewListBG->setContentSize(ccp(constants::ICONCELL_WIDTH, 220.f));
+    m_mainLayer->addChildAtPosition(previewListBG, Anchor::Right, ccp(-20.f, -5.f));
 
-    auto presetBackSpr = ButtonSprite::create("Back");
-    presetBackSpr->setScale(0.75f);
-    m_presetBackBtn = CCMenuItemSpriteExtra::create(
-        presetBackSpr,
-        this,
-        menu_selector(LoadPresetLayer::onBack)
-    );
-    m_buttonMenu->addChildAtPosition(m_presetBackBtn, Anchor::Bottom, ccp(0.f, 20.f));
+    m_previewList = ScrollLayer::create(previewListBG->getContentSize(), false);
+    previewListBG->addChild(m_previewList);
 
-    m_presetBackBtn->setVisible(false);
-    m_presetViewBg->setVisible(false);
-    m_presetViewList->m_disableMovement = true;
+    loadPresets();
 
     return true;
 }
 
-void LoadPresetLayer::refreshSets(bool toTop) {
-    auto res = file::readDirectory(CIManager::getPresetDir(m_iconType));
-    if (res.isErr()) {
-        log::error("{}", res.error());
+void LoadPresetLayer::loadPresets() {
+    std::vector<ghc::filesystem::path> presetPaths;
+    if (auto res = file::readDirectory(CIManager::getPresetDir(m_iconType))) {
+        presetPaths = res.value();
+    } else {
+        log::error("Error reading preset directory: {}", res.error());
         return;
     }
-    if (res.value().empty()) return;
+    if (presetPaths.empty()) return;
 
-    auto list = res.value();
-
-    auto content = m_setsList->m_contentLayer;
-    auto height = std::max(m_setsList->getContentHeight(), list.size() * constants::PRESETCELL_HEIGHT);
+    auto content = m_presetList->m_contentLayer;
+    auto height = std::max(m_presetList->getContentHeight(), presetPaths.size() * constants::PRESETCELL_HEIGHT);
     content->setContentHeight(height);
     content->removeAllChildren();
-    size_t i = 0;
-    for (auto const& path : list) {
-        auto res = file::readJson(path);
-        if (res.isErr()) {
+
+    int index = 0;
+    for (auto const& path : presetPaths) {
+        CIPreset preset;
+        if (auto res = file::readJson(path)) {
+            preset = res.value().as<CIPreset>();
+        } else {
             log::error("Error loading '{}': {}", path.filename(), res.error());
             continue;
         }
-        log::info("Loaded '{}'", path.filename());
-        auto const& preset = res.value().as<CIPreset>();
         auto cell = PresetCell::create(
-            this,
-            i,
-            m_iconType,
-            preset,
-            path.filename()
+            this, index, m_iconType, preset, path.filename()
         );
-        cell->setPositionY(height - (i + 1) * constants::PRESETCELL_HEIGHT);
+        cell->setPositionY(height - (index + 1) * constants::PRESETCELL_HEIGHT);
         content->addChild(cell);
-        i++;
+
+        ++index;
     }
-    if (toTop) {
-        m_setsList->moveToTop();
-        return;
-    }
-    auto maxScrollPos = m_setsList->getContentHeight() - content->getContentHeight();
-    content->setPositionY(std::clamp<float>(
-        content->getPositionY() + constants::PRESETCELL_HEIGHT,
-        maxScrollPos,
-        0.f
-    ));
+
+    m_presetList->moveToTop();
 }
 
-void LoadPresetLayer::viewPreset(CIPreset const& preset) {
-    this->setTitle(preset.name);
+void LoadPresetLayer::selectPreset(CIPreset const& preset) {
+    auto content = m_previewList->m_contentLayer;
+    auto height = std::max(m_previewList->getContentHeight(), preset.iconSet.size() * constants::ICONCELL_HEIGHT);
+    content->setContentHeight(height);
+    content->removeAllChildren();
 
-    m_setsScrollbar->removeFromParent();
-    m_setsListBg->setVisible(false);
-    m_setsList->m_disableMovement = true;
-
-    m_presetViewBg->setVisible(true);
-    m_presetViewList->m_disableMovement = false;
-    m_presetViewBg->addChildAtPosition(m_presetScrollbar, Anchor::Right, ccp(5.f, 0.f));
-    m_presetBackBtn->setVisible(true);
-
-    auto height = std::max(m_presetViewList->getContentHeight(), preset.iconSet.size() * constants::ICONCELL_HEIGHT);
-    m_presetViewList->m_contentLayer->setContentHeight(height);
-    m_presetViewList->m_contentLayer->removeAllChildren();
-    size_t i = 0;
+    int index = 0;
     for (auto const& icon : preset.iconSet) {
-        auto cell = IconCell::create(
-            i,
-            m_iconType,
-            icon
-        );
-        cell->setPositionY(height - (i + 1) * constants::ICONCELL_HEIGHT);
-        m_presetViewList->m_contentLayer->addChild(cell);
-        i++;
-    }
-    m_presetViewList->moveToTop();
-}
+        auto cell = IconCell::create(index, m_iconType, icon);
+        cell->setPositionY(height - (index + 1) * constants::ICONCELL_HEIGHT);
+        content->addChild(cell);
 
-void LoadPresetLayer::loadPreset(CIPreset const& preset) {
-    m_configLayer->replaceList(preset.iconSet);
-    LoadPresetLayer::onClose(nullptr);
+        ++index;
+    }
+    m_previewList->moveToTop();
+
+    m_selectedText->setString(preset.name.c_str());
+    m_selectedText->limitLabelWidth(constants::ICONCELL_WIDTH, 0.4f, 0.1f);
+    m_selectedPreset = preset;
 }
 
 void LoadPresetLayer::deletePreset(ghc::filesystem::path const& filename) {
-    auto presetDir = CIManager::getPresetDir(m_iconType) / filename.filename();
     std::error_code error;
-    if (!ghc::filesystem::remove(presetDir, error)) {
-        log::error("Error deleting {}: {}", filename.filename(), error);
+    if (!ghc::filesystem::remove(CIManager::getPresetDir(m_iconType) / filename, error)) {
+        Notification::create(error.message(), NotificationIcon::Error)->show();
         return;
     }
-    refreshSets();
+    loadPresets();
 }
 
-void LoadPresetLayer::onBack(CCObject*) {
-    this->setTitle("Load List");
-    m_presetScrollbar->removeFromParent();
-    m_presetBackBtn->setVisible(false);
-    m_presetViewBg->setVisible(false);
-    m_presetViewList->m_disableMovement = true;
-
-    m_setsListBg->setVisible(true);
-    m_setsList->m_disableMovement = false;
-    m_setsListBg->addChildAtPosition(
-        m_setsScrollbar, Anchor::Right, ccp(5.f, 0.f), false
+void LoadPresetLayer::onLoadSelected(CCObject*) {
+    if (!m_selectedPreset) {
+        Notification::create("No List Selected")->show();
+        return;
+    }
+    
+    createQuickPopup(
+        "Load List",
+        "Are you sure you want to load <cy>" + m_selectedPreset->name + "</c>?",
+        "Cancel", "Yes",
+        [this](auto, bool btn2) {
+            if (btn2) {
+                CIManager::get()->getConfigLayer()->replaceList(m_selectedPreset->iconSet);
+                LoadPresetLayer::onClose(nullptr);
+            }
+        }
     );
 }

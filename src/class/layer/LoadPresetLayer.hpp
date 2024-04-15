@@ -1,31 +1,25 @@
 #pragma once
-#include <Geode/ui/Popup.hpp>
+#include <class/IconCellDelegate.hpp>
 
 namespace changing_icons {
     struct CIPreset;
     class IconConfigLayer;
 
-    class LoadPresetLayer : public geode::Popup<IconConfigLayer*, IconType> {
+    class LoadPresetLayer : public geode::Popup<IconType>{
     protected:
-        IconConfigLayer* m_configLayer;
         IconType m_iconType;
-        cocos2d::CCLayerColor* m_setsListBg;
-        geode::ScrollLayer* m_setsList;
-        geode::Ref<geode::Scrollbar> m_setsScrollbar;
-        cocos2d::CCLayerColor* m_presetViewBg;
-        geode::ScrollLayer* m_presetViewList;
-        geode::Ref<geode::Scrollbar> m_presetScrollbar;
-        CCMenuItemSpriteExtra* m_presetBackBtn;
+        geode::ScrollLayer* m_presetList;
+        geode::ScrollLayer* m_previewList;
+        cocos2d::CCLabelBMFont* m_selectedText;
+        std::optional<CIPreset> m_selectedPreset;
 
-        bool setup(IconConfigLayer* configLayer, IconType type) override;
-        void refreshSets(bool toTop = false);
-        void refreshLoadBtn();
+        bool setup(IconType type) override;
+        void loadPresets();
     public:
-        static LoadPresetLayer* create(IconConfigLayer* configLayer, IconType type);
-        void viewPreset(CIPreset const& preset);
-        void loadPreset(CIPreset const& preset);
+        static LoadPresetLayer* create(IconType type);
+        void selectPreset(CIPreset const& preset);
         void deletePreset(ghc::filesystem::path const& filename);
 
-        void onBack(CCObject*);
+        void onLoadSelected(CCObject*);
     };
 }
