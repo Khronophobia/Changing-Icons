@@ -2,7 +2,6 @@
 #include "IconConfigLayer.hpp"
 #include "AddIconLayer.hpp"
 #include "GlobalConfigLayer.hpp"
-#include "SavePresetLayer.hpp"
 #include "LoadPresetLayer.hpp"
 #include <class/CCVariableRef.hpp>
 #include <class/IconCell.hpp>
@@ -237,11 +236,6 @@ bool IconConfigLayer::setup(bool fromModSettings) {
         this,
         menu_selector(IconConfigLayer::onClearList)
     );
-    auto iconListSaveBtn = CCMenuItemSpriteExtra::create(
-        CCSprite::createWithSpriteFrameName("GJ_downloadBtn_001.png"),
-        this,
-        menu_selector(IconConfigLayer::onSaveList)
-    );
     auto iconListLoadSpr = CCSprite::createWithSpriteFrameName("GJ_duplicateBtn_001.png");
     iconListLoadSpr->setScale(0.83f);
     auto iconListLoadBtn = CCMenuItemSpriteExtra::create(
@@ -252,7 +246,6 @@ bool IconConfigLayer::setup(bool fromModSettings) {
 
     iconListMenu->addChild(iconListAddBtn);
     iconListMenu->addChild(iconListClearBtn);
-    iconListMenu->addChild(iconListSaveBtn);
     iconListMenu->addChild(iconListLoadBtn);
     iconListMenu->updateLayout();
 
@@ -357,15 +350,6 @@ void IconConfigLayer::onClearList(CCObject*) {
             }
         }
     );
-}
-
-void IconConfigLayer::onSaveList(CCObject* sender) {
-    auto const& currentConfig = getCurrentConfig();
-    if (currentConfig.iconSet.empty()) {
-        Notification::create("List is empty", NotificationIcon::Error)->show();
-        return;
-    }
-    SavePresetLayer::create(m_currentTab, currentConfig.iconSet)->show();
 }
 
 void IconConfigLayer::onLoadList(CCObject* sender) {

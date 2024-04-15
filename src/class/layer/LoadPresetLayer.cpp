@@ -1,5 +1,6 @@
 #include "LoadPresetLayer.hpp"
 #include "IconConfigLayer.hpp"
+#include "SavePresetPopup.hpp"
 #include <class/CIConfigManager.hpp>
 #include <class/PresetCell.hpp>
 #include <class/IconCell.hpp>
@@ -32,7 +33,14 @@ bool LoadPresetLayer::setup(IconType type) {
     auto loadBtn = CCMenuItemSpriteExtra::create(
         loadBtnSpr, this, menu_selector(LoadPresetLayer::onLoadSelected)
     );
-    m_buttonMenu->addChildAtPosition(loadBtn, Anchor::Bottom, ccp(0.f, 20.f));
+    m_buttonMenu->addChildAtPosition(loadBtn, Anchor::BottomRight, ccp(-105.f, 20.f));
+
+    auto saveCurrentBtnSpr = ButtonSprite::create("Save Current");
+    saveCurrentBtnSpr->setScale(0.7f);
+    auto saveCurrentBtn = CCMenuItemSpriteExtra::create(
+        saveCurrentBtnSpr, this, menu_selector(LoadPresetLayer::onSaveCurrent)
+    );
+    m_buttonMenu->addChildAtPosition(saveCurrentBtn, Anchor::BottomLeft, ccp(105.f, 20.f));
 
     auto presetListBG = CCLayerColor::create();
     presetListBG->ignoreAnchorPointForPosition(false);
@@ -53,8 +61,8 @@ bool LoadPresetLayer::setup(IconType type) {
     previewListBG->ignoreAnchorPointForPosition(false);
     previewListBG->setAnchorPoint(ccp(1.f, 0.5f));
     previewListBG->setOpacity(95);
-    previewListBG->setContentSize(ccp(constants::ICONCELL_WIDTH, 220.f));
-    m_mainLayer->addChildAtPosition(previewListBG, Anchor::Right, ccp(-20.f, -5.f));
+    previewListBG->setContentSize(ccp(constants::ICONCELL_WIDTH, 216.f));
+    m_mainLayer->addChildAtPosition(previewListBG, Anchor::Right, ccp(-20.f, -7.f));
 
     m_previewList = ScrollLayer::create(previewListBG->getContentSize(), false);
     previewListBG->addChild(m_previewList);
@@ -147,4 +155,12 @@ void LoadPresetLayer::onLoadSelected(CCObject*) {
             }
         }
     );
+}
+
+void LoadPresetLayer::onSaveCurrent(CCObject*) {
+    if (CIManager::get()->getConfigLayer()->getCurrentConfig().iconSet.empty()) {
+        Notification::create("Current list is empty")->show();
+        return;
+    }
+    SavePresetPopup::create(this, m_iconType)->show();
 }

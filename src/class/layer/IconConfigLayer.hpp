@@ -44,7 +44,6 @@ namespace changing_icons {
         void onOrderInfo(CCObject*);
         void onAddIcon(CCObject*);
         void onClearList(CCObject*);
-        void onSaveList(CCObject*);
         void onLoadList(CCObject*);
 
         void editIcon(int index) override;

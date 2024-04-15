@@ -21,5 +21,8 @@ namespace changing_icons {
         void deletePreset(ghc::filesystem::path const& filename);
 
         void onLoadSelected(CCObject*);
+        void onSaveCurrent(CCObject*);
+
+        friend class SavePresetPopup;
     };
 }
