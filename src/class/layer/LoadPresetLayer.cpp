@@ -46,7 +46,7 @@ bool LoadPresetLayer::setup(IconType type) {
     presetListBG->ignoreAnchorPointForPosition(false);
     presetListBG->setAnchorPoint(ccp(0.f, 0.5f));
     presetListBG->setOpacity(95);
-    presetListBG->setContentSize(ccp(constants::PRESETCELL_WIDTH, 230.f));
+    presetListBG->setContentSize(ccp(constants::PRESETCELL_WIDTH, 220.f));
     m_mainLayer->addChildAtPosition(presetListBG, Anchor::Left, ccp(20.f, 0.f));
 
     m_presetList = ScrollLayer::create(presetListBG->getContentSize(), false);
@@ -55,19 +55,21 @@ bool LoadPresetLayer::setup(IconType type) {
     m_selectedText = CCLabelBMFont::create("None Selected", "bigFont.fnt");
     m_selectedText->setColor(cc3x(0x00ff00));
     m_selectedText->setScale(0.4f);
-    m_mainLayer->addChildAtPosition(m_selectedText, Anchor::Right, ccp(-105.f, 114.f));
+    m_mainLayer->addChildAtPosition(m_selectedText, Anchor::Right, ccp(-105.f, 115.f));
 
     auto previewListBG = CCLayerColor::create();
     previewListBG->ignoreAnchorPointForPosition(false);
     previewListBG->setAnchorPoint(ccp(1.f, 0.5f));
     previewListBG->setOpacity(95);
     previewListBG->setContentSize(ccp(constants::ICONCELL_WIDTH, 216.f));
-    m_mainLayer->addChildAtPosition(previewListBG, Anchor::Right, ccp(-20.f, -7.f));
+    m_mainLayer->addChildAtPosition(previewListBG, Anchor::Right, ccp(-20.f, -2.f));
 
     m_previewList = ScrollLayer::create(previewListBG->getContentSize(), false);
     previewListBG->addChild(m_previewList);
 
     loadPresets();
+
+    m_buttonMenu->setTouchPriority(CCTouchDispatcher::get()->getForcePrio() - 1);
 
     return true;
 }
