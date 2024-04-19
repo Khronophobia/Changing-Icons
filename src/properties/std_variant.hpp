@@ -22,20 +22,21 @@ template<class... Types>
 struct matjson::Serialize<std::variant<Types...>> {
 private:
     using Variant = std::variant<Types...>;
+    static auto constexpr lastIndex = std::variant_size_v<Variant> - 1;
 
     template<size_t N>
-    static std::variant<Types...> to_json_loop(matjson::Value const& value) {
+    static std::variant<Types...> from_json_loop(matjson::Value const& value) {
         using CurrentType = std::variant_alternative_t<N, Variant>;
         
         if (value.is<CurrentType>()) {
             return value.as<CurrentType>();
         }
         
-        return to_json_loop<N + 1>(value);
+        return from_json_loop<N + 1>(value);
     }
     template<>
-    static std::variant<Types...> to_json_loop<std::variant_size_v<Variant> - 1>(matjson::Value const& value) {
-        using CurrentType = std::variant_alternative_t<std::variant_size_v<Variant> - 1, Variant>;
+    static std::variant<Types...> from_json_loop<lastIndex>(matjson::Value const& value) {
+        using CurrentType = std::variant_alternative_t<lastIndex, Variant>;
 
         return value.as<CurrentType>();
     }
@@ -51,8 +52,8 @@ private:
         return to_json_loop<N + 1>(value);
     }
     template<>
-    static matjson::Value to_json_loop<std::variant_size_v<Variant> - 1>(Variant const& value) {
-        using CurrentType = std::variant_alternative_t<std::variant_size_v<Variant> - 1, Variant>;
+    static matjson::Value to_json_loop<lastIndex>(Variant const& value) {
+        using CurrentType = std::variant_alternative_t<lastIndex, Variant>;
 
         return std::get<CurrentType>(value);
     }
@@ -64,14 +65,14 @@ private:
         return (value.is<CurrentType>()) || is_json_loop<N + 1>(value);
     }
     template<>
-    static bool is_json_loop<std::variant_size_v<Variant> - 1>(matjson::Value const& value) {
-        using CurrentType = std::variant_alternative_t<std::variant_size_v<Variant> - 1, Variant>;
+    static bool is_json_loop<lastIndex>(matjson::Value const& value) {
+        using CurrentType = std::variant_alternative_t<lastIndex, Variant>;
 
         return (value.is<CurrentType>());
     }
 public:
     static std::variant<Types...> from_json(matjson::Value const& value) {
-        return to_json_loop<0>(value);
+        return from_json_loop<0>(value);
     }
     static matjson::Value to_json(std::variant<Types...> const& value) {
         return to_json_loop<0>(value);
