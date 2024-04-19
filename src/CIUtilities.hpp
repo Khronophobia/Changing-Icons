@@ -7,8 +7,11 @@ namespace changing_icons {
 
 namespace changing_icons::utils {
     template<class T>
-    T tryGetJsonValue(matjson::Value const& value, std::string_view key, T defaultVar) {
-        return value.contains(key) ? value[key].as<T>() : defaultVar;
+    T tryGetJsonValue(matjson::Value const& json, std::string_view key, T defaultVar) {
+        if (auto value = json.try_get<T>(key)) {
+            return *value;
+        }
+        return defaultVar;
     }
     /*
         Create a toggle button inside a menu with AnchorLayout.
