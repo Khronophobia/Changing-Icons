@@ -73,7 +73,7 @@ bool TriTogglerInfoLayer::init() {
         "Won't override setting\n"
         "Will override setting to <cy>off</c>\n"
         "Will override setting to <cy>on</c>",
-        "chatFont.fnt", 1.f, 150.f, ccp(0.f, 0.5f), checkYOffset, false
+        "chatFont.fnt", 1.f, 300.f, ccp(0.f, 0.5f), checkYOffset, false
     );
     checkExplanation->setAnchorPoint(ccp(0.f, 1.f));
     m_mainLayer->addChildAtPosition(checkExplanation, Anchor::Left, ccp(textXPos, checkYPos));
