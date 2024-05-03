@@ -6,6 +6,8 @@ using namespace geode::prelude;
 using namespace changing_icons;
 
 $on_mod(Loaded) {
+    CIManager::get();
+
     Mod::get()->addCustomSetting<OpenConfigSettingValue>("open-config", 0);
 
     Mod::get()->setSavedValue("version", 0);
