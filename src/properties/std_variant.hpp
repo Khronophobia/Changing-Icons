@@ -66,19 +66,6 @@ private:
 
         return std::get<CurrentType>(value);
     }
-
-    template<size_t N>
-    static bool __is_json(matjson::Value const& value) {
-        using CurrentType = std::variant_alternative_t<N, Variant>;
-
-        return (value.is<CurrentType>()) || __is_json<N + 1>(value);
-    }
-    template<>
-    static bool __is_json<lastIndex>(matjson::Value const& value) {
-        using CurrentType = std::variant_alternative_t<lastIndex, Variant>;
-
-        return (value.is<CurrentType>());
-    }
 public:
     static std::variant<Types...> from_json(matjson::Value const& value) {
         return __from_json<0>(value);
@@ -87,6 +74,6 @@ public:
         return __to_json<0>(value);
     }
     static bool is_json(matjson::Value const& value) {
-        return __is_json<0>(value);
+        return (value.is<Types> || ...);
     }
 };
