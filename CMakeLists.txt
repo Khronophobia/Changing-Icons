@@ -7,16 +7,9 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 project(ChangingIcons VERSION 1.0.0)
 
-file(GLOB SOURCES
-    src/*.cpp
-    src/class/*.cpp
-    src/class/layer/*.cpp
-    src/class/dropdown/*.cpp
-    src/hooks/*.cpp
-    src/properties/*.cpp
-)
+add_library(${PROJECT_NAME} SHARED
 
-add_library(${PROJECT_NAME} SHARED ${SOURCES})
+)
 
 if (NOT DEFINED ENV{GEODE_SDK})
     message(FATAL_ERROR "Unable to find Geode SDK! Please define GEODE_SDK environment variable to point to Geode")
