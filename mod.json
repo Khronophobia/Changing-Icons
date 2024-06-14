@@ -1,5 +1,5 @@
 {
-	"geode": "2.0.0-beta.25",
+	"geode": "3.0.0-alpha.2",
 	"gd": {
 		"win": "2.204",
 		"android": "2.205"
@@ -35,10 +35,6 @@
 			"description": "Show delete confirmations when removing icons from a list",
 			"type": "bool",
 			"default": true
-		},
-		"open-config": {
-			"name": "Open Config",
-			"type": "custom"
 		}
 	},
 	"incompatibilities": [
