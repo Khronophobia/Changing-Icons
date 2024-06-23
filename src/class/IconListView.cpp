@@ -91,7 +91,7 @@ void IconListView::changeView(IconList& iconList, CITab iconType, bool refresh) 
 }
 
 void IconListView::swapIcons(size_t index1, size_t index2, bool refresh) {
-    std::iter_swap(m_iconList->begin() + index1, m_iconList->begin() + index2);
+    std::swap((*m_iconList)[index1], (*m_iconList)[index2]);
 
     if (refresh) refreshList();
 }
