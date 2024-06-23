@@ -8,7 +8,14 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 project(ChangingIcons VERSION 1.0.0)
 
 add_library(${PROJECT_NAME} SHARED
-
+    src/main.cpp
+    src/CIUtilities.cpp
+    src/class/CIManager.cpp
+    src/class/CCMenuItemTriToggler.cpp
+    src/class/CIConfigPopup.cpp
+    src/class/IconCell.cpp
+    src/class/IconListView.cpp
+    src/hooks/GJGarageLayer.cpp
 )
 
 if (NOT DEFINED ENV{GEODE_SDK})

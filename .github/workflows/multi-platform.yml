@@ -36,6 +36,8 @@ jobs:
           target: ${{ matrix.config.target }}
           bindings: 'Khronophobia/geode-bindings'
           bindings-ref: 'khronos'
+          build-config: 'RelWithDebInfo'
+          export-pdb: true
 
   package:
     name: Package builds
