@@ -7,12 +7,15 @@ using namespace geode::prelude;
 
 namespace ci {
 
+template<typename T, typename Class>
+using CCMemberPtr = ObjWrapper<T Class::*>;
+
 CIConfigPopup::CIConfigPopup(CITab& tab)
     : m_currentTab(tab) {}
 
 CIConfigPopup* CIConfigPopup::create(bool show) {
     auto ret = new (std::nothrow) CIConfigPopup(ci::CIManager::get()->getGlobalSetting().currentTab);
-    if (ret && ret->initAnchored(400.f, 280.f, "GJ_square05.png")) {
+    if (ret && ret->initAnchored(350.f, 285.f, "GJ_square05.png")) {
         ret->autorelease();
         if (show) ret->show();
         return ret;
@@ -58,12 +61,13 @@ m_tabNavMenu->addChild(__##spr##TabBtn)
 
     m_tabNavMenu->updateLayout();
 
-    m_useAllCheckbox = CCMenuItemToggler::createWithStandardSprites(
-        this, menu_selector(CIConfigPopup::onSettingCheckbox), 0.7f
+    addCheckbox(&TabSettings::disabled, "Disabled", cocos2d::Anchor::Left, ccp(40.f, 90.f));
+    addCheckbox(
+        &TabSettings::useAllIcons, "Use All Icons", Anchor::Left, ccp(40.f, 65.f),
+        "Use all icons instead of the ones on the list."
     );
-    m_buttonMenu->addChildAtPosition(m_useAllCheckbox, Anchor::Left);
 
-    m_iconListView = IconListView::create(currentSetting().iconSet, m_currentTab, 180.f);
+    m_iconListView = IconListView::create(currentSetting().iconSet, m_currentTab, 179.9f);
     m_mainLayer->addChildAtPosition(m_iconListView, Anchor::Right, ccp(-80.f, 15.f));
 
     refreshTab();
@@ -79,13 +83,30 @@ TabSettings& CIConfigPopup::currentSetting() {
     return CIManager::get()->getSetting(m_currentTab);
 }
 
-template<typename T>
-static void setReference(CCNode* node, T& ref) {
-    if (auto refObj = dynamic_cast<khronos::CCReference<T>*>(node->getUserObject())) {
-        refObj->reseat(ref);
-    } else {
-        node->setUserObject(khronos::CCReference<T>::create(ref));
+CCMenuItemToggler* CIConfigPopup::addCheckbox(bool TabSettings::* memberPtr, char const* name, Anchor anchor, CCPoint const& offset, char const* info) {
+    auto btn = CCMenuItemToggler::createWithStandardSprites(this, menu_selector(CIConfigPopup::onSettingCheckbox), 0.6f);
+    btn->updateSprite();
+    btn->setUserObject(CCMemberPtr<bool, TabSettings>::create(memberPtr));
+
+    m_checkboxList.push_back(btn);
+    m_buttonMenu->addChildAtPosition(btn, anchor, offset);
+
+    auto text = CCLabelBMFont::create(name, "bigFont.fnt");
+    text->setAnchorPoint(ccp(0.f, 0.5f));
+    text->limitLabelWidth(200.f, 0.5f, 0.1f);
+    m_mainLayer->addChildAtPosition(text, anchor, offset + ccp(12.f, 0.f));
+
+    if (info) {
+        auto infoBtn = CCMenuItemExt::createSpriteExtraWithFrameName(
+            "GJ_infoIcon_001.png", 0.4f,
+            [name, info](auto) {
+                FLAlertLayer::create(name, info, "Ok")->show();
+            }
+        );
+        m_buttonMenu->addChildAtPosition(infoBtn, anchor, offset + ccp(-12.f, 12.f));
     }
+
+    return btn;
 }
 
 void CIConfigPopup::refreshTab() {
@@ -99,19 +120,19 @@ void CIConfigPopup::refreshTab() {
         btn->setEnabled(true);
         btn->toggle(false);
     }
-
-    m_useAllCheckbox->toggle(currentSetting().useAllIcons);
-    setReference(m_useAllCheckbox, currentSetting().useAllIcons);
+    for (auto btn : m_checkboxList) {
+        auto memberPtr = static_cast<CCMemberPtr<bool, TabSettings>*>(btn->getUserObject())->getValue();
+        btn->toggle(currentSetting().*memberPtr);
+    }
 
     m_iconListView->changeView(currentSetting().iconSet, m_currentTab);
 }
 
 void CIConfigPopup::onSettingCheckbox(CCObject* sender) {
     auto btn = static_cast<CCMenuItemToggler*>(sender);
-    auto refObj = static_cast<khronos::CCReference<bool>*>(btn->getUserObject());
+    auto memberPtr = static_cast<CCMemberPtr<bool, TabSettings>*>(btn->getUserObject())->getValue();
 
-    // Had to negate the bool because the actual bool gets changed after the callback
-    refObj->get() = !btn->isToggled();
+    currentSetting().*memberPtr = !btn->isToggled();
 }
 
 CIConfigPopup::~CIConfigPopup() {

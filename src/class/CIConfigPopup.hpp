@@ -14,6 +14,7 @@ protected:
     bool setup() override;
     void refreshTab();
     TabSettings& currentSetting();
+    CCMenuItemToggler* addCheckbox(bool TabSettings::* memberPtr, char const* name, cocos2d::Anchor anchor, cocos2d::CCPoint const& offset = cocos2d::CCPointZero, char const* info = nullptr);
     void onGamemodeTab(cocos2d::CCObject*);
     void onSettingCheckbox(cocos2d::CCObject*);
     ~CIConfigPopup();
@@ -21,7 +22,7 @@ protected:
     static inline CIConfigPopup* s_instance{};
     CITab& m_currentTab;
     cocos2d::CCMenu* m_tabNavMenu{};
-    CCMenuItemToggler* m_useAllCheckbox{};
+    geode::cocos::CCArrayExt<CCMenuItemToggler*> m_checkboxList;
     IconListView* m_iconListView;
 };
 
