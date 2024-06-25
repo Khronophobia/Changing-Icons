@@ -12,6 +12,7 @@ add_library(${PROJECT_NAME} SHARED
     src/CIUtilities.cpp
     src/class/CIManager.cpp
     src/class/CCMenuItemTriToggler.cpp
+    src/class/CCMenuItemTogglerEx.cpp
     src/class/CIConfigPopup.cpp
     src/class/IconCell.cpp
     src/class/IconListView.cpp

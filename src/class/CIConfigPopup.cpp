@@ -1,6 +1,5 @@
 #include "CIConfigPopup.hpp"
 #include "CIManager.hpp"
-#include "CCReference.hpp"
 #include <CIConstants.hpp>
 
 using namespace geode::prelude;
@@ -83,18 +82,13 @@ TabSettings& CIConfigPopup::currentSetting() {
     return CIManager::get()->getSetting(m_currentTab);
 }
 
-CCMenuItemToggler* CIConfigPopup::addCheckbox(bool TabSettings::* memberPtr, char const* name, Anchor anchor, CCPoint const& offset, char const* info) {
-    auto btn = CCMenuItemToggler::createWithStandardSprites(this, menu_selector(CIConfigPopup::onSettingCheckbox), 0.6f);
+khronos::CCMenuItemTogglerEx* CIConfigPopup::addCheckbox(bool TabSettings::* memberPtr, char const* name, Anchor anchor, CCPoint const& offset, char const* info) {
+    auto btn = khronos::CCMenuItemTogglerEx::createWithStandardSprites(this, menu_selector(CIConfigPopup::onSettingCheckbox), 0.6f, name);
     btn->updateSprite();
     btn->setUserObject(CCMemberPtr<bool, TabSettings>::create(memberPtr));
 
     m_checkboxList.push_back(btn);
     m_buttonMenu->addChildAtPosition(btn, anchor, offset);
-
-    auto text = CCLabelBMFont::create(name, "bigFont.fnt");
-    text->setAnchorPoint(ccp(0.f, 0.5f));
-    text->limitLabelWidth(200.f, 0.5f, 0.1f);
-    m_mainLayer->addChildAtPosition(text, anchor, offset + ccp(12.f, 0.f));
 
     if (info) {
         auto infoBtn = CCMenuItemExt::createSpriteExtraWithFrameName(
@@ -129,10 +123,10 @@ void CIConfigPopup::refreshTab() {
 }
 
 void CIConfigPopup::onSettingCheckbox(CCObject* sender) {
-    auto btn = static_cast<CCMenuItemToggler*>(sender);
+    auto btn = static_cast<khronos::CCMenuItemTogglerEx*>(sender);
     auto memberPtr = static_cast<CCMemberPtr<bool, TabSettings>*>(btn->getUserObject())->getValue();
 
-    currentSetting().*memberPtr = !btn->isToggled();
+    currentSetting().*memberPtr = btn->isToggled();
 }
 
 CIConfigPopup::~CIConfigPopup() {
