@@ -2,6 +2,15 @@
 #include "CIManager.hpp"
 #include <CIConstants.hpp>
 
+#define ADD_TAB_BUTTON(spr, mode) \
+auto __##spr##TabBtn = CCMenuItemToggler::create( \
+    CCSprite::createWithSpriteFrameName(GEODE_STR(gj_##spr##Btn_off_001.png)), \
+    CCSprite::createWithSpriteFrameName(GEODE_STR(gj_##spr##Btn_on_001.png)), \
+    this, menu_selector(CIConfigPopup::onGamemodeTab) \
+); \
+__##spr##TabBtn->setTag(static_cast<int>(CITab::mode)); \
+m_tabNavMenu->addChild(__##spr##TabBtn)
+
 using namespace geode::prelude;
 
 namespace ci {
@@ -36,15 +45,6 @@ bool CIConfigPopup::setup() {
     m_tabNavMenu->setContentWidth(m_size.width - 30.f);
     m_tabNavMenu->setLayout(RowLayout::create());
     m_mainLayer->addChildAtPosition(m_tabNavMenu, Anchor::Bottom, ccp(0.f, 24.f));
-
-#define ADD_TAB_BUTTON(spr, mode) \
-auto __##spr##TabBtn = CCMenuItemToggler::create( \
-    CCSprite::createWithSpriteFrameName(GEODE_STR(gj_##spr##Btn_off_001.png)), \
-    CCSprite::createWithSpriteFrameName(GEODE_STR(gj_##spr##Btn_on_001.png)), \
-    this, menu_selector(CIConfigPopup::onGamemodeTab) \
-); \
-__##spr##TabBtn->setTag(static_cast<int>(CITab::mode)); \
-m_tabNavMenu->addChild(__##spr##TabBtn)
 
     ADD_TAB_BUTTON(icon, Cube);
     ADD_TAB_BUTTON(ship, Ship);
